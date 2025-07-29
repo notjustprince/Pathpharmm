@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pathology Flashcards</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      color: #fff;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .card-container {
+      perspective: 1000px;
+      margin-bottom: 100px;
+    }
+
+    .card {
+      width: 260px;
+      height: 160px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.8s;
+      cursor: pointer;
+      border-radius: 16px;
+    }
+
+    .card-content {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      border-radius: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 18px;
+      text-align: center;
+      font-size: 1rem;
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+    }
+
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .buttons {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 10px 22px;
+      background-color: rgba(255, 255, 255, 0.8);
+      color: #333;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transition: transform 0.2s, background-color 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #f0f0f0;
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 400px) {
+      .card {
+        width: 90vw;
+        height: 150px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card-container">
+    <div class="card" onclick="flipCard()" id="flashcard">
+      <div class="card-content card-front" id="question">
+        What is the hallmark of reversible cell injury?
+      </div>
+      <div class="card-content card-back" id="answer">
+        Cellular swelling due to failure of ATP-dependent ion pumps.
+      </div>
+    </div>
+  </div>
+
+  <div class="buttons">
+    <button class="btn" onclick="prevCard()">Back</button>
+    <button class="btn" onclick="flipCard()">Flip</button>
+    <button class="btn" onclick="nextCard()">Next</button>
+  </div>
+
+  <script>
+    const flashcards = [
+      {
+        question: "What is the hallmark of reversible cell injury?",
+        answer: "Cellular swelling due to failure of ATP-dependent ion pumps."
+      },
+      {
+        question: "What is coagulative necrosis typically associated with?",
+        answer: "Ischemic infarction in all tissues except the brain."
+      },
+      {
+        question: "Which stain is used to identify amyloid deposits?",
+        answer: "Congo red stain under polarized light shows apple-green birefringence."
+      }
+      // ➕ Add more flashcards here
+    ];
+
+    let currentCard = 0;
+    let isFlipped = false;
+
+    function updateCard() {
+      const card = document.getElementById("flashcard");
+      card.classList.remove("flipped");
+      isFlipped = false;
+      document.getElementById("question").textContent = flashcards[currentCard].question;
+      document.getElementById("answer").textContent = flashcards[currentCard].answer;
+    }
+
+    function flipCard() {
+      const card = document.getElementById("flashcard");
+      isFlipped = !isFlipped;
+      card.classList.toggle("flipped");
+    }
+
+    function nextCard() {
+      currentCard = (currentCard + 1) % flashcards.length;
+      updateCard();
+    }
+
+    function prevCard() {
+      currentCard = (currentCard - 1 + flashcards.length) % flashcards.length;
+      updateCard();
+    }
+
+    updateCard();
+  </script>
+
+</body>
+</html>

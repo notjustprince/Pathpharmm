@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Path & Pharm Challenge</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      padding: 0;
+      margin: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      height: 100vh;
+      background: linear-gradient(to bottom right, #6a11cb, #2575fc);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    .title {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .subtitle {
+      font-size: 16px;
+      margin-bottom: 30px;
+      opacity: 0.85;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .buttons button {
+      padding: 15px 25px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+      transition: transform 0.2s ease, background 0.3s ease;
+    }
+
+    .buttons button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+
+    .buttons button:active {
+      transform: scale(0.95);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="title">🧠 Path & Pharm Challenge</h1>
+
+  <div class="container">
+    <p class="subtitle">Sharpen your brain, one question at a time!</p>
+    
+    <div class="buttons">
+      <button onclick="startGame();playclicksound()">▶ Start Game</button>
+      
+    </div>
+  </div>
+
+  <script>
+    function playclicksound() {
+      const audio = document.getElementById("click");
+      if (audio) audio.play();
+    }
+
+    function startGame() {
+  window.location.href = "pharma.html";
+}
+
+
+    function viewFlashcards() {
+  window.location.href = "flashcard.html";
+    }
+  </script>
+
+  <audio id="click" src="click.wav"></audio>
+
+</body>
+</html>

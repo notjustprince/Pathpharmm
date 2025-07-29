@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pharmacology Flashcards</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #6a85b6, #bac8e0);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.97);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .card-container {
+      perspective: 1200px;
+      margin-bottom: 100px;
+    }
+
+    .card {
+      width: 260px;
+      height: 160px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.8s ease;
+      cursor: pointer;
+      border-radius: 20px;
+    }
+
+    .card-content {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+      font-size: 1rem;
+      color: #fff;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+    }
+
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .buttons {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 10px 24px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 400px) {
+      .card {
+        width: 85vw;
+        height: 150px;
+      }
+
+      .btn {
+        padding: 8px 18px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card-container">
+    <div class="card" onclick="flipCard()" id="flashcard">
+      <div class="card-content card-front" id="question">
+        What is the mechanism of action of Aspirin?
+      </div>
+      <div class="card-content card-back" id="answer">
+        Aspirin irreversibly inhibits COX-1 and COX-2 enzymes.
+      </div>
+    </div>
+  </div>
+
+  <div class="buttons">
+    <button class="btn" onclick="prevCard()">Back</button>
+    <button class="btn" onclick="flipCard()">Flip</button>
+    <button class="btn" onclick="nextCard()">Next</button>
+  </div>
+
+  <script>
+    const flashcards = [
+      {
+        question: "What is the mechanism of action of Aspirin?",
+        answer: "Aspirin irreversibly inhibits COX-1 and COX-2 enzymes."
+      },
+      {
+        question: "What class of drug is Metoprolol?",
+        answer: "Metoprolol is a selective β1-blocker (beta-blocker)."
+      },
+      {
+        question: "What is the antidote for acetaminophen overdose?",
+        answer: "N-acetylcysteine (NAC)."
+      }
+      // Add more questions here
+    ];
+
+    let currentCard = 0;
+    let isFlipped = false;
+
+    function updateCard() {
+      const card = document.getElementById("flashcard");
+      card.classList.remove("flipped");
+      isFlipped = false;
+      document.getElementById("question").textContent = flashcards[currentCard].question;
+      document.getElementById("answer").textContent = flashcards[currentCard].answer;
+    }
+
+    function flipCard() {
+      const card = document.getElementById("flashcard");
+      isFlipped = !isFlipped;
+      card.classList.toggle("flipped");
+    }
+
+    function nextCard() {
+      currentCard = (currentCard + 1) % flashcards.length;
+      updateCard();
+    }
+
+    function prevCard() {
+      currentCard = (currentCard - 1 + flashcards.length) % flashcards.length;
+      updateCard();
+    }
+
+    updateCard();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Choose Flashcards</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #654ea3, #eaafc8);
+      overflow: hidden;
+      padding-bottom: 80px; /* for bottom nav */
+    }
+
+    .card {
+      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      padding: 40px 30px;
+      text-align: center;
+      width: 90%;
+      max-width: 420px;
+      color: #fff;
+    }
+
+    .card h1 {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      margin: 15px 0;
+      font-size: 16px;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    .btn i {
+      margin-right: 10px;
+    }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      z-index: 999;
+    }
+
+    .nav-item {
+      color: #fff;
+      font-size: 13px;
+      text-align: center;
+      flex: 1;
+    }
+
+    .nav-item span {
+      display: block;
+      font-size: 20px;
+      margin-bottom: 2px;
+    }
+
+    .nav-item.active {
+      font-weight: bold;
+      color: #ffffff;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<script>
+  let startX = 0;
+  let endX = 0;
+
+  document.addEventListener('touchstart', function(e) {
+    startX = e.touches[0].clientX;
+  });
+
+  document.addEventListener('touchend', function(e) {
+    endX = e.changedTouches[0].clientX;
+    handleSwipe();
+  });
+
+  function handleSwipe() {
+    const distance = endX - startX;
+
+    if (Math.abs(distance) > 50) {
+      if (distance > 0) {
+        // Swipe right
+        window.location.href = 'pathology.html';  // previous page
+      } else {
+        // Swipe left
+        window.location.href = 'flashcard.html';  // next page
+      }
+    }
+  }
+</script>
+<body>
+
+  <div class="card">
+    <h1>What would you like to study?</h1>
+    <button class="btn" onclick="location.href='pharmcard.html'">
+      <i class="fas fa-pills"></i> Pharmacology Flashcards
+    </button>
+    <button class="btn" onclick="location.href='pathcard.html'">
+      <i class="fas fa-heartbeat"></i> Pathology Flashcards
+    </button>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="location.href='pharma.html'">
+      <span><i class="fas fa-pills"></i></span>Pharma
+    </div>
+    <div class="nav-item" onclick="location.href='pathology.html'">
+      <span><i class="fas fa-flask"></i></span>Patho
+    </div>
+    <div class="nav-item active">
+      <span><i class="fas fa-layer-group"></i></span>Cards
+    </div>
+  </div>
+
+</body>
+</html>

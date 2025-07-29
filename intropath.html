@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pathology Game – Introduction</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #1e2a38;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .container {
+      text-align: center;
+      width: 90%;
+      max-width: 360px;
+      animation: fadeIn 0.8s ease;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1em;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(12px);
+    }
+    h1 {
+      font-size: 1.6em;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 0.2em;
+    }
+    h2 { margin-bottom: 1em; }
+    .option {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 0.4em 0;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease, transform 0.2s;
+    }
+    .option:hover { background-color: rgba(255, 255, 255, 0.3); }
+    .option.correct { background-color: #4caf50 !important; }
+    .option.incorrect { background-color: #f44336 !important; }
+    .score { margin-top: 1em; font-size: 1em; color: #b2ebf2; }
+    button {
+      margin-top: 1.2em;
+      padding: 8px 16px;
+      background: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      color: #0f9d58;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover { background: #d1f7e5; }
+    .explanation {
+      margin-top: 1em;
+      font-size: 0.9em;
+      background: rgba(255,255,255,0.08);
+      padding: 0.8em;
+      border-radius: 8px;
+    }
+    .progress-bar {
+      width: 100%; height: 8px;
+      background-color: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      margin-bottom: 1em;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background-color: #4caf50;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🧠 Test Your Pathology Knowledge</h1>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress"></div>
+    </div>
+    <h2 id="question">Loading question...</h2>
+    <div id="options"></div>
+    <div class="score" id="score">Score: 0</div>
+    <div class="explanation" id="explanation"></div>
+    <button onclick="nextQuestion()" id="nextBtn" style="display:none;">Next</button>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "What is pathology the study of?",
+        options: ["Drugs", "Diseases and tissue changes", "Nutrition", "Cells only"],
+        answer: 1,
+        explanation: "Pathology studies disease mechanisms and changes in tissues and organs."
+      },
+      {
+        question: "What term describes microscopic examination of cells?",
+        options: ["Histology", "Cytology", "Microbiology", "Biochemistry"],
+        answer: 1,
+        explanation: "Cytology is the study of individual cells under the microscope."
+      },
+      {
+        question: "Which branch of pathology deals with tissues?",
+        options: ["Clinical pathology", "Molecular pathology", "Histopathology", "Neuropathology"],
+        answer: 2,
+        explanation: "Histopathology focuses on tissue changes during disease."
+      },
+      {
+        question: "What is inflammation?",
+        options: ["Drug reaction", "Tissue response to injury", "Genetic mutation", "Cancer growth"],
+        answer: 1,
+        explanation: "Inflammation is tissue's protective response to injury or infection."
+      },
+      {
+        question: "Which pathology studies cancer?",
+        options: ["Hematology", "Cytopathology", "Oncology", "Oncologic pathology"],
+        answer: 3,
+        explanation: "Oncologic pathology focuses on the study of tumors and cancers."
+      }
+    ];
+    const more = [
+      {
+        question: "What does necrosis mean?",
+        options: ["Cell growth", "Cell death due to injury", "Infection", "Immune response"],
+        answer: 1,
+        explanation: "Necrosis is the uncontrolled death of cells due to damage."
+      },
+      {
+        question: "Which type of necrosis is characteristic of tuberculosis?",
+        options: ["Coagulative", "Liquefactive", "Caseous", "Fat necrosis"],
+        answer: 2,
+        explanation: "Caseous necrosis appears cheese‑like and is seen in TB lesions."
+      },
+      {
+        question: "What cells are first responders in acute inflammation?",
+        options: ["Lymphocytes", "Macrophages", "Neutrophils", "Eosinophils"],
+        answer: 2,
+        explanation: "Neutrophils are the main cells in acute inflammatory response."
+      },
+      {
+        question: "What is granuloma?",
+        options: ["Tumor", "Aggregates of activated macrophages", "Blood clot", "Scar tissue"],
+        answer: 1,
+        explanation: "Granulomas are clusters of activated macrophages—in infections and chronic inflammation."
+      },
+      {
+        question: "Which organelle often shows fatty change in disease?",
+        options: ["Mitochondria", "Nucleus", "Lipid droplet", "Golgi apparatus"],
+        answer: 2,
+        explanation: "Lipid droplet accumulation (fatty change) is a reversible injury response."
+      }
+      // add more of your pathology questions here...
+    ];
+    
+    questions.push(...more);
+    const moreQuestions = [
+  {
+    question: "What is metaplasia?",
+    options: ["Benign tumor", "Normal tissue", "Reversible change from one cell type to another", "Uncontrolled cell growth"],
+    answer: 2,
+    explanation: "Metaplasia is a reversible change where one differentiated cell type is replaced by another."
+  },
+  {
+    question: "Which type of necrosis is seen in ischemic brain injury?",
+    options: ["Coagulative", "Caseous", "Liquefactive", "Fat necrosis"],
+    answer: 2,
+    explanation: "Liquefactive necrosis occurs in the brain due to enzymatic digestion of tissue."
+  },
+  {
+    question: "What is amyloidosis?",
+    options: ["Immune deficiency", "Protein deposition in tissues", "Infection", "Cancer metastasis"],
+    answer: 1,
+    explanation: "Amyloidosis involves extracellular deposition of amyloid protein in organs."
+  },
+  {
+    question: "What is dystrophic calcification?",
+    options: ["Metastatic calcium deposit in normal tissues", "Calcification in dead or damaged tissue", "Calcium supplement side effect", "A bone tumor"],
+    answer: 1,
+    explanation: "Dystrophic calcification happens in necrotic or degenerated tissues despite normal serum calcium."
+  },
+  {
+    question: "What is thrombosis?",
+    options: ["Red blood cell destruction", "Formation of clot in vessel", "Loss of blood", "Viral infection"],
+    answer: 1,
+    explanation: "Thrombosis is formation of a blood clot within a vessel during life."
+  },
+  {
+    question: "Which embolus type is most common?",
+    options: ["Fat", "Air", "Thromboembolus", "Foreign body"],
+    answer: 2,
+    explanation: "Thromboembolus (dislodged clot) is the most frequent type of embolus."
+  },
+  {
+    question: "What is infarction?",
+    options: ["Infection spread", "Tissue death due to ischemia", "Autoimmune reaction", "Tumor formation"],
+    answer: 1,
+    explanation: "Infarction is tissue necrosis caused by obstruction of blood supply."
+  },
+  {
+    question: "Which cells dominate chronic inflammation?",
+    options: ["Neutrophils", "Eosinophils", "Lymphocytes and macrophages", "Basophils"],
+    answer: 2,
+    explanation: "Chronic inflammation features lymphocytes and macrophages rather than neutrophils."
+  },
+  {
+    question: "What does granulomatous inflammation include?",
+    options: ["Accumulation of neutrophils", "Fibrosis only", "Clusters of epithelioid macrophages", "Fat necrosis"],
+    answer: 2,
+    explanation: "Granulomas are formed by epithelioid macrophages often surrounded by lymphocytes."
+  },
+  {
+    question: "What is the hallmark of acute inflammation?",
+    options: ["Fibrosis", "Lymphocyte influx", "Neutrophil infiltration", "Granuloma formation"],
+    answer: 2,
+    explanation: "Acute inflammation is characterized by neutrophil accumulation in affected tissues."
+  },
+  {
+    question: "What is hyperplasia?",
+    options: ["Tumor formation", "Increase in cell size", "Increase in cell number", "Cell death"],
+    answer: 2,
+    explanation: "Hyperplasia is an increase in the number of cells in a tissue or organ."
+  },
+  {
+    question: "What is dysplasia?",
+    options: ["Benign tumor", "Maladaptive changes in tissue architecture", "Immune reaction", "Normal growth"],
+    answer: 1,
+    explanation: "Dysplasia refers to disordered growth with abnormal cell appearance, often pre-cancerous."
+  },
+  {
+    question: "What is a lipoma?",
+    options: ["Malignant fat tumor", "Benign fat tumor", "Inflammation", "Calcified lesion"],
+    answer: 1,
+    explanation: "Lipoma is a benign neoplasm composed of adipose tissue."
+  },
+  {
+    question: "Which cell type is a hallmark of viral infection?",
+    options: ["Histocytes", "Neutrophils", "Plasma cells", "Lymphocytes"],
+    answer: 3,
+    explanation: "Viral infections typically draw lymphocyte-predominant inflammation."
+  },
+  {
+    question: "What is hemochromatosis?",
+    options: ["Iron deficiency", "Excessive iron storage", "Calcium overload", "Protein misfolding"],
+    answer: 1,
+    explanation: "Hemochromatosis is pathological accumulation of iron in tissues."
+  },
+  {
+    question: "Which is a feature of coagulative necrosis?",
+    options: ["Liquefied tissue", "Outline preserved architecture", "Fat necrosis", "Abscess formation"],
+    answer: 1,
+    explanation: "In coagulative necrosis, tissue architecture is preserved despite cell death."
+  },
+  {
+    question: "Which molecule is a key mediator in acute inflammation?",
+    options: ["Interleukin‑1 (IL‑1)", "Hemoglobin", "Albumin", "Insulin"],
+    answer: 0,
+    explanation: "IL‑1 is a pro-inflammatory cytokine driving hallmark features of acute inflammation."
+  },
+  {
+    question: "What is pannus formation characteristic of?",
+    options: ["Osteoarthritis", "Rheumatoid arthritis", "Gout", "Fracture healing"],
+    answer: 1,
+    explanation: "Pannus is granulation-tissue-like inflammatory tissue seen in rheumatoid arthritis."
+  },
+  {
+    question: "What is amyloid seen on Congo red stain?",
+    options: ["Blue", "Apple-green birefringence", "Red", "Black"],
+    answer: 1,
+    explanation: "Amyloid shows apple‑green birefringence under polarized light with Congo red."
+  },
+  {
+    question: "What is steatosis?",
+    options: ["Inflammation", "Fatty liver change", "Cell necrosis", "Fibrosis"],
+    answer: 1,
+    explanation: "Steatosis refers to abnormal accumulation of fat in liver cells."
+  },
+  {
+    question: "What is fibrosis?",
+    options: ["Acute swelling", "Scarring of tissue", "Tumor growth", "Fat deposition"],
+    answer: 1,
+    explanation: "Fibrosis is replacement of normal tissue with collagen and scar tissue."
+  },
+  {
+    question: "Which neoplasm arises from epithelial tissue?",
+    options: ["Carcinoma", "Sarcoma", "Lymphoma", "Glioma"],
+    answer: 0,
+    explanation: "Carcinomas arise from epithelial cells."
+  },
+  {
+    question: "Which lesion is benign and well-differentiated?",
+    options: ["Adenoma", "Carcinoma", "Melanoma", "Lymphoma"],
+    answer: 0,
+    explanation: "Adenoma is a benign tumor of glandular epithelial tissue."
+  },
+  {
+    question: "What is apoptosis?",
+    options: ["Uncontrolled necrosis", "Programmed cell death", "Inflammatory cell rupture", "Cell replication"],
+    answer: 1,
+    explanation: "Apoptosis is regulated cell death without inflammation."
+  },
+  {
+    question: "What enzyme system is key for drug metabolism and important in pathology as well?",
+    options: ["Cytochrome P450", "ATP synthase", "DNA polymerase", "Lipase"],
+    answer: 0,
+    explanation: "Cytochrome P450 is central to metabolism and detoxification pathways."
+  },
+  {
+    question: "Which neoplasm is most likely malignant?",
+    options: ["Teratoma", "Lipoma", "Hemangioma", "Basal cell carcinoma"],
+    answer: 3,
+    explanation: "Basal cell carcinoma is a malignant skin tumor."
+  },
+  {
+    question: "What is dystrophic calcification often seen in?",
+    options: ["Normal tissue", "Fatty acid deposits", "Atherosclerotic plaque", "Muscle only"],
+    answer: 2,
+    explanation: "Dystrophic calcification commonly appears in atherosclerotic lesions."
+  },
+  {
+    question: "What is myxedema?",
+    options: ["Skin thickening in hypothyroidism", "Edema in kidney disease", "Liver disease", "Heart failure"],
+    answer: 0,
+    explanation: "Myxedema refers to non-pitting facial and skin edema in hypothyroid states."
+  },
+  {
+    question: "What pathology term describes new blood vessel formation?",
+    options: ["Hyperplasia", "Angiogenesis", "Metaplasia", "Atrophy"],
+    answer: 1,
+    explanation: "Angiogenesis is formation of new blood vessels, often seen in tissue repair or tumors."
+  },
+  {
+    question: "What is karyorrhexis?",
+    options: ["Nuclear fragmentation", "Cell growth", "Cell division", "Protein synthesis"],
+    answer: 0,
+    explanation: "Karyorrhexis is fragmentation of the nucleus during cell death."
+  }
+];
+questions.push(...moreQuestions);
+const morePathology = [
+  {
+    question: "What is atrophy?",
+    options: ["Increase in cell size", "Decrease in cell size or number", "Tumor growth", "Calcium deposit"],
+    answer: 1,
+    explanation: "Atrophy is a reduction in cell size or number due to decreased workload or nutrition."
+  },
+  {
+    question: "Which is a cause of cellular atrophy?",
+    options: ["Increased workload", "Hormonal stimulation", "Disuse", "Infection"],
+    answer: 2,
+    explanation: "Disuse or immobility often leads to muscle atrophy."
+  },
+  {
+    question: "What is hypertrophy?",
+    options: ["Increase in cell size", "Decrease in cell number", "Tumor type", "Calcium deposition"],
+    answer: 0,
+    explanation: "Hypertrophy refers to increase in individual cell size."
+  },
+  {
+    question: "Which condition shows fatty change in the liver?",
+    options: ["Cirrhosis", "Steatosis", "Fibrosis", "Granuloma"],
+    answer: 1,
+    explanation: "Steatosis is fat accumulation in liver cells."
+  },
+  {
+    question: "Which inflammatory mediator increases vascular permeability?",
+    options: ["Histamine", "Albumin", "Insulin", "Hemoglobin"],
+    answer: 0,
+    explanation: "Histamine causes dilation and increased permeability in capillaries."
+  },
+  {
+    question: "What is a pseudomembrane in diphtheria?",
+    options: ["Calcified tissue", "Layer of fibrin and dead cells", "Tumor", "Granuloma"],
+    answer: 1,
+    explanation: "Pseudomembranes form from fibrin and necrotic debris in diphtheria."
+  },
+  {
+    question: "Which type of necrosis is found in acute pancreatitis?",
+    options: ["Caseous", "Fat necrosis", "Coagulative", "Liquefactive"],
+    answer: 1,
+    explanation: "Fat necrosis in the pancreas is due to lipase activity on fat cells."
+  },
+  {
+    question: "Which form of cell death is energy-dependent and programmed?",
+    options: ["Autophagy", "Necrosis", "Apoptosis", "Oncosis"],
+    answer: 2,
+    explanation: "Apoptosis is regulated and requires energy for cell dismantling."
+  },
+  {
+    question: "Which disease is associated with accumulation of misfolded tau protein?",
+    options: ["Alzheimer's disease", "Parkinson's", "Amyotrophic lateral sclerosis", "Huntington's"],
+    answer: 0,
+    explanation: "Tau protein accumulation is a hallmark of Alzheimer's disease."
+  },
+  {
+    question: "What is gout?",
+    options: ["Calcium deposition", "Uric acid crystal deposition in joints", "Infection", "Amyloid disease"],
+    answer: 1,
+    explanation: "Gout results from urate crystal build-up in joint spaces."
+  },
+  {
+    question: "Which lesion is benign and well-circumscribed?",
+    options: ["Malignant melanoma", "Adenoma", "Metastasis", "Sarcoma"],
+    answer: 1,
+    explanation: "Adenomas are benign and have clear boundaries."
+  },
+  {
+    question: "What is a hamartoma?",
+    options: ["Malignant tumor", "Malformation of tissue components", "Inflammatory lesion", "Scar tissue"],
+    answer: 1,
+    explanation: "Hamartoma is disorganized overgrowth of normal tissue elements."
+  },
+  {
+    question: "Which cytokine stimulates fibroblast proliferation?",
+    options: ["IL-1", "IL-6", "Transforming growth factor-beta (TGF-β)", "TNF-alpha"],
+    answer: 2,
+    explanation: "TGF‑β plays a central role in fibrosis by activating fibroblasts."
+  },
+  {
+    question: "Which cellular adaptation is often reversible?",
+    options: ["Dysplasia", "Metaplasia", "Neoplasia", "Apoptosis"],
+    answer: 1,
+    explanation: "Metaplasia can reverse if the injurious stimulus is removed."
+  },
+  {
+    question: "What is osteoarthritis characterized by?",
+    options: ["Autoimmune joint destruction", "Cartilage wear and bone remodeling", "Granuloma formation", "Amyloid deposition"],
+    answer: 1,
+    explanation: "Osteoarthritis involves cartilage breakdown with bone remodeling."
+  },
+  {
+    question: "Which mutation is characteristic of chronic myeloid leukemia?",
+    options: ["BRAF V600E", "Philadelphia chromosome (BCR-ABL)", "TP53 deletion", "BRCA1 mutation"],
+    answer: 1,
+    explanation: "Philadelphia chromosome (BCR‑ABL translocation) is hallmark of CML."
+  },
+  {
+    question: "What does ischemia refer to?",
+    options: ["Excess blood flow", "Lack of blood supply", "Infection", "Tumor invasion"],
+    answer: 1,
+    explanation: "Ischemia is insufficient blood flow to tissue, causing hypoxia and damage."
+  },
+  {
+    question: "What is autolysis?",
+    options: ["Enzymatic self-digestion after death", "Inflammation", "Cell division", "Calcification"],
+    answer: 0,
+    explanation: "Autolysis is self-destruction of cells post-mortem via enzymes."
+  },
+  {
+    question: "Which structural change happens in Alzheimer’s disease?",
+    options: ["Lewy bodies", "Neurofibrillary tangles", "Granulomas", "Amyloid plaques only"],
+    answer: 1,
+    explanation: "Neurofibrillary tangles of tau protein are key Alzheimer's features."
+  },
+  {
+    question: "What is amyloid light-chain (AL) amyloidosis?",
+    options: ["Iron deposition", "Result of immunoglobulin light-chain misfolding", "Calcium metabolism", "Fatty liver disease"],
+    answer: 1,
+    explanation: "AL amyloidosis arises from monoclonal light chains deposited in organs."
+  },
+  {
+    question: "What is edema?",
+    options: ["Cell death", "Excess fluid in tissues", "Tumor formation", "Calcification"],
+    answer: 1,
+    explanation: "Edema is accumulation of fluid in interstitial spaces."
+  },
+  {
+    question: "Which vessel change occurs in hypertension?",
+    options: ["Aneurysm", "Atherosclerosis", "Hyaline arteriolosclerosis", "Thrombosis"],
+    answer: 2,
+    explanation: "Hyaline arteriolosclerosis involves thickened vessel walls due to hypertension."
+  },
+  {
+    question: "Which is a characteristic of malignant cells?",
+    options: ["Slow growth", "Well-differentiated", "Anaplasia and invasion", "No mitotic activity"],
+    answer: 2,
+    explanation: "Malignant tumors exhibit anaplasia (cellular dedifferentiation) and invasion."
+  },
+  {
+    question: "What is oncogenesis?",
+    options: ["Normal cell growth", "Process of tumor formation", "Cell death", "Inflammation"],
+    answer: 1,
+    explanation: "Oncogenesis is the development and progression of cancer."
+  },
+  {
+    question: "Which factor is NOT a carcinogen?",
+    options: ["Asbestos", "UV radiation", "Coffee", "Tobacco smoke"],
+    answer: 2,
+    explanation: "Coffee is not considered a carcinogenic agent."
+  },
+  {
+    question: "What is cachexia?",
+    options: ["Weight gain", "Weight loss and muscle wasting in chronic disease", "Inflammatory nodule", "Tumor mass"],
+    answer: 1,
+    explanation: "Cachexia is wasting syndrome often seen in advanced cancer."
+  },
+  {
+    question: "What is leukocytosis?",
+    options: ["Low white blood cell count", "High white blood cell count", "Platelet count change", "Red blood cell abnormality"],
+    answer: 1,
+    explanation: "Leukocytosis is an elevated WBC count, often seen in infection or leukemia."
+  },
+  {
+    question: "Which enzyme degrades collagen in inflammation?",
+    options: ["Collagenase", "Lipase", "Amylase", "Kinase"],
+    answer: 0,
+    explanation: "Collagenase breaks down collagen during tissue remodeling."
+  },
+  {
+    question: "Which cancer metastasizes most commonly to brain?",
+    options: ["Melanoma", "Basal cell carcinoma", "Squamous cell carcinoma", "Adenoma"],
+    answer: 0,
+    explanation: "Melanoma has high metastatic potential and often spreads to brain."
+  },
+  {
+    question: "What is poikilocytosis?",
+    options: ["Abnormally shaped red blood cells", "High WBC count", "Platelet clumping", "Bone marrow fibrosis"],
+    answer: 0,
+    explanation: "Poikilocytosis refers to variation in RBC shape."
+  }
+];
+
+questions.push(...morePathology);
+
+    let current = 0, score = 0;
+    const shuffled = [...questions].sort(() => Math.random() - 0.5);
+
+    function loadQuestion() {
+      const q = shuffled[current];
+      document.getElementById("question").textContent = q.question;
+      document.getElementById("explanation").textContent = "";
+      document.getElementById("nextBtn").style.display = "none";
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
+      const opts = q.options.map((opt,i) => ({text:opt,index:i}))
+                  .sort(() => Math.random() - 0.5);
+      opts.forEach(({text,index}) => {
+        const div = document.createElement("div");
+        div.className = "option";
+        div.textContent = text;
+        div.onclick = () => checkAnswer(index, div);
+        optionsDiv.appendChild(div);
+      });
+      document.getElementById("score").textContent = `Score: ${score}`;
+      document.getElementById("progress").style.width = `${(current / shuffled.length) * 100}%`;
+    }
+
+    function checkAnswer(selected, el) {
+      const correct = shuffled[current].answer;
+      const explanation = shuffled[current].explanation;
+      const all = document.querySelectorAll(".option");
+      all.forEach(o => o.onclick = null);
+      if (selected === correct) { el.classList.add("correct"); score++; }
+      else { el.classList.add("incorrect"); all[correct].classList.add("correct"); }
+      document.getElementById("score").textContent = `Score: ${score}`;
+      document.getElementById("explanation").textContent = explanation;
+      document.getElementById("nextBtn").style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current < shuffled.length) loadQuestion();
+      else {
+        alert(`🎉 Finished! Score: ${score}/${shuffled.length}`);
+        current = 0; score = 0; loadQuestion();
+      }
+    }
+
+    window.onload = loadQuestion;
+  </script>
+</body>
+</html>

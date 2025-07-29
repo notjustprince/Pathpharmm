@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pharma Game - Introduction</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #1e2a38;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      text-align: center;
+      width: 90%;
+      max-width: 360px;
+      animation: fadeIn 0.8s ease;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1em;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(12px);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 0.2em;
+    }
+
+    h2 {
+      margin-bottom: 1em;
+    }
+
+    .option {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 0.4em 0;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease, transform 0.2s;
+    }
+
+    .option:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .option.correct {
+      background-color: #4caf50 !important;
+    }
+
+    .option.incorrect {
+      background-color: #f44336 !important;
+    }
+
+    .score {
+      margin-top: 1em;
+      font-size: 1em;
+      color: #b2ebf2;
+    }
+
+    button {
+      margin-top: 1.2em;
+      padding: 8px 16px;
+      background: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      color: #0f9d58;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #d1f7e5;
+    }
+
+    .explanation {
+      margin-top: 1em;
+      font-size: 0.9em;
+      background: rgba(255,255,255,0.08);
+      padding: 0.8em;
+      border-radius: 8px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background-color: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      margin-bottom: 1em;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: #4caf50;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <audio autoplay loop>
+    <source src="background-music.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="container">
+    <h1>🧠 Choose Your Battle Wisely</h1>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress"></div>
+    </div>
+    <h2 id="question">Loading question...</h2>
+    <div id="options"></div>
+    <div class="score" id="score">Score: 0</div>
+    <div class="explanation" id="explanation"></div>
+    <button onclick="nextQuestion()" id="nextBtn" style="display:none;">Next</button>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "What is the study of drugs and their interactions with living systems called?",
+        options: ["Pharmacology", "Toxicology", "Physiology", "Microbiology"],
+        answer: 0,
+        explanation: "Pharmacology is the science that deals with the study of drugs and how they interact with the body."
+      },
+      {
+        question: "Which of these best defines a drug?",
+        options: ["A type of food", "A chemical used to diagnose, treat, or prevent disease", "A nutrient supplement", "A vitamin"],
+        answer: 1,
+        explanation: "A drug is any chemical substance that affects the processes of the body and is used in diagnosis, treatment, or prevention of diseases."
+      },
+      {
+        question: "Who is considered the father of modern pharmacology?",
+        options: ["Paul Ehrlich", "Paracelsus", "Claude Bernard", "Oswald Schmiedeberg"],
+        answer: 3,
+        explanation: "Oswald Schmiedeberg is widely recognized as the father of modern pharmacology."
+      },
+      {
+        question: "Which of the following terms describes the movement of drugs within the body?",
+        options: ["Pharmacokinetics", "Pharmacodynamics", "Pharmacogenetics", "Pharmacy"],
+        answer: 0,
+        explanation: "Pharmacokinetics involves absorption, distribution, metabolism, and excretion of drugs — what the body does to the drug."
+      },
+      {
+        question: "What does pharmacodynamics study?",
+        options: ["How the body affects a drug", "How drugs affect the body", "Drug prices", "Drug marketing"],
+        answer: 1,
+        explanation: "Pharmacodynamics focuses on how the drug produces its effects in the body — what the drug does to the body."
+      },
+      
+    ];
+    const moreQuestions = [
+  {
+    question: "What does pharmacology primarily study?",
+    options: ["The human genome", "Diseases", "Drugs and their effects on the body", "Nutrition"],
+    answer: 2,
+    explanation: "Pharmacology is the science of drugs and their interactions with biological systems."
+  },
+  {
+    question: "Which term describes how the body affects a drug?",
+    options: ["Pharmacokinetics", "Pharmacodynamics", "Pharmacy", "Pharmacogenomics"],
+    answer: 0,
+    explanation: "Pharmacokinetics includes absorption, distribution, metabolism, and excretion."
+  },
+  {
+    question: "Which process involves the chemical alteration of a drug in the body?",
+    options: ["Absorption", "Distribution", "Metabolism", "Excretion"],
+    answer: 2,
+    explanation: "Metabolism modifies drugs, usually in the liver, to facilitate excretion."
+  },
+  {
+    question: "What is bioavailability?",
+    options: ["Rate of metabolism", "Rate of distribution", "Fraction of drug reaching circulation", "Drug clearance rate"],
+    answer: 2,
+    explanation: "Bioavailability refers to how much of the drug enters the systemic circulation intact."
+  },
+  {
+    question: "The half-life of a drug is defined as:",
+    options: ["Time to full absorption", "Time to eliminate 50% of the drug", "Time to metabolize the drug", "Duration of drug effect"],
+    answer: 1,
+    explanation: "Half-life is the time required to reduce the drug concentration by half."
+  },
+  {
+    question: "Which organ is most responsible for drug metabolism?",
+    options: ["Liver", "Kidney", "Stomach", "Lungs"],
+    answer: 0,
+    explanation: "The liver is the primary site for metabolizing most drugs."
+  },
+  {
+    question: "What term describes how drugs affect the body?",
+    options: ["Pharmacokinetics", "Pharmacodynamics", "Pharmacogenomics", "Toxicology"],
+    answer: 1,
+    explanation: "Pharmacodynamics studies the mechanisms and effects of drugs on the body."
+  },
+  {
+    question: "Which route has the highest first-pass effect?",
+    options: ["Intravenous", "Sublingual", "Oral", "Inhalation"],
+    answer: 2,
+    explanation: "Oral drugs are subject to extensive metabolism in the liver before reaching circulation."
+  },
+  {
+    question: "A drug that activates a receptor is called a:",
+    options: ["Blocker", "Antagonist", "Agonist", "Inhibitor"],
+    answer: 2,
+    explanation: "An agonist binds to and activates a receptor."
+  },
+  {
+    question: "What is the primary route for drug excretion?",
+    options: ["Liver", "Intestines", "Lungs", "Kidneys"],
+    answer: 3,
+    explanation: "Most drugs are excreted through the kidneys in urine."
+  },
+  {
+    question: "Which of the following drugs bypasses the first-pass metabolism?",
+    options: ["Oral tablet", "Rectal suppository", "Sublingual tablet", "Capsule"],
+    answer: 2,
+    explanation: "Sublingual drugs are absorbed directly into the bloodstream."
+  },
+  {
+    question: "What is the study of harmful effects of drugs?",
+    options: ["Pharmacology", "Toxicology", "Therapeutics", "Physiology"],
+    answer: 1,
+    explanation: "Toxicology focuses on adverse and poisonous effects of substances."
+  },
+  {
+    question: "Which term refers to the lowest dose that produces a measurable effect?",
+    options: ["Toxic dose", "Loading dose", "Threshold dose", "Effective dose"],
+    answer: 2,
+    explanation: "Threshold dose is the minimum amount needed to see an effect."
+  },
+  {
+    question: "Which drug class ends in '-pril'?",
+    options: ["Beta blockers", "ACE inhibitors", "Diuretics", "Calcium channel blockers"],
+    answer: 1,
+    explanation: "ACE inhibitors like enalapril end with '-pril'."
+  },
+  {
+    question: "Which phase of clinical trials tests drug safety in healthy volunteers?",
+    options: ["Phase I", "Phase II", "Phase III", "Phase IV"],
+    answer: 0,
+    explanation: "Phase I evaluates drug safety and dosage in healthy subjects."
+  },
+  {
+    question: "Which phase involves post-marketing surveillance?",
+    options: ["Phase I", "Phase II", "Phase III", "Phase IV"],
+    answer: 3,
+    explanation: "Phase IV collects data on drug effects after FDA approval."
+  },
+  {
+    question: "Which term refers to drug interaction with receptors?",
+    options: ["Pharmacokinetics", "Pharmacodynamics", "Toxicology", "Pharmaceutics"],
+    answer: 1,
+    explanation: "Pharmacodynamics covers receptor binding and responses."
+  },
+  {
+    question: "Which of the following is a drug antagonist?",
+    options: ["Insulin", "Adrenaline", "Naloxone", "Dopamine"],
+    answer: 2,
+    explanation: "Naloxone blocks opioid receptors and is an opioid antagonist."
+  },
+  {
+    question: "What property determines how well a drug binds to its receptor?",
+    options: ["Affinity", "Efficacy", "Bioavailability", "Potency"],
+    answer: 0,
+    explanation: "Affinity describes the strength of drug-receptor binding."
+  },
+  {
+    question: "What is a prodrug?",
+    options: ["Inactive compound converted into active form", "Overdose medication", "Vaccine", "Topical drug"],
+    answer: 0,
+    explanation: "Prodrugs become active after metabolism in the body."
+  },
+  {
+    question: "What does a high therapeutic index indicate?",
+    options: ["Drug is potent", "Drug is effective", "Drug is safe", "Drug is toxic"],
+    answer: 2,
+    explanation: "A high therapeutic index suggests a wide margin of safety."
+  },
+  {
+    question: "What is the primary function of an enzyme inducer?",
+    options: ["Inhibits metabolism", "Slows absorption", "Accelerates metabolism", "Blocks receptors"],
+    answer: 2,
+    explanation: "Enzyme inducers increase metabolic enzyme activity, lowering drug levels."
+  },
+  {
+    question: "Which form of drug crosses membranes most easily?",
+    options: ["Ionized", "Charged", "Non-ionized", "Salt"],
+    answer: 2,
+    explanation: "Non-ionized (lipophilic) drugs cross lipid membranes more readily."
+  },
+  {
+    question: "What does steady-state concentration mean?",
+    options: ["Highest drug level", "Equal intake and elimination", "Toxic level", "Single dose peak"],
+    answer: 1,
+    explanation: "Steady-state is reached when drug input equals elimination rate."
+  },
+  {
+    question: "Which term refers to the max response a drug can produce?",
+    options: ["Potency", "Efficacy", "Affinity", "Toxicity"],
+    answer: 1,
+    explanation: "Efficacy measures the drug's maximal effect."
+  }
+  // Add 25 more in the same format if needed
+];
+
+// 🔗 Then append to your main questions array:
+questions.push(...moreQuestions);
+moreQuestions.push(
+  {
+    question: "What is a placebo?",
+    options: ["An actual drug", "An inactive substance", "A vitamin", "A stimulant"],
+    answer: 1,
+    explanation: "A placebo is an inert substance used in clinical trials as a control."
+  },
+  {
+    question: "What is the primary organ for drug excretion?",
+    options: ["Heart", "Skin", "Kidneys", "Liver"],
+    answer: 2,
+    explanation: "Kidneys are the main route of drug excretion via urine."
+  },
+  {
+    question: "What term refers to a drug’s strength at a given dose?",
+    options: ["Efficacy", "Affinity", "Potency", "Toxicity"],
+    answer: 2,
+    explanation: "Potency is the amount of drug needed to produce an effect."
+  },
+  {
+    question: "Which is NOT a route of drug administration?",
+    options: ["Oral", "Intramuscular", "Intravenous", "Photosynthetic"],
+    answer: 3,
+    explanation: "Photosynthetic is not a method of administering drugs."
+  },
+  {
+    question: "What is a side effect?",
+    options: ["Therapeutic effect", "Main drug action", "Unwanted secondary effect", "Drug overdose"],
+    answer: 2,
+    explanation: "Side effects are unintended effects of a drug."
+  },
+  {
+    question: "Which dosage form is absorbed the fastest?",
+    options: ["Capsule", "Tablet", "Sublingual", "Topical cream"],
+    answer: 2,
+    explanation: "Sublingual bypasses digestion and acts quickly via oral mucosa."
+  },
+  {
+    question: "What is drug tolerance?",
+    options: ["Reduced response over time", "Increased effectiveness", "Toxicity", "Liver damage"],
+    answer: 0,
+    explanation: "Tolerance means decreased response after repeated use."
+  },
+  {
+    question: "Which term describes drug movement from blood to tissues?",
+    options: ["Absorption", "Distribution", "Metabolism", "Excretion"],
+    answer: 1,
+    explanation: "Distribution refers to the dispersion of a drug into tissues."
+  },
+  {
+    question: "Which term refers to a drug that blocks receptor action?",
+    options: ["Antagonist", "Agonist", "Prodrug", "Enzyme"],
+    answer: 0,
+    explanation: "Antagonists bind to receptors but do not activate them."
+  },
+  {
+    question: "What does LD50 mean?",
+    options: ["Effective dose", "Minimum toxic dose", "Lethal dose for 50% of population", "Lowest dose"],
+    answer: 2,
+    explanation: "LD50 is the dose that causes death in 50% of subjects."
+  },
+  {
+    question: "Which class includes drugs like ibuprofen?",
+    options: ["Antibiotics", "NSAIDs", "Antivirals", "Beta blockers"],
+    answer: 1,
+    explanation: "Ibuprofen is a nonsteroidal anti-inflammatory drug (NSAID)."
+  },
+  {
+    question: "What is a teratogen?",
+    options: ["A cancer drug", "A toxic waste", "A drug causing birth defects", "An antibiotic"],
+    answer: 2,
+    explanation: "Teratogens can cause malformations in the developing fetus."
+  },
+  {
+    question: "Which factor does NOT affect drug absorption?",
+    options: ["Food", "pH", "Molecular size", "Color of the pill"],
+    answer: 3,
+    explanation: "Color has no pharmacokinetic effect on absorption."
+  },
+  {
+    question: "Which organ is MOST involved in drug detoxification?",
+    options: ["Liver", "Lungs", "Kidneys", "Brain"],
+    answer: 0,
+    explanation: "The liver is the main site for detoxifying chemicals."
+  },
+  {
+    question: "A drug with high first-pass effect should be given:",
+    options: ["Orally", "Rectally", "Intravenously", "Topically"],
+    answer: 2,
+    explanation: "IV administration avoids liver metabolism and improves bioavailability."
+  },
+  {
+    question: "Which route offers fastest drug action?",
+    options: ["Oral", "Intramuscular", "Intravenous", "Transdermal"],
+    answer: 2,
+    explanation: "IV administration delivers drug directly into bloodstream for instant effect."
+  },
+  {
+    question: "Which of the following can delay drug excretion?",
+    options: ["Fasting", "Renal failure", "Exercise", "Cold temperature"],
+    answer: 1,
+    explanation: "Renal failure reduces kidney function, slowing excretion."
+  },
+  {
+    question: "What term defines the body's ability to eliminate drugs?",
+    options: ["Metabolism", "Clearance", "Potency", "Toxicity"],
+    answer: 1,
+    explanation: "Clearance describes the body's efficiency in removing drugs."
+  },
+  {
+    question: "Which drug form bypasses absorption process?",
+    options: ["IV injection", "Oral capsule", "Inhaler", "Topical gel"],
+    answer: 0,
+    explanation: "IV drugs are introduced directly into systemic circulation."
+  },
+  {
+    question: "What is drug-drug interaction?",
+    options: ["Taking expired drugs", "Combined effect of two drugs", "Allergic reaction", "Mixing with alcohol only"],
+    answer: 1,
+    explanation: "Drug interactions occur when two drugs influence each other’s effects."
+  },
+  {
+    question: "The 'loading dose' is used to:",
+    options: ["Reduce toxicity", "Treat overdose", "Reach therapeutic level faster", "Test for allergy"],
+    answer: 2,
+    explanation: "A loading dose quickly achieves effective drug levels."
+  },
+  {
+    question: "What is an adverse drug reaction?",
+    options: ["Positive effect", "Expected therapeutic result", "Harmful, unintended effect", "Placebo effect"],
+    answer: 2,
+    explanation: "Adverse reactions are negative side effects of medications."
+  },
+  {
+    question: "Which route is best for unconscious patients?",
+    options: ["Oral", "Sublingual", "IV", "Transdermal"],
+    answer: 2,
+    explanation: "IV administration is preferred when the patient can't swallow."
+  },
+  {
+    question: "Which organ is NOT part of ADME?",
+    options: ["Liver", "Skin", "Kidneys", "Intestines"],
+    answer: 1,
+    explanation: "Skin is not a primary ADME organ."
+  },
+  {
+    question: "What does MEC stand for?",
+    options: ["Minimum Effective Concentration", "Maximum Efficiency Curve", "Metabolized Elimination Control", "Main Enzyme Clearance"],
+    answer: 0,
+    explanation: "MEC is the lowest concentration needed for a therapeutic effect."
+  }
+);
+moreQuestions.push(
+  {
+    question: "Which factor most affects oral drug bioavailability?",
+    options: ["Molecular size", "Taste", "First-pass metabolism", "Color"],
+    answer: 2,
+    explanation: "First-pass metabolism in the liver significantly reduces bioavailability of orally administered drugs."
+  },
+  {
+    question: "What is the definition of a receptor?",
+    options: ["A hormone", "A cell membrane", "A protein that binds drugs", "A neurotransmitter"],
+    answer: 2,
+    explanation: "A receptor is a protein that binds a drug to produce a biological response."
+  },
+  {
+    question: "What is the primary goal of Phase II clinical trials?",
+    options: ["Safety in healthy volunteers", "Dose optimization", "Efficacy in patients", "Market approval"],
+    answer: 2,
+    explanation: "Phase II focuses on testing drug effectiveness in patients."
+  },
+  {
+    question: "Which of the following is a pharmacokinetic property?",
+    options: ["Receptor binding", "Drug absorption", "Adverse effect", "Therapeutic use"],
+    answer: 1,
+    explanation: "Absorption is part of pharmacokinetics, describing how a drug enters circulation."
+  },
+  {
+    question: "Which part of ADME involves the breakdown of drugs?",
+    options: ["Absorption", "Distribution", "Metabolism", "Excretion"],
+    answer: 2,
+    explanation: "Metabolism involves enzymatic conversion, often in the liver."
+  },
+  {
+    question: "Which of the following is a common site for drug action?",
+    options: ["Teeth", "Receptors", "Nails", "Bone marrow"],
+    answer: 1,
+    explanation: "Most drugs work by binding to receptors."
+  },
+  {
+    question: "Which best describes a competitive antagonist?",
+    options: ["Irreversibly binds to receptor", "Competes with agonist at same site", "Activates receptor", "Blocks absorption"],
+    answer: 1,
+    explanation: "Competitive antagonists reversibly bind the same site as agonists."
+  },
+  {
+    question: "Which organ system is primarily involved in drug elimination?",
+    options: ["Respiratory", "Digestive", "Renal", "Reproductive"],
+    answer: 2,
+    explanation: "The renal system (kidneys) is the main route of drug excretion."
+  },
+  {
+    question: "What is pharmacogenetics?",
+    options: ["Genetic diseases", "Drug-induced mutation", "Genetic variation in drug response", "Drug allergies"],
+    answer: 2,
+    explanation: "Pharmacogenetics studies how genetic differences affect drug response."
+  },
+  {
+    question: "What does EC50 represent?",
+    options: ["Toxic concentration", "Effective dose for 50% max response", "Drug clearance rate", "Half-life"],
+    answer: 1,
+    explanation: "EC50 is the concentration of a drug that gives half-maximal response."
+  },
+  {
+    question: "Which class of drugs ends in '-olol'?",
+    options: ["ACE inhibitors", "Calcium channel blockers", "Beta blockers", "NSAIDs"],
+    answer: 2,
+    explanation: "Beta blockers like atenolol and metoprolol end in '-olol'."
+  },
+  {
+    question: "Which drug class is commonly used for bacterial infections?",
+    options: ["Antibiotics", "Antivirals", "Antifungals", "Beta-blockers"],
+    answer: 0,
+    explanation: "Antibiotics treat bacterial infections by killing or inhibiting growth."
+  },
+  {
+    question: "What is the main purpose of a maintenance dose?",
+    options: ["Quick therapeutic effect", "Prevent overdose", "Sustain drug levels", "Test drug resistance"],
+    answer: 2,
+    explanation: "Maintenance doses help sustain therapeutic levels over time."
+  },
+  {
+    question: "What route of administration is best for slow, continuous absorption?",
+    options: ["IV", "Transdermal", "Oral", "Sublingual"],
+    answer: 1,
+    explanation: "Transdermal patches provide slow, steady drug release through skin."
+  },
+  {
+    question: "What is the purpose of a drug’s chemical name?",
+    options: ["Marketing", "Describe structure", "Identify dosage", "Indicate brand"],
+    answer: 1,
+    explanation: "Chemical names describe the molecular structure of a drug."
+  },
+  {
+    question: "Which factor most affects distribution of a drug?",
+    options: ["Plasma protein binding", "Tablet size", "Flavor", "Dose time"],
+    answer: 0,
+    explanation: "Drugs bound to plasma proteins cannot easily cross membranes for distribution."
+  },
+  {
+    question: "Which term describes a substance that causes cancer?",
+    options: ["Allergen", "Carcinogen", "Antigen", "Mutagen"],
+    answer: 1,
+    explanation: "Carcinogens are agents that promote the formation of cancer."
+  },
+  {
+    question: "Drugs that reduce the action of the sympathetic nervous system are called:",
+    options: ["Parasympatholytics", "Sympathomimetics", "Sympatholytics", "Cholinergics"],
+    answer: 2,
+    explanation: "Sympatholytics inhibit sympathetic nervous system activity."
+  },
+  {
+    question: "A narrow therapeutic index means:",
+    options: ["Safe drug", "Broad dosing range", "Small margin between safe/toxic doses", "No monitoring needed"],
+    answer: 2,
+    explanation: "Drugs with narrow TI require close monitoring due to toxicity risks."
+  },
+  {
+    question: "Which term describes drug removal from the body?",
+    options: ["Distribution", "Excretion", "Metabolism", "Absorption"],
+    answer: 1,
+    explanation: "Excretion refers to elimination of drugs, usually via kidneys."
+  },
+  {
+    question: "Which administration route provides local effect only?",
+    options: ["Topical", "IV", "Oral", "Sublingual"],
+    answer: 0,
+    explanation: "Topical drugs act on the skin surface or local area without systemic absorption."
+  },
+  {
+    question: "A drug that mimics natural neurotransmitter action is a:",
+    options: ["Prodrug", "Antagonist", "Agonist", "Beta-blocker"],
+    answer: 2,
+    explanation: "Agonists bind receptors and mimic endogenous substances."
+  },
+  {
+    question: "What is drug efficacy?",
+    options: ["Ability to bind receptors", "Maximum effect achievable", "Dose-response relationship", "Absorption rate"],
+    answer: 1,
+    explanation: "Efficacy is the maximum therapeutic effect a drug can produce."
+  },
+  {
+    question: "Which phase of clinical trials involves thousands of patients?",
+    options: ["Phase I", "Phase II", "Phase III", "Phase IV"],
+    answer: 2,
+    explanation: "Phase III evaluates drug safety and effectiveness on a large scale."
+  },
+  {
+    question: "A drug with high lipid solubility likely:",
+    options: ["Is excreted quickly", "Crosses cell membranes easily", "Remains in GI tract", "Acts only locally"],
+    answer: 1,
+    explanation: "Lipid-soluble drugs penetrate membranes easily and distribute widely."
+  },
+  {
+    question: "What is a black box warning?",
+    options: ["Side effect summary", "Strongest safety alert by FDA", "Label expiration date", "Dosage instruction"],
+    answer: 1,
+    explanation: "Black box warnings highlight serious or life-threatening risks."
+  },
+  {
+    question: "What is the main advantage of oral administration?",
+    options: ["Fastest effect", "Highest safety", "Convenience and compliance", "No first-pass effect"],
+    answer: 2,
+    explanation: "Oral route is easy, cheap, and widely accepted."
+  },
+  {
+    question: "Which suffix is associated with antifungal drugs?",
+    options: ["-pril", "-olol", "-azole", "-navir"],
+    answer: 2,
+    explanation: "Drugs ending in '-azole' are usually antifungal agents."
+  },
+  {
+    question: "Which route is best when drug needs to bypass digestion?",
+    options: ["Oral", "Sublingual", "Topical", "Rectal"],
+    answer: 1,
+    explanation: "Sublingual administration avoids gastric destruction and first-pass metabolism."
+  },
+  {
+    question: "Which statement is TRUE about pharmacodynamics?",
+    options: ["It is unrelated to receptors", "It involves drug absorption", "It describes what drugs do to the body", "It’s the same as excretion"],
+    answer: 2,
+    explanation: "Pharmacodynamics refers to the effects drugs have on the body and mechanisms of action."
+  }
+);
+moreQuestions.push(
+  {
+    question: "Which parameter determines a drug’s bioavailability?",
+    options: ["Absorption", "Metabolism", "Clearance", "Plasma protein binding"],
+    answer: 0,
+    explanation: "Bioavailability depends primarily on how much drug is absorbed into systemic circulation."
+  },
+  {
+    question: "What does ADME stand for?",
+    options: ["Adsorption, Distribution, Metabolism, Excretion", "Absorption, Distribution, Metabolism, Excretion", "Administration, Distribution, Mechanism, Excretion", "Absorption, Derivatives, Movement, Elimination"],
+    answer: 1,
+    explanation: "ADME describes how the body handles a drug: Absorption → Distribution → Metabolism → Excretion." 
+  },
+  {
+    question: "Which organ is most responsible for drug metabolism?",
+    options: ["Liver", "Kidney", "Spleen", "Lung"],
+    answer: 0,
+    explanation: "The liver, via its cytochrome P450 enzymes, is the main site of drug metabolism." 
+  },
+  {
+    question: "What describes pharmacodynamics?",
+    options: ["How the body moves drugs", "How drugs affect the body", "Drug elimination pathways", "Drug manufacturing process"],
+    answer: 1,
+    explanation: "Pharmacodynamics is the study of effects and mechanisms of drugs on the body. 2"
+  },
+  {
+    question: "Which describes pharmacokinetics?",
+    options: ["How drugs affect the body", "How the body affects drugs", "Drug development phases", "Drug purity standards"],
+    answer: 1,
+    explanation: "Pharmacokinetics studies absorption, distribution, metabolism, and excretion. 3"
+  },
+  {
+    question: "An antagonist drug does what?",
+    options: ["Activates receptor", "Blocks receptor action", "Enhances enzyme activity", "Decreases absorption"],
+    answer: 1,
+    explanation: "Antagonists bind receptors but prevent activation by agonists."
+  },
+  {
+    question: "Volume of distribution (Vₙ) refers to:",
+    options: ["Dose per kilogram", "Apparent volume where drug distributes", "Plasma protein-binding ratio", "Total clearance"],
+    answer: 1,
+    explanation: "Vₙ relates drug amount in the body to plasma concentration."
+  },
+  {
+    question: "Which milestone represents Phase III clinical trials?",
+    options: ["Safety in healthy volunteers", "Efficacy in patients", "Post-marketing surveillance", "Dose-finding studies"],
+    answer: 1,
+    explanation: "Phase III assesses drug efficacy and safety in larger patient groups."
+  },
+  {
+    question: "What is EC₅₀?",
+    options: ["Concentration producing half max effect", "Dose causing toxicity", "Elimination rate", "Time to peak effect"],
+    answer: 0,
+    explanation: "EC₅₀ indicates the concentration for half-maximal effective response."
+  },
+  {
+    question: "A high therapeutic index implies:",
+    options: ["Small safety margin", "Narrow dose range", "Wider safety margin", "More side effects"],
+    answer: 2,
+    explanation: "A high TI means the drug is safer with a wider dosing window. 4"
+  },
+  {
+    question: "What does steady state mean in pharmacology?",
+    options: ["Zero drug elimination", "Infusion ends", "Input equals elimination", "Dose doubled"],
+    answer: 2,
+    explanation: "At steady state, rate of administration equals rate of elimination. 5"
+  },
+  {
+    question: "Which describes first-pass effect?",
+    options: ["Metabolism after oral dose in liver", "Renal clearance", "Protein binding in blood", "GI absorption"],
+    answer: 0,
+    explanation: "First-pass effect reduces oral bioavailability through hepatic metabolism."
+  },
+  {
+    question: "Which of these increases metabolism of other drugs?",
+    options: ["Enzyme inducer", "Enzyme inhibitor", "Potentiator", "Chelator"],
+    answer: 0,
+    explanation: "Enzyme inducers upregulate liver enzymes, reducing plasma drug levels."
+  },
+  {
+    question: "What is a prodrug?",
+    options: ["Inactive until metabolized", "Immediate active agent", "Adverse effect", "Enzyme substrate only"],
+    answer: 0,
+    explanation: "Prodrugs must be metabolized into an active form to exert effect."
+  },
+  {
+    question: "Which form crosses membranes most easily?",
+    options: ["Ionized", "Charged", "Non-ionized", "Salt"],
+    answer: 2,
+    explanation: "Non‑ionized (lipophilic) drugs cross lipid membranes more readily."
+  },
+  {
+    question: "Bioavailability of IV drugs is:",
+    options: ["0%", "50%", "100%", "Unknown"],
+    answer: 2,
+    explanation: "IV administration bypasses absorption barriers, so bioavailability is 100%. 6"
+  },
+  {
+    question: "Which describes Vₙ and Clearance relationship to half-life?",
+    options: ["t₁/₂ = 0.693 × Cl / Vₙ", "t₁/₂ = 0.693 × Vₙ / Cl", "t₁/₂ = Vₙ + Cl", "t₁/₂ = Cl – Vₙ"],
+    answer: 1,
+    explanation: "Half‑life is related to Vₙ and clearance through t₁/₂ = 0.693 × Vₙ / Cl."
+  },
+  {
+    question: "What is the main route of drug excretion?",
+    options: ["Feces", "Kidneys", "Sweat", "Breathing"],
+    answer: 1,
+    explanation: "Most drugs and metabolites are excreted via kidneys. 7"
+  },
+  {
+    question: "Pharmacogenetics studies:",
+    options: ["Drug manufacturing", "Population drug use", "Genetic impact on drug response", "Drug marketing"],
+    answer: 2,
+    explanation: "It examines how genetic differences influence drug efficacy and safety."
+  },
+  {
+    question: "What is a side effect?",
+    options: ["Therapeutic action", "Expected dose", "Unintended secondary action", "Drug overdose"],
+    answer: 2,
+    explanation: "Side effects are non‑intended effects caused by drug therapy."
+  },
+  {
+    question: "What is drug tolerance?",
+    options: ["Increased response over time", "Reduced response over time", "Dose increase effect", "Constant effect"],
+    answer: 1,
+    explanation: "Tolerance occurs when repeated use reduces drug effect. 8"
+  },
+  {
+    question: "Which is NOT part of ADME?",
+    options: ["Absorption", "Distribution", "Mechanism of action", "Excretion"],
+    answer: 2,
+    explanation: "Mechanism of action is pharmacodynamics, not ADME."
+  },
+  {
+    question: "Which describes elimination via biliary route?",
+    options: ["Liver to gut to feces", "Kidney filtration", "Evaporation", "Skin secretion"],
+    answer: 0,
+    explanation: "Some metabolites are excreted via bile into the gut and eliminated in feces."
+  },
+  {
+    question: "Receptor affinity refers to:",
+    options: ["Max effect", "Dose required", "Binding strength", "Rate of metabolism"],
+    answer: 2,
+    explanation: "Affinity is how tightly drug binds its receptor."
+  },
+  {
+    question: "Which is a noncompetitive antagonist?",
+    options: ["Reversible binding same site", "Irreversible allosteric binding", "Partial agonist", "Prodrug"],
+    answer: 1,
+    explanation: "Noncompetitive antagonists bind allosterically and reduce efficacy regardless of dose."
+  },
+  {
+    question: "What does toxicodynamics study?",
+    options: ["Drug elimination", "Adverse effects and dose‑response", "Distribution patterns", "Absorption rates"],
+    answer: 1,
+    explanation: "Toxicodynamics explores harmful dose–response relationships of toxins and drugs. 9"
+  },
+  {
+    question: "What is therapeutic window?",
+    options: ["Area skin absorbs drugs", "Range between effective and toxic dose", "Highest dose allowed", "No-observed-effect level"],
+    answer: 1,
+    explanation: "It is the plasma concentration range between therapeutic effect and toxicity. 10"
+  },
+  {
+    question: "Which phase is about post-marketing drug monitoring?",
+    options: ["Phase I", "Phase II", "Phase III", "Phase IV"],
+    answer: 3,
+    explanation: "Phase IV monitors safety and effectiveness after regulatory approval."
+  },
+  {
+    question: "What is pharmacology?",
+    options: ["Study of drugs and their biological effects", "Study of pharmacy practice", "Study of nutrition", "Study of diseases"],
+    answer: 0,
+    explanation: "Pharmacology is the scientific study of drugs and their effects. 11"
+  }
+);
+questions.push(...moreQuestions);
+    let current = 0;
+    let score = 0;
+
+    // Shuffle questions
+    const shuffled = [...questions].sort(() => Math.random() - 0.5);
+
+    function loadQuestion() {
+      const q = shuffled[current];
+      document.getElementById("question").textContent = q.question;
+      document.getElementById("explanation").textContent = "";
+      document.getElementById("nextBtn").style.display = "none";
+
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
+
+      const shuffledOptions = q.options.map((opt, i) => ({ text: opt, index: i }))
+                                        .sort(() => Math.random() - 0.5);
+
+      shuffledOptions.forEach(({ text, index }) => {
+        const div = document.createElement("div");
+        div.className = "option";
+        div.textContent = text;
+        div.onclick = () => checkAnswer(index, div);
+        optionsDiv.appendChild(div);
+      });
+
+      document.getElementById("score").textContent = `Score: ${score}`;
+      document.getElementById("progress").style.width = `${(current / shuffled.length) * 100}%`;
+    }
+
+    function checkAnswer(selected, element) {
+      const correct = shuffled[current].answer;
+      const explanation = shuffled[current].explanation;
+
+      const allOptions = document.querySelectorAll(".option");
+      allOptions.forEach(opt => opt.onclick = null); // Disable clicking
+
+      if (selected === correct) {
+        element.classList.add("correct");
+        score++;
+      } else {
+        element.classList.add("incorrect");
+        allOptions[correct].classList.add("correct");
+      }
+
+      document.getElementById("score").textContent = `Score: ${score}`;
+      document.getElementById("explanation").textContent = explanation;
+      document.getElementById("nextBtn").style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current < shuffled.length) {
+        loadQuestion();
+      } else {
+        alert(`🎉 Game Over! Your Score: ${score}/${shuffled.length}`);
+        current = 0;
+        score = 0;
+        loadQuestion();
+      }
+    }
+
+    window.onload = loadQuestion;
+  </script>
+</body>
+</html>
