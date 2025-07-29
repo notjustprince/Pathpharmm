@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Path & Pharm Challenge</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
   <style>
     * {
       box-sizing: border-box;
@@ -14,66 +16,94 @@
     body {
       font-family: 'Segoe UI', sans-serif;
       height: 100vh;
-      background: linear-gradient(to bottom right, #6a11cb, #2575fc);
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       color: white;
-      animation: fadeIn 0.3s ease-in;
+      animation: fadeIn 0.5s ease-in;
+      padding: 20px;
     }
 
     .title {
-      font-size: 32px;
-      font-weight: bold;
+      font-size: 36px;
+      font-weight: 800;
       margin-bottom: 20px;
       text-align: center;
-      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+      text-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #6a11cb; }
+      to { text-shadow: 0 0 10px #fff, 0 0 20px #2575fc, 0 0 30px #2575fc; }
     }
 
     .container {
-      background: rgba(255, 255, 255, 0.07);
+      background: rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      padding: 50px 30px;
+      border-radius: 25px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
       text-align: center;
-      max-width: 400px;
-      width: 90%;
+      max-width: 420px;
+      width: 100%;
       border: 1px solid rgba(255, 255, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(60deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+      animation: shine 4s infinite linear;
+      transform: rotate(45deg);
+    }
+
+    @keyframes shine {
+      0% { transform: translate(-100%, -100%) rotate(45deg); }
+      100% { transform: translate(100%, 100%) rotate(45deg); }
     }
 
     .subtitle {
-      font-size: 16px;
-      margin-bottom: 30px;
-      opacity: 0.85;
+      font-size: 17px;
+      margin-bottom: 35px;
+      opacity: 0.9;
     }
 
     .buttons {
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 20px;
     }
 
     .buttons button {
-      padding: 15px 25px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      padding: 16px 28px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(to right, #ff4b2b, #ff416c);
       color: white;
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 18px;
+      font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-      transition: transform 0.2s ease, background 0.3s ease;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
     }
 
     .buttons button:hover {
-      background: rgba(255, 255, 255, 0.2);
       transform: scale(1.05);
+      background: linear-gradient(to right, #ff416c, #ff4b2b);
     }
 
     .buttons button:active {
@@ -94,28 +124,24 @@
     <p class="subtitle">Sharpen your brain, one question at a time!</p>
     
     <div class="buttons">
-      <button onclick="startGame();playclicksound()">▶ Start Game</button>
-      
+      <button onclick="startGame(); playClickSound()">
+        <i class="fas fa-play-circle"></i> Start Game
+      </button>
     </div>
   </div>
 
+  <audio id="click" src="click.wav"></audio>
+
   <script>
-    function playclicksound() {
+    function playClickSound() {
       const audio = document.getElementById("click");
       if (audio) audio.play();
     }
 
     function startGame() {
-  window.location.href = "pharma.html";
-}
-
-
-    function viewFlashcards() {
-  window.location.href = "flashcard.html";
+      window.location.href = "pharmacology.html";
     }
   </script>
-
-  <audio id="click" src="click.wav"></audio>
 
 </body>
 </html>

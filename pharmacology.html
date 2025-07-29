@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pathology Topics</title>
+  <title>Pharmacology Topics</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
   <style>
@@ -11,19 +11,13 @@
 
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #6a11cb, #9b37ff);
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 20px 20px 100px;
-      animation: fadeIn 0.4s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     .glass-card {
@@ -85,7 +79,7 @@
       left: 0;
       width: 100%;
       background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
       display: flex;
       justify-content: space-around;
       padding: 12px 0;
@@ -126,22 +120,21 @@
 <body>
 
   <div class="glass-card">
-    <h2><i class="fas fa-flask"></i> Pathology Topics</h2>
+    <h2><i class="fas fa-stethoscope"></i> Pharmacology Topics</h2>
     <div class="topic-grid">
-      <div class="topic-card" onclick="location.href='intropath.html'"><i class="fas fa-book"></i> Intro</div>
-      <div class="topic-card" onclick="location.href='quiz_inflammation.html'"><i class="fas fa-fire"></i> Inflammation</div>
-      <div class="topic-card" onclick="location.href='quiz_healing.html'"><i class="fas fa-band-aid"></i> Healing</div>
-      <div class="topic-card" onclick="location.href='quiz_neoplasia.html'"><i class="fas fa-dna"></i> Neoplasia</div>
-      <div class="topic-card" onclick="location.href='quiz_immunopathology.html'"><i class="fas fa-shield-virus"></i> Immuno</div>
-      <div class="topic-card" onclick="location.href='quiz_cell_injury.html'"><i class="fas fa-bolt"></i> Cell Injury</div>
+      <div class="topic-card" onclick="location.href='game.html'"><i class="fas fa-book-medical"></i> Intro</div>
+      <div class="topic-card" onclick="location.href='quiz_autonomics.html'"><i class="fas fa-brain"></i> Autonomics</div>
+      <div class="topic-card" onclick="location.href='quiz_antibiotics.html'"><i class="fas fa-capsules"></i> Antibiotics</div>
+      <div class="topic-card" onclick="location.href='quiz_analgesics.html'"><i class="fas fa-pills"></i> Analgesics</div>
+      <div class="topic-card" onclick="location.href='quiz_cns.html'"><i class="fas fa-head-side-virus"></i> CNS Drugs</div>
     </div>
   </div>
 
   <div class="bottom-nav">
-    <div class="nav-item" onclick="location.href='pharmacology.html'">
+    <div class="nav-item active">
       <span><i class="fas fa-pills"></i></span>Pharma
     </div>
-    <div class="nav-item active">
+    <div class="nav-item" onclick="location.href='pathology.html'">
       <span><i class="fas fa-flask"></i></span>Patho
     </div>
     <div class="nav-item" onclick="location.href='flashcard.html'">
@@ -150,7 +143,7 @@
   </div>
 
   <script>
-    // Swipe navigation
+    // Swipe between pages
     let startX = 0;
     let endX = 0;
 
@@ -167,9 +160,9 @@
       const distance = endX - startX;
       if (Math.abs(distance) > 60) {
         if (distance > 0) {
-          window.location.href = 'pharmacology.html';
+          window.location.href = 'flashcard.html'; // left swipe goes back
         } else {
-          window.location.href = 'flashcard.html';
+          window.location.href = 'pathology.html'; // right swipe goes forward
         }
       }
     }
