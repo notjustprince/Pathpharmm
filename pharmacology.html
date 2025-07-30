@@ -1,3 +1,4 @@
+<!-- pharmacology.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -24,19 +25,19 @@
       background: rgba(255, 255, 255, 0.12);
       backdrop-filter: blur(18px);
       border-radius: 20px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
       padding: 30px 20px;
-      text-align: center;
       width: 100%;
       max-width: 460px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
       border: 1px solid rgba(255, 255, 255, 0.2);
+      text-align: center;
     }
 
     h2 {
-      color: #fff;
       font-size: 26px;
-      font-weight: 700;
-      margin-bottom: 25px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 20px;
     }
 
     .topic-grid {
@@ -52,34 +53,33 @@
       backdrop-filter: blur(10px);
       border-radius: 15px;
       padding: 20px;
-      color: #fff;
+      text-align: center;
+      color: white;
       font-weight: 600;
       font-size: 15px;
-      text-align: center;
       border: 1px solid rgba(255, 255, 255, 0.25);
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: 0.3s;
     }
 
     .topic-card:hover {
-      background: rgba(255, 255, 255, 0.35);
+      background: rgba(255, 255, 255, 0.3);
       transform: translateY(-4px);
     }
 
     .topic-card i {
-      display: block;
       font-size: 20px;
       margin-bottom: 8px;
+      display: block;
     }
 
     .bottom-nav {
       position: fixed;
       bottom: 0;
-      left: 0;
       width: 100%;
       background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(10px);
       display: flex;
       justify-content: space-around;
       padding: 12px 0;
@@ -87,11 +87,11 @@
     }
 
     .nav-item {
-      color: #fff;
-      font-size: 13px;
+      color: white;
       text-align: center;
       flex: 1;
-      transition: 0.3s ease;
+      font-size: 13px;
+      transition: 0.3s;
     }
 
     .nav-item span {
@@ -106,7 +106,8 @@
 
     .nav-item.active {
       font-weight: bold;
-      color: #ffffff;
+      color: #fff;
+      background-color: rgba(255, 255, 255, 0.25);
     }
 
     @media (max-width: 500px) {
@@ -116,14 +117,13 @@
     }
   </style>
 </head>
-
 <body>
 
   <div class="glass-card">
     <h2><i class="fas fa-stethoscope"></i> Pharmacology Topics</h2>
     <div class="topic-grid">
-      <div class="topic-card" onclick="location.href='game.html'"><i class="fas fa-book-medical"></i> Intro</div>
-      <div class="topic-card" onclick="location.href='quiz_autonomics.html'"><i class="fas fa-brain"></i> Autonomics</div>
+      <div class="topic-card" onclick="location.href='intropharm.html'"><i class="fas fa-book-medical"></i> Intro</div>
+      <div class="topic-card" onclick=".href='quiz_autonomics.html'"><i class="fas fa-brain"></i> Autonomics</div>
       <div class="topic-card" onclick="location.href='quiz_antibiotics.html'"><i class="fas fa-capsules"></i> Antibiotics</div>
       <div class="topic-card" onclick="location.href='quiz_analgesics.html'"><i class="fas fa-pills"></i> Analgesics</div>
       <div class="topic-card" onclick="location.href='quiz_cns.html'"><i class="fas fa-head-side-virus"></i> CNS Drugs</div>
@@ -143,30 +143,14 @@
   </div>
 
   <script>
-    // Swipe between pages
-    let startX = 0;
-    let endX = 0;
+    let startX = 0, endX = 0;
 
-    document.addEventListener('touchstart', function(e) {
-      startX = e.touches[0].clientX;
-    });
-
-    document.addEventListener('touchend', function(e) {
+    document.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+    document.addEventListener('touchend', e => {
       endX = e.changedTouches[0].clientX;
-      handleSwipe();
-    });
-
-    function handleSwipe() {
-      const distance = endX - startX;
-      if (Math.abs(distance) > 60) {
-        if (distance > 0) {
-          window.location.href = 'flashcard.html'; // left swipe goes back
-        } else {
-          window.location.href = 'pathology.html'; // right swipe goes forward
-        }
+      if (Math.abs(endX - startX) > 60) {
+        window.location.href = endX < startX ? 'pathology.html' : 'flashcard.html';
       }
-    }
+    });
   </script>
-
 </body>
-</html>

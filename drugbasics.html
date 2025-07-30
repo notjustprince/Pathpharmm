@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Drug Basics & Quiz</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #6a11cb;
+      --secondary: #2575fc;
+      --accent: #00e0ff;
+      --correct: #4caf50;
+      --wrong: #f44336;
+      --glass: rgba(255,255,255,0.15);
+      --blur: blur(16px);
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color:#fff; font-family:'Segoe UI',sans-serif;
+      padding:20px; min-height:100vh;
+      display:flex; flex-direction:column; align-items:center;
+    }
+    h1 { margin-top:20px; font-size:2em; text-align:center; }
+    .info-grid {
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr));
+      gap:20px; width:100%; max-width:900px; margin:20px 0;
+    }
+    .info-card {
+      background:var(--glass); backdrop-filter:var(--blur);
+      border:1px solid rgba(255,255,255,0.3); border-radius:16px;
+      padding:20px; box-shadow:0 8px 20px rgba(0,0,0,0.2);
+      transition:transform .3s;
+    }
+    .info-card:hover { transform:translateY(-5px); }
+    .info-card i { font-size:1.4em; margin-right:8px; }
+    .info-card h3 { display:flex; align-items:center; margin-bottom:10px; font-size:1.2em; }
+    .info-card p { font-size:14px; line-height:1.5; }
+
+    .quiz-area {
+      background:var(--glass); backdrop-filter:var(--blur);
+      border:1px solid rgba(255,255,255,0.3); border-radius:16px;
+      width:100%; max-width:600px; padding:25px; box-shadow:0 8px 20px rgba(0,0,0,0.2);
+      margin-bottom:40px;
+      position:relative;
+      overflow:hidden;
+    }
+    .progress-bar { background:rgba(255,255,255,0.3); height:8px; border-radius:4px; overflow:hidden; margin-bottom:15px; }
+    .progress-fill { height:100%; background:var(--accent); width:0%; transition:width .5s ease; }
+    .question { font-size:1.2em; margin-bottom:20px; animation:fadeInUp .4s; }
+    .options li {
+      background:rgba(255,255,255,0.2); list-style:none; padding:12px; margin:10px 0;
+      border-radius:8px; cursor:pointer; transition:background .3s, transform .2s;
+      font-size: 1em;
+    }
+    .options li:hover { background:rgba(255,255,255,0.3); transform:scale(1.02); }
+    .options li.correct { background:var(--correct)!important; }
+    .options li.incorrect { background:var(--wrong)!important; }
+    .explanation { font-size:14px; margin-top:15px; background:rgba(255,255,255,0.1); padding:10px; border-radius:8px; }
+    button#nextBtn {
+      margin-top:20px; padding:12px 26px; font-size:1em; font-weight:600;
+      border:none; border-radius:8px; background:var(--accent); color:#000;
+      cursor:pointer; position:absolute; right:20px; bottom:20px;
+      transition:background .3s;
+    }
+    button#nextBtn:hover { background:#00c4d9; }
+    @keyframes fadeInUp { from {opacity:0; transform:translateY(10px);} to {opacity:1; transform:none;} }
+    footer { font-size:14px; opacity:0.8; margin-bottom:20px; }
+
+    @media(max-width:500px){
+      .options li { font-size:0.95em; }
+      button#nextBtn { bottom:10px; right:20px; }
+    }
+  </style>
+</head>
+<body>
+  <h1> Drug Basics</h1>
+  <div class="info-grid">
+    <div class="info-card"><h3><i class="fas fa-pills"></i> What is a Drug?</h3><p>A drug is any chemical substance that causes physiological change...</p></div>
+    <div class="info-card"><h3><i class="fas fa-sync-alt"></i> ADME</h3><p>Absorption • Distribution • Metabolism • Excretion – how drugs move through your body.</p></div>
+    <div class="info-card"><h3><i class="fas fa-brain"></i> Pharmacodynamics</h3><p>How drugs act on your body – e.g. receptor binding and effects.</p></div>
+    <div class="info-card"><h3><i class="fas fa-tools"></i> Pharmacokinetics</h3><p>What your body does to the drug (ADME processes).</p></div>
+    <div class="info-card"><h3><i class="fas fa-balance-scale"></i> Therapeutic Index</h3><p>Safety measure—difference between therapeutic and toxic doses.</p></div>
+    <div class="info-card"><h3><i class="fas fa-liver"></i> First‑Pass Effect</h3><p>Oral drugs may be inactivated by liver before reaching bloodstream.</p></div>
+  </div>
+
+  <div class="quiz-area">
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <div class="question" id="question">Loading question...</div>
+    <ul class="options" id="options"></ul>
+    <div class="explanation" id="explanation"></div>
+    <button id="nextBtn" onclick="nextQuestion()" style="display:none;">Next ➤</button>
+  </div>
+
+  <footer>Powered by your Medical Quiz App</footer>
+
+  <script>
+    const questions = [
+      {q:"What does ADME stand for?", opts:["Absorb, Distribute…","Administer, Direct…","Absorption, Distribution, Metabolism, Excretion","Active Drug Mechanism Excretion"], ans:2, exp:"It’s classic pharmacokinetics acronym."},
+      {q:"Which organ metabolizes most drugs?", opts:["Kidney","Liver","Lung","Skin"], ans:1, exp:"The liver via cytochrome P450 enzymes."},
+      {q:"Pharmacodynamics refers to:", opts:["What body does to drugs","Drug distribution","Drug effects on body","Drug pre‑clinical development"], ans:2, exp:"It studies what the drug does to your body."},
+      {q:"First‑pass effect affects:", opts:["IV drugs","Inhaled drugs","Oral drugs","Topical drugs"], ans:2, exp:"Only oral drugs pass through liver before reaching blood."},
+      {q:"Therapeutic index measures:", opts:["Potency","Safety margin","Rate of absorption","Chemical purity"], ans:1, exp:"TI = toxic dose ÷ effective dose."},
+      {q:"Bioavailability of IV dose is:", opts:["50%","0%","100%","Variable"], ans:2, exp:"IV bypasses absorption so full amount reaches circulation."},
+      {q:"Half‑life is time to:", opts:["Reach peak","Absorb 50%","Eliminate 50% of drug","Activate drug"], ans:2, exp:"A pharmacokinetic measure of elimination."},
+      {q:"Prodrug is:", opts:["Active drug","Inactive until metabolized","Poison","None"], ans:1, exp:"Requires metabolic conversion to become active."},
+      {q:"Agonist drug:", opts:["Blocks receptor","Activates receptor","Damages receptor","None"], ans:1, exp:"Fits receptor and triggers response."},
+      {q:"Antagonist drug:", opts:["Activates receptor","Blocks response","Causes toxic effect","Enhances agonist"], ans:1, exp:"Prevents receptor activation by agonists."},
+      {q:"Which is NOT part of ADME?", opts:["Excretion","Distribution","Mechanism of Action","Absorption"], ans:2, exp:"Mechanism of action is pharmacodynamics."},
+      {q:"Enzyme inducer:", opts:["Decreases metabolism","Increases metabolism","Inactive agent","None"], ans:1, exp:"Accelerates drug breakdown."},
+      {q:"High first‑pass effect reduces:", opts:["Safety","Bioavailability","Potency","Excretion"], ans:1, exp:"Liver metabolism lowers absorbed dose."},
+      {q:"Volume of distribution describes:", opts:["Dose size","Apparent drug volume","Absorption rate","Toxic dose"], ans:1, exp:"Relates drug concentration to amount stored."},
+      {q:"EC₅₀ means:", opts:["Toxic dose","Half‑max effect concentration","Clearance rate","Absorption half‑time"], ans:1, exp:"Middle point on dose-response curve."},
+      {q:"Loading dose purpose:", opts:["Slow absorption","Quick therapeutic level","Test tolerance","None"], ans:1, exp:"Boost dose to reach steady state fast."},
+      {q:"Route bypassing first‑pass:", opts:["Oral","Rectal","IV","Topical"], ans:2, exp:"IV avoids liver before circulation."},
+      {q:"Steady state achieved when:", opts:["Input=elimination","Clearance doubles","Absorption stops","Half‑life ends"], ans:0, exp:"Intake equals elimination over time."},
+      {q:"Tolerance means:", opts:["Increased effect","Decreased response","No effect change","Overdose"], ans:1, exp:"Requires higher dose over time for same effect."},
+      {q:"MEC stands for:", opts:["Minimum Effective Concentration","Maximum Efficacy Count","Medium Excretion Constant","Minimum Excretion Constant"], ans:0, exp:"Lowest drug level needed for effect."}
+    ];
+    let idx=0, score=0, total=questions.length;
+    function load(){
+      const data=questions[idx];
+      document.getElementById("question").textContent=data.q;
+      const optbox=document.getElementById("options");
+      optbox.innerHTML="";
+      data.opts.forEach((t,i)=>{
+        const li=document.createElement("li");
+        li.textContent=t;
+        li.onclick=()=> selectAnswer(i,li);
+        optbox.appendChild(li);
+      });
+      document.getElementById("explanation").textContent="";
+      document.getElementById("nextBtn").style.display="none";
+      document.getElementById("progress").style.width = (idx/total*100)+"%";
+    }
+    function selectAnswer(i,el){
+      const data=questions[idx];
+      document.querySelectorAll(".options li").forEach(li=>li.onclick=null);
+      if(i===data.ans) el.classList.add("correct");
+      else { el.classList.add("incorrect"); document.querySelectorAll(".options li")[data.ans].classList.add("correct"); }
+      document.getElementById("explanation").textContent=data.exp;
+      document.getElementById("nextBtn").style.display="block";
+    }
+    function nextQuestion(){
+      idx++;
+      if(idx<total) load();
+      else {
+        alert(`✅ Finish! You scored ${score}/${total}`);
+        idx=0; score=0; load();
+      }
+    }
+    window.onload=load;
+  </script>
+</body>
+</html>
