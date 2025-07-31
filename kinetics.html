@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pharmacokinetics Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #24495e, #2a9d8f);
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 { text-align: center; margin-bottom: 20px; }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .info-card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .info-card h3 { margin-bottom: 8px; font-size: 1.1em; }
+    .info-card p { font-size: 0.9em; line-height: 1.4; }
+
+    .quiz-area {
+      max-width: 600px;
+      margin: 30px auto;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 16px;
+      position: relative;
+      padding-bottom: 80px;
+    }
+
+    .progress-bar {
+      background: rgba(255,255,255,0.3);
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #00e0ff;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .question { font-size: 1.2em; margin-bottom: 20px; }
+
+    ul.options {
+      list-style: none;
+      padding: 0;
+    }
+
+    ul.options li {
+      background: rgba(255,255,255,0.2);
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    ul.options li:hover { background: rgba(255,255,255,0.3); }
+
+    ul.options li.correct { background: #4caf50 !important; }
+    ul.options li.incorrect { background: #f44336 !important; }
+
+    #nextBtn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 24px;
+      border: none;
+      background: #00e0ff;
+      color: black;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .explanation {
+      margin-top: 15px;
+      background: rgba(255,255,255,0.1);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pharmacokinetics (ADME)</h1>
+
+  <div class="info-grid">
+    <div class="info-card"><h3>Absorption</h3><p>Drug entry into bloodstream via membranes.</p></div>
+    <div class="info-card"><h3>Distribution</h3><p>Movement of drug through body compartments.</p></div>
+    <div class="info-card"><h3>Metabolism</h3><p>Biotransformation usually by liver enzymes.</p></div>
+    <div class="info-card"><h3>Excretion</h3><p>Removal via kidneys, bile, lungs, sweat.</p></div>
+    <div class="info-card"><h3>Half‑Life (t₁/₂)</h3><p>Time for drug plasma concentration to halve.</p></div>
+    <div class="info-card"><h3>Clearance</h3><p>Volume of plasma cleared per unit time.</p></div>
+  </div>
+
+  <div class="quiz-area">
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <div class="question" id="question">Loading question...</div>
+    <ul class="options" id="options"></ul>
+    <div class="explanation" id="explanation"></div>
+    <button id="nextBtn" onclick="nextQuestion()">Next ➤</button>
+  </div>
+
+  <script>
+    const questions = [
+      {q:"Which organ metabolizes most drugs?", opts:["Liver","Kidney","Lung","Skin"], ans:0, exp:"The liver, via cytochrome P450 enzymes."},
+      {q:"Bioavailability (F) of IV administration is:", opts:["100%","50%","Variable","0%"], ans:0, exp:"IV delivers full dose directly to circulation."},
+      {q:"t₁/₂ is defined as:", opts:["Time to peak","Half-life elimination","Absorption time","Time to onset"], ans:1, exp:"Time for plasma concentration to reduce by 50%."},
+      {q:"Clearance is:", opts:["Dose per time","Volume cleared per time","Half-life","Absorption rate"], ans:1, exp:"Volume of plasma cleared of drug per unit time."},
+      {q:"Volume of distribution relates:", opts:["Dose to concentration","Efficacy","Potency","Absorption rate"], ans:0, exp:"Apparent volume drug occupies relative to plasma."},
+      {q:"First-pass effect occurs in:", opts:["Liver","Kidney","Heart","Lungs"], ans:0, exp:"Liver metabolizes oral drugs before systemic circulation."},
+      {q:"Drug excreted unchanged in urine suggests:", opts:["High metabolism","Low renal clearance","Active elimination","High absorption"], ans:2, exp:"Eliminated directly via kidneys without biotransformation."},
+      {q:"Zero-order elimination means:", opts:["Rate constant","Constant amount per time","Half-life dependent","Exponential decline"], ans:1, exp:"Fixed amount eliminated per unit time (e.g., alcohol)."},
+      {q:"First-order elimination means:", opts:["Rate proportional to concentration","Amount constant","Dose independent","Zero-order"], ans:0, exp:"Rate decreases as concentration falls."},
+      {q:"Steady state achieved when:", opts:["Absorption stops","Input equals elimination","Dose is maximal","Clearance doubles"], ans:1, exp:"Rate in = rate out maintains stable level."},
+      {q:"Loading dose is used to:", opts:["Reduce toxicity","Reach therapeutic level faster","Lower clearance","Increase absorption"], ans:1, exp:"Achieve steady state quickly."},
+      {q:"Maintenance dose maintains:", opts:["Steady state level","Toxic levels","Absorption rate","Distribution volume"], ans:0, exp:"Keeps plasma concentration in therapeutic range."},
+      {q:"High protein binding decreases:", opts:["Distribution","Half-life","Free drug","Absorption"], ans:2, exp:"Only unbound drug is active and cleared."},
+      {q:"Renal clearance involves:", opts:["Filtration, secretion, reabsorption","Metabolism","Distribution","Absorption"], ans:0, exp:"Combination of kidney processes."},
+      {q:"A drug with large Vd is likely:", opts:["Remain in plasma","Widely distributed","Poor tissue uptake","High clearance"], ans:1, exp:"It distributes into tissues outside plasma."},
+      {q:"Hepatic enzyme induction leads to:", opts:["Lower drug levels","Higher drug levels","Unchanged levels","Reduced clearance"], ans:0, exp:"Faster metabolism reduces plasma concentration."},
+      {q:"Prodrug must be:", opts:["Active as is","Inactive until metabolized","Excreted unchanged","Protein bound"], ans:1, exp:"Activated via metabolism."},
+      {q:"Renal failure reduces:", opts:["Bioavailability","Clearance","Absorption","Metabolism"], ans:1, exp:"Efficient drug elimination is reduced."},
+      {q:"Half‑life increases when:", opts:["Vd increases or clearance decreases","Absorption speeds","Distribution slows","Dose increases"], ans:0, exp:"Longer half-life with increased Vd or reduced clearance."},
+      {q:"Intrinsic clearance (Cl_int) refers to:", opts:["Clearance by kidneys","Clearance by liver enzymes","Volume distribution","Half‑life measure"], ans:1, exp:"Metabolic clearance capacity independent of blood flow."}
+    ];
+
+    let idx = 0, score = 0;
+    const total = questions.length;
+
+    function shuffle(arr) {
+      return arr.map(x => [x, Math.random()]).sort((a,b) => a[1]-b[1]).map(x => x[0]);
+    }
+
+    function load() {
+      const data = questions[idx];
+      document.getElementById("question").textContent = data.q;
+      document.getElementById("explanation").textContent = "";
+      document.getElementById("nextBtn").style.display = "none";
+      document.getElementById("progress").style.width = ((idx / total) * 100) + "%";
+
+      const optsEl = document.getElementById("options");
+      optsEl.innerHTML = "";
+
+      const correctText = data.opts[data.ans];
+      const shuffled = shuffle(data.opts);
+      shuffled.forEach(opt => {
+        const li = document.createElement("li");
+        li.textContent = opt;
+        li.onclick = () => {
+          document.querySelectorAll("li").forEach(li => li.onclick = null);
+          if (opt === correctText) {
+            li.classList.add("correct");
+            score++;
+          } else {
+            li.classList.add("incorrect");
+            document.querySelectorAll("li").forEach(el => {
+              if (el.textContent === correctText) el.classList.add("correct");
+            });
+          }
+          document.getElementById("explanation").textContent = data.exp;
+          document.getElementById("nextBtn").style.display = "block";
+        };
+        optsEl.appendChild(li);
+      });
+    }
+
+    function nextQuestion() {
+      idx++;
+      if (idx >= total) {
+        alert(`✅ Quiz complete! You scored ${score}/${total}`);
+        idx = 0;
+        score = 0;
+      }
+      load();
+    }
+
+    window.onload = load;
+  </script>
+</body>
+</html>

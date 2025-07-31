@@ -41,6 +41,21 @@
       position: relative;
       padding-bottom: 80px;
     }
+
+    .progress-bar {
+      background: rgba(255,255,255,0.3);
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #00e0ff;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
     .question { font-size: 1.2em; margin-bottom: 20px; }
     ul.options { list-style: none; padding: 0; }
     ul.options li {
@@ -68,6 +83,7 @@
       cursor: pointer;
       display: none;
     }
+
     .explanation {
       margin-top: 15px;
       background: rgba(255,255,255,0.1);
@@ -79,6 +95,7 @@
 </head>
 <body>
   <h1>Dose-Response Concepts</h1>
+
   <div class="info-grid">
     <div class="info-card"><h3>Dose-Response Curve</h3><p>Graph of drug effect vs. dose.</p></div>
     <div class="info-card"><h3>EC₅₀ & Emax</h3><p>Concentration producing half‑maximal effect & maximum effect.</p></div>
@@ -89,6 +106,7 @@
   </div>
 
   <div class="quiz-area">
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
     <div class="question" id="question">Loading question...</div>
     <ul class="options" id="options"></ul>
     <div class="explanation" id="explanation"></div>
@@ -119,7 +137,8 @@
       {q:"Right shift of dose‑response curve indicates:", opts:["Increased potency","Decreased potency","Higher efficacy","Lower TD₅₀"], ans:1, exp:"Need higher dose — potency reduced."}
     ];
 
-    let idx=0, score=0;
+    let idx = 0, score = 0;
+    const total = questions.length;
 
     function shuffle(arr) {
       return arr.map(x => [x, Math.random()])
@@ -132,6 +151,8 @@
       document.getElementById("question").textContent = data.q;
       document.getElementById("explanation").textContent = "";
       document.getElementById("nextBtn").style.display = "none";
+      document.getElementById("progress").style.width = ((idx / total) * 100) + "%";
+
       const optsEl = document.getElementById("options");
       optsEl.innerHTML = "";
 
@@ -160,9 +181,10 @@
 
     function nextQuestion() {
       idx++;
-      if (idx >= questions.length) {
-        alert(`✅ Quiz over—your score: ${score}/${questions.length}`);
-        idx = 0; score = 0;
+      if (idx >= total) {
+        alert(`✅ Quiz complete! You scored ${score}/${total}`);
+        idx = 0;
+        score = 0;
       }
       load();
     }
