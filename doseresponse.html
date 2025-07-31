@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dose-Response Concepts & Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 { text-align: center; margin-bottom: 20px; }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    .info-card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .info-card h3 { margin-bottom: 8px; font-size: 1.1em; }
+    .info-card p { font-size: 0.9em; line-height: 1.4; }
+
+    .quiz-area {
+      max-width: 600px;
+      margin: 30px auto;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 16px;
+      position: relative;
+      padding-bottom: 80px;
+    }
+    .question { font-size: 1.2em; margin-bottom: 20px; }
+    ul.options { list-style: none; padding: 0; }
+    ul.options li {
+      background: rgba(255,255,255,0.2);
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    ul.options li:hover { background: rgba(255,255,255,0.3); }
+    ul.options li.correct { background: #4caf50 !important; }
+    ul.options li.incorrect { background: #f44336 !important; }
+
+    #nextBtn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 24px;
+      border: none;
+      background: #00e0ff;
+      color: black;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+    }
+    .explanation {
+      margin-top: 15px;
+      background: rgba(255,255,255,0.1);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dose-Response Concepts</h1>
+  <div class="info-grid">
+    <div class="info-card"><h3>Dose-Response Curve</h3><p>Graph of drug effect vs. dose.</p></div>
+    <div class="info-card"><h3>EC₅₀ & Emax</h3><p>Concentration producing half‑maximal effect & maximum effect.</p></div>
+    <div class="info-card"><h3>Potency vs Efficacy</h3><p>Potency = dose needed; Efficacy = max effect.</p></div>
+    <div class="info-card"><h3>Graded vs Quantal</h3><p>Individual response curves vs population all‑or‑nothing responses.</p></div>
+    <div class="info-card"><h3>Therapeutic Window</h3><p>Range between therapeutic effect and toxicity.</p></div>
+    <div class="info-card"><h3>Ceiling Effect</h3><p>Maximum effect plateau despite increasing dose.</p></div>
+  </div>
+
+  <div class="quiz-area">
+    <div class="question" id="question">Loading question...</div>
+    <ul class="options" id="options"></ul>
+    <div class="explanation" id="explanation"></div>
+    <button id="nextBtn" onclick="nextQuestion()">Next ➤</button>
+  </div>
+
+  <script>
+    const questions = [
+      {q:"What does EC₅₀ represent?", opts:["Maximum effect","Minimum effective dose","Half‑maximal concentration","Toxic threshold"], ans:2, exp:"EC₅₀ is concentration for half‑max effect."},
+      {q:"Emax refers to:", opts:["Toxicity level","Potency","Maximum possible effect","Minimum effect"], ans:2, exp:"Highest effect a drug can produce."},
+      {q:"A drug is more potent if:", opts:["It has lower EC₅₀","It has higher Emax","It requires higher dose","It has more side effects"], ans:0, exp:"Lower EC₅₀ means more potency."},
+      {q:"Efficacy is:", opts:["Dose amount","Maximum effect","Side effects","Therapeutic index"], ans:1, exp:"It’s the greatest effect achievable."},
+      {q:"Graded dose‑response curves show:", opts:["Population percentages","Single‑dose responses","Range of effects","Toxicity rates"], ans:2, exp:"Shows intensity of response vs dose."},
+      {q:"Quantal curves plot:", opts:["Individual effects","Population binary outcomes","Dose vs side‑effects","Absorption rate"], ans:1, exp:"Plots yes/no outcomes across population."},
+      {q:"Therapeutic window indicates:", opts:["Dose for maximum effect","Time window","Safe dose range","Metabolism rate"], ans:2, exp:"Dose range that’s effective and safe."},
+      {q:"Ceiling effect means:", opts:["More dose gives more effect","Max effect reached","No absorption","Toxic effect begins"], ans:1, exp:"No further effect beyond a certain dose."},
+      {q:"Toxic dose threshold is called:", opts:["EC₅₀","LD₅₀","ED₅₀","TD₅₀"], ans:3, exp:"TD₅₀ is toxic dose in 50% of subjects."},
+      {q:"ED₅₀ means:", opts:["Half‑destroyed dose","Effective dose in 50%","Toxic dose in 50%","Potency measure"], ans:1, exp:"Dose producing therapeutic effect in 50%."},
+      {q:"A drug with narrow therapeutic window:", opts:["Has wide safety margin","Requires careful dosing","Is always safe","Is highly potent"], ans:1, exp:"Small margin between effective and toxic dose."},
+      {q:"If drug reaches plateau in effect despite dose increases:", opts:["Potency reduces","Ceiling effect","EC₅₀ increases","Emax increases"], ans:1, exp:"Effects plateau at ceiling."},
+      {q:"Relative potency compares:", opts:["Emax values","EC₅₀ values","Side‑effects","Admin routes"], ans:1, exp:"Based on difference in EC₅₀ between drugs."},
+      {q:"A quantal dose‑response graph shows:", opts:["Dose vs effect intensity","Binary response distribution","Therapeutic vs toxic dose","Efficacy plateau"], ans:1, exp:"Shows fraction of population responding."},
+      {q:"A flatter dose‑response slope suggests:", opts:["Higher potency","Lower efficacy","Wider safety margin","Sensitive response change"], ans:3, exp:"Small dose change gives large effect change."},
+      {q:"When potency increases:", opts:["Emax changes","EC₅₀ decreases","TD₅₀ decreases","Therapeutic window narrows"], ans:1, exp:"Less dose required for same effect."},
+      {q:"Efficacy difference between drugs lies in:", opts:["Dose size","Maximum effect achievable","Onset speed","Absorption rate"], ans:1, exp:"It’s the maximal response capability."},
+      {q:"Therapeutic index formula is:", opts:["TD₅₀/ED₅₀","EC₅₀/E₅₀","ED₅₀/TD₅₀","Efficacy / potency"], ans:0, exp:"Index = toxic dose / effective dose."},
+      {q:"If TI is small, drug:", opts:["Is safer","Is riskier","Has high efficacy","Has low potency"], ans:1, exp:"Small TI = small safety margin."},
+      {q:"Right shift of dose‑response curve indicates:", opts:["Increased potency","Decreased potency","Higher efficacy","Lower TD₅₀"], ans:1, exp:"Need higher dose — potency reduced."}
+    ];
+
+    let idx=0, score=0;
+
+    function shuffle(arr) {
+      return arr.map(x => [x, Math.random()])
+                .sort((a,b) => a[1]-b[1])
+                .map(x => x[0]);
+    }
+
+    function load() {
+      const data = questions[idx];
+      document.getElementById("question").textContent = data.q;
+      document.getElementById("explanation").textContent = "";
+      document.getElementById("nextBtn").style.display = "none";
+      const optsEl = document.getElementById("options");
+      optsEl.innerHTML = "";
+
+      const correctText = data.opts[data.ans];
+      const shuffled = shuffle(data.opts);
+      shuffled.forEach(opt => {
+        const li = document.createElement("li");
+        li.textContent = opt;
+        li.onclick = () => {
+          document.querySelectorAll("li").forEach(li => li.onclick = null);
+          if (opt === correctText) {
+            li.classList.add("correct");
+            score++;
+          } else {
+            li.classList.add("incorrect");
+            document.querySelectorAll("li").forEach(el => {
+              if (el.textContent === correctText) el.classList.add("correct");
+            });
+          }
+          document.getElementById("explanation").textContent = data.exp;
+          document.getElementById("nextBtn").style.display = "block";
+        };
+        optsEl.appendChild(li);
+      });
+    }
+
+    function nextQuestion() {
+      idx++;
+      if (idx >= questions.length) {
+        alert(`✅ Quiz over—your score: ${score}/${questions.length}`);
+        idx = 0; score = 0;
+      }
+      load();
+    }
+
+    window.onload = load;
+  </script>
+</body>
+</html>

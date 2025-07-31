@@ -1,0 +1,193 @@
+<!<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mechanism of Drugs</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #0f2027;
+      --secondary: #203a43;
+      --accent: #2c5364;
+      --correct: #4caf50;
+      --wrong: #f44336;
+      --glass: rgba(255,255,255,0.15);
+      --blur: blur(16px);
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color:#fff; font-family:'Segoe UI',sans-serif;
+      padding:20px; min-height:100vh;
+      display:flex; flex-direction:column; align-items:center;
+    }
+    h1 { margin-top:20px; font-size:2em; text-align:center; }
+    .info-grid {
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr));
+      gap:20px; width:100%; max-width:900px; margin:20px 0;
+    }
+    .info-card {
+      background:var(--glass); backdrop-filter:var(--blur);
+      border:1px solid rgba(255,255,255,0.3); border-radius:16px;
+      padding:20px; box-shadow:0 8px 20px rgba(0,0,0,0.2);
+      transition:transform .3s;
+    }
+    .info-card:hover { transform:translateY(-5px); }
+    .info-card i { font-size:1.4em; margin-right:8px; }
+    .info-card h3 { display:flex; align-items:center; margin-bottom:10px; font-size:1.2em; }
+    .info-card p { font-size:14px; line-height:1.5; }
+
+    .quiz-area {
+      background:var(--glass); backdrop-filter:var(--blur);
+      border:1px solid rgba(255,255,255,0.3); border-radius:16px;
+      width:100%; max-width:600px; padding:25px; box-shadow:0 8px 20px rgba(0,0,0,0.2);
+      margin-bottom:40px;
+      position:relative;
+      overflow:hidden;
+      padding-bottom: 80px;
+    }
+    .progress-bar { background:rgba(255,255,255,0.3); height:8px; border-radius:4px; overflow:hidden; margin-bottom:15px; }
+    .progress-fill { height:100%; background:var(--accent); width:0%; transition:width .5s ease; }
+    .question { font-size:1.2em; margin-bottom:20px; animation:fadeInUp .4s; }
+    .options li {
+      background:rgba(255,255,255,0.2); list-style:none; padding:12px; margin:10px 0;
+      border-radius:8px; cursor:pointer; transition:background .3s, transform .2s;
+      font-size: 1em;
+    }
+    .options li:hover { background:rgba(255,255,255,0.3); transform:scale(1.02); }
+    .options li.correct { background:var(--correct)!important; }
+    .options li.incorrect { background:var(--wrong)!important; }
+    .explanation { font-size:14px; margin-top:15px; background:rgba(255,255,255,0.1); padding:10px; border-radius:8px; }
+    button#nextBtn {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      margin-top:20px; padding:12px 26px; font-size:1em; font-weight:600;
+      border:none; border-radius:8px; background:var(--accent); color:#fff;
+      cursor:pointer; transition:background .3s;
+    }
+    button#nextBtn:hover { background:#3c6e8f; }
+    @keyframes fadeInUp { from {opacity:0; transform:translateY(10px);} to {opacity:1; transform:none;} }
+    footer { font-size:14px; opacity:0.8; margin-bottom:20px; }
+
+    @media(max-width:500px){
+      .options li { font-size:0.95em; }
+      button#nextBtn { bottom:10px; right:20px; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Mechanism of Drugs</h1>
+  <div class="info-grid">
+    <div class="info-card"><h3><i class="fas fa-bolt"></i> Receptor Agonist</h3><p>Binds and activates a receptor to produce biological effect.</p></div>
+    <div class="info-card"><h3><i class="fas fa-ban"></i> Receptor Antagonist</h3><p>Blocks receptors, preventing activation by agonists.</p></div>
+    <div class="info-card"><h3><i class="fas fa-cut"></i> Enzyme Inhibitor</h3><p>Stops enzyme activity, altering chemical reactions in body.</p></div>
+    <div class="info-card"><h3><i class="fas fa-exchange-alt"></i> Ion Channel Blocker</h3><p>Prevents ions like Na⁺/K⁺ from passing through membrane channels.</p></div>
+    <div class="info-card"><h3><i class="fas fa-sync-alt"></i> Transport Inhibitor</h3><p>Blocks molecules from being transported across membranes.</p></div>
+    <div class="info-card"><h3><i class="fas fa-dna"></i> DNA Synthesis Inhibitor</h3><p>Used in cancer or bacterial drugs to halt replication.</p></div>
+  </div>
+
+  <div class="quiz-area">
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <div class="question" id="question">Loading question...</div>
+    <ul class="options" id="options"></ul>
+    <div class="explanation" id="explanation"></div>
+    <button id="nextBtn" onclick="nextQuestion()" style="display:none;">Next ➤</button>
+  </div>
+
+  <footer>Powered by your Medical Quiz App</footer>
+
+  <script>
+  const questions = [
+    // Original 5
+    {q:"What does a receptor agonist do?", opts:["Blocks receptor","Activates receptor","Destroys receptor","No effect"], ans:1, exp:"It mimics the natural ligand and triggers action."},
+    {q:"Enzyme inhibitors are used to:", opts:["Speed up reactions","Lower heart rate","Prevent chemical reactions","Block DNA"], ans:2, exp:"They block specific enzymes to alter body processes."},
+    {q:"Which drug blocks ion movement?", opts:["Enzyme inducer","Agonist","Ion channel blocker","Transport inhibitor"], ans:2, exp:"Used in antiarrhythmic or anticonvulsant drugs."},
+    {q:"Transport inhibitors affect:", opts:["Enzyme binding","Receptor response","Membrane transport","Protein folding"], ans:2, exp:"They block membrane transport proteins."},
+    {q:"Which mechanism is typical of chemotherapy?", opts:["Receptor agonism","Enzyme activation","DNA synthesis inhibition","Ion channel activation"], ans:2, exp:"Cancer drugs often stop DNA replication in cells."},
+
+    // 20 new questions
+    {q:"An antagonist drug:", opts:["Activates receptor","Blocks receptor","Enhances enzyme","Inhibits transporter"], ans:1, exp:"Prevent agonists from binding and activating receptor."},
+    {q:"Competitive antagonists bind:", opts:["Same site as agonist","Different site","Enzyme active site","DNA"], ans:0, exp:"They compete with agonists at binding site."},
+    {q:"Non-competitive antagonists bind:", opts:["Agonist site","Allosteric site","Transport channel","Enzyme substrate"], ans:1, exp:"They bind allosterically and reduce efficacy."},
+    {q:"Enzyme inducers:", opts:["Increase enzyme production","Block enzyme","Destroy receptor","Activate transporter"], ans:0, exp:"Increase metabolism, often lowering drug levels."},
+    {q:"Enzyme inhibitors:", opts:["Increase clearance","Decrease metabolism","Activate receptor","Block receptor"], ans:1, exp:"Slows metabolism, raising drug concentration."},
+    {q:"Irreversible enzyme inhibitors bind:", opts:["Weakly","Covalently","Temporarily","Ionically"], ans:1, exp:"Bind covalently—effects last until enzyme degraded."},
+    {q:"Transport inhibitors target:", opts:["Nuclei","Cell membrane transporters","Enzymes","Receptors"], ans:1, exp:"Block uptake or efflux transport proteins."},
+    {q:"Ion channel blockers are useful in:", opts:["Pain relief","Hypertension","Asthma","Cancer"], ans:1, exp:"E.g., calcium channel blockers for high blood pressure."},
+    {q:"Beta‑blockers act via:", opts:["Enzyme inhibition","Receptor antagonism","Ion channel blocking","Transport inhibiting"], ans:1, exp:"Block β‑adrenergic receptors to slow heart."},
+    {q:"SSRIs work by:", opts:["Blocking enzyme","Inhibiting transporter","Agonizing receptors","Channel blocking"], ans:1, exp:"Inhibit serotonin transporter so more stays in synapse."},
+    {q:"Proton pump inhibitors block:", opts:["Ion channel","Enzyme (ATPase)","Transporter","Receptor"], ans:1, exp:"Irreversibly inhibit the gastric H⁺/K⁺‑ATPase enzyme."},
+    {q:"Statins inhibit:", opts:["HMG‑CoA reductase","Enzyme induction","Transporter","Ion channel"], ans:0, exp:"Lower cholesterol by inhibiting HMG‑CoA reductase."},
+    {q:"Which is a reversible antagonism?", opts:["Covalent block","Non-competitive","Competitive","Irreversible"], ans:2, exp:"Agonist can out‑compete with enough concentration."},
+    {q:"Partial agonists:", opts:["No effect","Full activation","Partial activation","Inverse effect"], ans:2, exp:"Activate receptor but produce sub-maximal response."},
+    {q:"Inverse agonists:", opts:["Activate receptor","Block receptor","Produce opposite response","No effect"], ans:2, exp:"Reduce basal receptor activity below normal level."},
+    {q:"Monoclonal antibodies act via:", opts:["Ion channels","Enzymes","Receptors","Transporters"], ans:2, exp:"Bind receptors to block ligands or trigger immune response."},
+    {q:"Chemo‑resistance often involves:", opts:["Enhanced transporter efflux","Ion channel blockage","Receptor activation","DNA activation"], ans:0, exp:"Cancer cells pump drugs out via efflux transporters."},
+    {q:"Opioids are receptor:", opts:["Antagonists","Agonists","Enzyme blockers","Transport inhibitors"], ans:1, exp:"Activate opioid receptors to produce analgesia."},
+    {q:"ACE inhibitors lower BP by:", opts:["Blocking receptor","Inhibiting enzyme","Activating transporter","Channel blocking"], ans:1, exp:"Inhibit angiotensin-converting enzyme."},
+    {q:"Calcium channel blockers treat:", opts:["Infection","Hypertension","Diabetes","Hypothyroidism"], ans:1, exp:"They dilate vessels by blocking Ca²⁺ entry."},
+    {q:"Which binds receptor and activates?", opts:["Antagonist","Agonist","Inhibitor","Blocker"], ans:1, exp:"That's the definition of an agonist."},
+    {q:"Which reduces natural agonist effect?", opts:["Agonist","Partial agonist","Antagonist","Transporter"], ans:2, exp:"Antagonist prevents activation by natural ligand."},
+    {q:"A substrate that binds but not activate receptor is:", opts:["Agonist","Inverse agonist","Antagonist","Enhancer"], ans:2, exp:"That’s an antagonist—they block activation."}
+  ];
+
+  let idx = 0, score = 0, total = questions.length;
+
+  function load(){
+    const data = questions[idx];
+    document.getElementById("question").textContent = data.q;
+    const optbox = document.getElementById("options");
+    optbox.innerHTML = "";
+    data.opts.forEach((t,i)=>{
+      const li = document.createElement("li");
+      li.textContent = t;
+      li.onclick = () => selectAnswer(i, li);
+      optbox.appendChild(li);
+    });
+    document.getElementById("explanation").textContent = "";
+    document.getElementById("nextBtn").style.display = "none";
+    document.getElementById("progress").style.width = (idx/total*100) + "%";
+  }
+
+  function selectAnswer(i, el){
+    const data = questions[idx];
+    document.querySelectorAll(".options li").forEach(li => li.onclick = null);
+    if(i === data.ans){
+      el.classList.add("correct");
+      score++;
+    } else {
+      el.classList.add("incorrect");
+      document.querySelectorAll(".options li")[data.ans].classList.add("correct");
+    }
+    document.getElementById("explanation").textContent = data.exp;
+    document.getElementById("nextBtn").style.display = "block";
+  }
+
+  function nextQuestion(){
+    idx++;
+    if(idx < total) load();
+    else {
+      alert(`✅ Quiz Complete! You scored ${score}/${total}`);
+      idx = 0; score = 0; load();
+    }
+  }
+
+  window.onload = load;
+</script>
+</body>
+</html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+</head>
+
+<body>
+  
+</body>
+
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Drug Basics & Quiz</title>
+  <title>Drug Administration & Quiz</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
     :root {
@@ -89,14 +89,14 @@ button#nextBtn {
   </style>
 </head>
 <body>
-  <h1> Drug Basics</h1>
+  <h1>Drug Administration Routes</h1>
   <div class="info-grid">
-    <div class="info-card"><h3><i class="fas fa-pills"></i> What is a Drug?</h3><p>A drug is any chemical substance that causes physiological change...</p></div>
-    <div class="info-card"><h3><i class="fas fa-sync-alt"></i> ADME</h3><p>Absorption • Distribution • Metabolism • Excretion – how drugs move through your body.</p></div>
-    <div class="info-card"><h3><i class="fas fa-brain"></i> Pharmacodynamics</h3><p>How drugs act on your body – e.g. receptor binding and effects.</p></div>
-    <div class="info-card"><h3><i class="fas fa-tools"></i> Pharmacokinetics</h3><p>What your body does to the drug (ADME processes).</p></div>
-    <div class="info-card"><h3><i class="fas fa-balance-scale"></i> Therapeutic Index</h3><p>Safety measure—difference between therapeutic and toxic doses.</p></div>
-    <div class="info-card"><h3><i class="fas fa-liver"></i> First‑Pass Effect</h3><p>Oral drugs may be inactivated by liver before reaching bloodstream.</p></div>
+    <div class="info-card"><h3><i class="fas fa-capsules"></i> Oral</h3><p>Most common and convenient. Taken by mouth and absorbed via GI tract.</p></div>
+    <div class="info-card"><h3><i class="fas fa-syringe"></i> Intravenous (IV)</h3><p>Injected directly into vein. Fastest onset and 100% bioavailability.</p></div>
+    <div class="info-card"><h3><i class="fas fa-syringe"></i> Intramuscular (IM)</h3><p>Injected into muscle tissue. Slower than IV, faster than oral.</p></div>
+    <div class="info-card"><h3><i class="fas fa-inhaler"></i> Inhalation</h3><p>Delivered to lungs. Rapid effect due to large surface area and blood supply.</p></div>
+    <div class="info-card"><h3><i class="fas fa-hand-holding-water"></i> Subcutaneous (SC)</h3><p>Injected under skin. Slower absorption, used for insulin, vaccines.</p></div>
+    <div class="info-card"><h3><i class="fas fa-toilet-paper"></i> Rectal</h3><p>Useful when oral route is not possible. Partially bypasses first-pass effect.</p></div>
   </div>
 
   <div class="quiz-area">
@@ -111,26 +111,14 @@ button#nextBtn {
 
   <script>
     const questions = [
-      {q:"What does ADME stand for?", opts:["Absorb, Distribute…","Administer, Direct…","Absorption, Distribution, Metabolism, Excretion","Active Drug Mechanism Excretion"], ans:2, exp:"It’s classic pharmacokinetics acronym."},
-      {q:"Which organ metabolizes most drugs?", opts:["Kidney","Liver","Lung","Skin"], ans:1, exp:"The liver via cytochrome P450 enzymes."},
-      {q:"Pharmacodynamics refers to:", opts:["What body does to drugs","Drug distribution","Drug effects on body","Drug pre‑clinical development"], ans:2, exp:"It studies what the drug does to your body."},
-      {q:"First‑pass effect affects:", opts:["IV drugs","Inhaled drugs","Oral drugs","Topical drugs"], ans:2, exp:"Only oral drugs pass through liver before reaching blood."},
-      {q:"Therapeutic index measures:", opts:["Potency","Safety margin","Rate of absorption","Chemical purity"], ans:1, exp:"TI = toxic dose ÷ effective dose."},
-      {q:"Bioavailability of IV dose is:", opts:["50%","0%","100%","Variable"], ans:2, exp:"IV bypasses absorption so full amount reaches circulation."},
-      {q:"Half‑life is time to:", opts:["Reach peak","Absorb 50%","Eliminate 50% of drug","Activate drug"], ans:2, exp:"A pharmacokinetic measure of elimination."},
-      {q:"Prodrug is:", opts:["Active drug","Inactive until metabolized","Poison","None"], ans:1, exp:"Requires metabolic conversion to become active."},
-      {q:"Agonist drug:", opts:["Blocks receptor","Activates receptor","Damages receptor","None"], ans:1, exp:"Fits receptor and triggers response."},
-      {q:"Antagonist drug:", opts:["Activates receptor","Blocks response","Causes toxic effect","Enhances agonist"], ans:1, exp:"Prevents receptor activation by agonists."},
-      {q:"Which is NOT part of ADME?", opts:["Excretion","Distribution","Mechanism of Action","Absorption"], ans:2, exp:"Mechanism of action is pharmacodynamics."},
-      {q:"Enzyme inducer:", opts:["Decreases metabolism","Increases metabolism","Inactive agent","None"], ans:1, exp:"Accelerates drug breakdown."},
-      {q:"High first‑pass effect reduces:", opts:["Safety","Bioavailability","Potency","Excretion"], ans:1, exp:"Liver metabolism lowers absorbed dose."},
-      {q:"Volume of distribution describes:", opts:["Dose size","Apparent drug volume","Absorption rate","Toxic dose"], ans:1, exp:"Relates drug concentration to amount stored."},
-      {q:"EC₅₀ means:", opts:["Toxic dose","Half‑max effect concentration","Clearance rate","Absorption half‑time"], ans:1, exp:"Middle point on dose-response curve."},
-      {q:"Loading dose purpose:", opts:["Slow absorption","Quick therapeutic level","Test tolerance","None"], ans:1, exp:"Boost dose to reach steady state fast."},
-      {q:"Route bypassing first‑pass:", opts:["Oral","Rectal","IV","Topical"], ans:2, exp:"IV avoids liver before circulation."},
-      {q:"Steady state achieved when:", opts:["Input=elimination","Clearance doubles","Absorption stops","Half‑life ends"], ans:0, exp:"Intake equals elimination over time."},
-      {q:"Tolerance means:", opts:["Increased effect","Decreased response","No effect change","Overdose"], ans:1, exp:"Requires higher dose over time for same effect."},
-      {q:"MEC stands for:", opts:["Minimum Effective Concentration","Maximum Efficacy Count","Medium Excretion Constant","Minimum Excretion Constant"], ans:0, exp:"Lowest drug level needed for effect."}
+      {q:"Which route provides 100% bioavailability?", opts:["Oral","Rectal","IV","IM"], ans:2, exp:"IV directly enters bloodstream with no absorption loss."},
+      {q:"What’s the major downside of oral administration?", opts:["Infection risk","Pain","First-pass metabolism","Slow distribution"], ans:2, exp:"Oral drugs are metabolized in liver before reaching circulation."},
+      {q:"Subcutaneous injections are commonly used for:", opts:["Emergency drugs","Insulin delivery","Anesthesia","Antibiotics"], ans:1, exp:"Insulin is administered subcutaneously for sustained release."},
+      {q:"Which has the fastest onset?", opts:["Oral","SC","IM","IV"], ans:3, exp:"IV is immediate because it's directly in blood."},
+      {q:"Inhalation route is best for:", opts:["Heart drugs","Respiratory drugs","Skin diseases","Neurological issues"], ans:1, exp:"Inhaled drugs act quickly in lungs, ideal for asthma etc."},
+      {q:"Which bypasses liver first-pass effect the most?", opts:["Oral","Rectal","IV","Sublingual"], ans:2, exp:"IV completely avoids liver metabolism on first pass."},
+      {q:"Rectal administration is helpful when:", opts:["Patient is vomiting","Drug is tasteless","Time is flexible","Pain is desired"], ans:0, exp:"Useful if oral route isn’t feasible."},
+      {q:"Which route is most painful?", opts:["Inhalation","Topical","IV","Oral"], ans:2, exp:"IV involves needle puncture and is often uncomfortable."}
     ];
     let idx=0, score=0, total=questions.length;
     function load(){
@@ -160,7 +148,7 @@ button#nextBtn {
       idx++;
       if(idx<total) load();
       else {
-        alert(`✅ Finish! You scored ${score}/${total}`);
+        alert(`✅ Quiz Complete! You scored ${score}/${total}`);
         idx=0; score=0; load();
       }
     }
