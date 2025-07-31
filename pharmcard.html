@@ -23,27 +23,24 @@
     }
 
     @keyframes fadeIn {
-      0% {
-        opacity: 0;
-        transform: scale(0.97);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
     }
 
     .card-container {
       perspective: 1200px;
       margin-bottom: 100px;
+      position: relative;
+      width: 280px;
+      height: 180px;
     }
 
     .card {
-      width: 260px;
-      height: 160px;
-      position: relative;
+      width: 100%;
+      height: 100%;
+      position: absolute;
       transform-style: preserve-3d;
-      transition: transform 0.8s ease;
+      transition: transform 0.6s ease, opacity 0.4s ease;
       cursor: pointer;
       border-radius: 20px;
     }
@@ -75,6 +72,24 @@
       transform: rotateY(180deg);
     }
 
+    .card.animate-next {
+      animation: slideOutLeft 0.4s forwards ease;
+    }
+
+    .card.animate-prev {
+      animation: slideOutRight 0.4s forwards ease;
+    }
+
+    @keyframes slideOutLeft {
+      0% { opacity: 1; transform: translateX(0); }
+      100% { opacity: 0; transform: translateX(-300px); }
+    }
+
+    @keyframes slideOutRight {
+      0% { opacity: 1; transform: translateX(0); }
+      100% { opacity: 0; transform: translateX(300px); }
+    }
+
     .buttons {
       display: flex;
       gap: 14px;
@@ -101,7 +116,7 @@
     }
 
     @media (max-width: 400px) {
-      .card {
+      .card-container {
         width: 85vw;
         height: 150px;
       }
@@ -146,14 +161,14 @@
         question: "What is the antidote for acetaminophen overdose?",
         answer: "N-acetylcysteine (NAC)."
       }
-      // Add more questions here
+      // ➕ Add more flashcards here
     ];
 
     let currentCard = 0;
     let isFlipped = false;
+    const card = document.getElementById("flashcard");
 
-    function updateCard() {
-      const card = document.getElementById("flashcard");
+    function updateCardContent() {
       card.classList.remove("flipped");
       isFlipped = false;
       document.getElementById("question").textContent = flashcards[currentCard].question;
@@ -161,22 +176,33 @@
     }
 
     function flipCard() {
-      const card = document.getElementById("flashcard");
       isFlipped = !isFlipped;
       card.classList.toggle("flipped");
     }
 
+    function animateAndChange(direction) {
+      card.classList.add(direction === "next" ? "animate-next" : "animate-prev");
+
+      setTimeout(() => {
+        card.classList.remove("animate-next", "animate-prev");
+        if (direction === "next") {
+          currentCard = (currentCard + 1) % flashcards.length;
+        } else {
+          currentCard = (currentCard - 1 + flashcards.length) % flashcards.length;
+        }
+        updateCardContent();
+      }, 400);
+    }
+
     function nextCard() {
-      currentCard = (currentCard + 1) % flashcards.length;
-      updateCard();
+      animateAndChange("next");
     }
 
     function prevCard() {
-      currentCard = (currentCard - 1 + flashcards.length) % flashcards.length;
-      updateCard();
+      animateAndChange("prev");
     }
 
-    updateCard();
+    updateCardContent();
   </script>
 
 </body>
