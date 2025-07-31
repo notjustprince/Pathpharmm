@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bioavailability Concepts & Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #283c86, #45a247);
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 { text-align: center; margin-bottom: 20px; }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+      gap: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    .info-card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .info-card h3 { margin-bottom: 8px; font-size: 1.1em; }
+    .info-card p { font-size: 0.9em; line-height: 1.4; }
+
+    .quiz-area {
+      max-width: 600px;
+      margin: 30px auto;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 16px;
+      position: relative;
+      padding-bottom: 80px;
+    }
+
+    .progress-bar {
+      background: rgba(255,255,255,0.3);
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #00e0ff;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .question { font-size: 1.2em; margin-bottom: 20px; }
+    ul.options { list-style: none; padding: 0; }
+    ul.options li {
+      background: rgba(255,255,255,0.2);
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    ul.options li:hover { background: rgba(255,255,255,0.3); }
+    ul.options li.correct { background: #4caf50 !important; }
+    ul.options li.incorrect { background: #f44336 !important; }
+
+    #nextBtn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 24px;
+      border: none;
+      background: #00e0ff;
+      color: black;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .explanation {
+      margin-top: 15px;
+      background: rgba(255,255,255,0.1);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bioavailability & Absorption</h1>
+
+  <div class="info-grid">
+    <div class="info-card"><h3>First-Pass Effect</h3><p>Drug metabolism in liver/GI before reaching systemic circulation.</p></div>
+    <div class="info-card"><h3>Absolute Bioavailability</h3><p>Fraction of administered dose reaching circulation intact.</p></div>
+    <div class="info-card"><h3>Relative Bioavailability</h3><p>Comparison of bioavailability between formulations or routes.</p></div>
+    <div class="info-card"><h3>Absorption Factors</h3><p>pH, solubility, permeability, surface area influence bioavailability.</p></div>
+    <div class="info-card"><h3>Dosage Form Impact</h3><p>Formulation (e.g., solution vs tablet) affects absorption rate.</p></div>
+    <div class="info-card"><h3>Food Effect</h3><p>Presence of food can increase or decrease absorption.</p></div>
+  </div>
+
+  <div class="quiz-area">
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <div class="question" id="question">Loading question...</div>
+    <ul class="options" id="options"></ul>
+    <div class="explanation" id="explanation"></div>
+    <button id="nextBtn" onclick="nextQuestion()">Next ➤</button>
+  </div>
+
+  <script>
+    const questions = [
+      {q:"Absolute bioavailability of IV administration is:", opts:["<100%","Exactly 100%","Variable <100","Cannot determine"], ans:1, exp:"IV route delivers full dose to systemic circulation."},
+      {q:"First-pass metabolism occurs primarily in the:", opts:["Liver","Kidney","Lung","Skin"], ans:0, exp:"Drugs absorbed orally pass through portal circulation to liver."},
+      {q:"Relative bioavailability compares:", opts:["Bioavailability to IV","Two formulations","Bioavailability to oral","Plasma levels to liver levels"], ans:1, exp:"Relative compares different dosage forms or routes."},
+      {q:"Food that decreases absorption might:", opts:["Increase GI pH","Empty stomach","Promote constant release","Boost solubility"], ans:0, exp:"Food may alter gastric pH and reduce absorption."},
+      {q:"Bioavailability is affected by:", opts:["Particle size","Drug color","Packaging","Label"], ans:0, exp:"Smaller particles dissolve faster → better absorption."},
+      {q:"Poor permeability across gut wall reduces bioavailability by:", opts:["First-pass effect","Transport limitation","Solubility only","Clearance"], ans:1, exp:"Low permeability limits drug crossing membranes."},
+      {q:"Suspension vs solution: which has faster absorption?", opts:["Suspension","Solution","Tablet","Capsule"], ans:1, exp:"Solution is pre-dissolved—absorbed faster."},
+      {q:"Higher hepatic blood flow increases bioavailability when first-pass is:", opts:["Low","High","None","Not relevant"], ans:0, exp:"If first-pass metabolism is low, higher flow has little effect."},
+      {q:"Which route bypasses first-pass metabolism completely?", opts:["Oral","Sublingual","Rectal","Transdermal"], ans:1, exp:"Sublingual avoids hepatic first-pass via mucosal absorption."},
+      {q:"Food that increases absorption might:", opts:["Delay gastric emptying","Lower pH","Reduce transit time","Inactivate enzymes"], ans:0, exp:"Delaying gastric emptying gives time for absorption."},
+      {q:"Poor solubility limits bioavailability due to:", opts:["Low dose","Slow dissolution","Taste issues","High permeability"], ans:1, exp:"Drug must dissolve before absorption."},
+      {q:"Bioavailability (F) = AUC oral ÷ AUC IV ×:", opts:["Dose IV/Dose oral","Dose oral/Dose IV","Dose oral²","Dose irrelevant"], ans:1, exp:"Relative formula adjusts for dose differences."},
+      {q:"If a drug’s F is very low (<10%), you might:", opts:["Give high oral dose","Use IV","Use capsule form","Increase marketing"], ans:0, exp:"Higher dose needed or choose alternative route."},
+      {q:"A drug with high first-pass extraction will have:", opts:["High F","Low F","Variable F","100% F"], ans:1, exp:"Most of drug dose is metabolized before systemic circulation."},
+      {q:"Intramuscular route bioavailability is usually:", opts:["<50%","~100%","0%","Cannot absorb"], ans:1, exp:"IM absorption often avoids first-pass—F ≈100%."},
+      {q:"The main site of drug absorption in oral route is:", opts:["Stomach","Small intestine","Colon","Lungs"], ans:1, exp:"Large surface area of small intestine favors absorption."},
+      {q:"Food can reduce bioavailability by:", opts:["Binding drug","Destroying liver","Increasing solubility","Coloring tablets"], ans:0, exp:"Food components may bind or chelate drug, hindering absorption."},
+      {q:"Relative bioavailability >100% suggests:", opts:["Better formulation","Worse absorption","More toxicity","Less efficacy"], ans:0, exp:"The test formulation absorbs better than reference."},
+      {q:"Transdermal patch bioavailability is:", opts:["High first pass","100% in plasma","Independent of liver","Cloudy absorption"], ans:2, exp:"Patch bypasses GI/liver metabolism unless enters bloodstream."},
+      {q:"Delayed-release tablets improve bioavailability by:", opts:["Protecting drug until absorption site","Speeding absorption","Changing potency","Reducing dose"], ans:0, exp:"Release occurs where drug is more stable or absorbable."}
+    ];
+
+    let idx = 0, score = 0;
+    const total = questions.length;
+
+    function shuffle(arr) {
+      return arr.map(x => [x, Math.random()])
+                .sort((a,b) => a[1]-b[1])
+                .map(x => x[0]);
+    }
+
+    function load() {
+      const data = questions[idx];
+      document.getElementById("question").textContent = data.q;
+      document.getElementById("explanation").textContent = "";
+      document.getElementById("nextBtn").style.display = "none";
+      document.getElementById("progress").style.width = ((idx / total) * 100) + "%";
+
+      const optsEl = document.getElementById("options");
+      optsEl.innerHTML = "";
+      const correct = data.opts[data.ans];
+      shuffle(data.opts).forEach(opt => {
+        const li = document.createElement("li");
+        li.textContent = opt;
+        li.onclick = () => {
+          document.querySelectorAll("li").forEach(li => li.onclick = null);
+          if (opt === correct) { li.classList.add("correct"); score++; }
+          else {
+            li.classList.add("incorrect");
+            document.querySelectorAll("li").forEach(el => {
+              if (el.textContent === correct) el.classList.add("correct");
+            });
+          }
+          document.getElementById("explanation").textContent = data.exp;
+          document.getElementById("nextBtn").style.display = "block";
+        };
+        optsEl.appendChild(li);
+      });
+    }
+
+    function nextQuestion() {
+      idx++;
+      if (idx >= total) {
+        alert(`✅ Quiz complete! You scored ${score}/${total}`);
+        idx = 0; score = 0;
+      }
+      load();
+    }
+
+    window.onload = load;
+  </script>
+</body>
+</html>

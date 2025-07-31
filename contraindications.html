@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Drug Contraindications & Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #8B0000, #FF4500);
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 { text-align: center; margin-bottom: 20px; }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    .info-card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .info-card h3 { margin-bottom: 8px; font-size: 1.1em; }
+    .info-card p { font-size: 0.9em; line-height: 1.4; }
+
+    .quiz-area {
+      max-width: 600px;
+      margin: 30px auto;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 16px;
+      position: relative;
+      padding-bottom: 80px;
+    }
+
+    .progress-bar {
+      background: rgba(255,255,255,0.3);
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #FFD700;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .question { font-size: 1.2em; margin-bottom: 20px; }
+    ul.options { list-style: none; padding: 0; }
+    ul.options li {
+      background: rgba(255,255,255,0.2);
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    ul.options li:hover { background: rgba(255,255,255,0.3); }
+    ul.options li.correct { background: #4caf50 !important; }
+    ul.options li.incorrect { background: #f44336 !important; }
+
+    #nextBtn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 24px;
+      border: none;
+      background: #FFD700;
+      color: black;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .explanation {
+      margin-top: 15px;
+      background: rgba(255,255,255,0.1);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Drug Contraindications</h1>
+
+  <div class="info-grid">
+    <div class="info-card"><h3>Absolute</h3><p>Never use—risk outweighs benefit.</p></div>
+    <div class="info-card"><h3>Relative</h3><p>Use with caution, weigh risks vs benefits.</p></div>
+    <div class="info-card"><h3>Age-related</h3><p>Contraindicated in pediatrics or geriatric patients.</p></div>
+    <div class="info-card"><h3>Pregnancy</h3><p>Teratogenic risks or fetal harm.</p></div>
+    <div class="info-card"><h3>Organ Dysfunction</h3><p>Liver, kidney, heart impairment.</p></div>
+    <div class="info-card"><h3>Drug Allergy</h3><p>Hypersensitivity reactions contraindicate use.</p></div>
+  </div>
+
+  <div class="quiz-area">
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <div class="question" id="question">Loading question...</div>
+    <ul class="options" id="options"></ul>
+    <div class="explanation" id="explanation"></div>
+    <button id="nextBtn" onclick="nextQuestion()">Next ➤</button>
+  </div>
+
+  <script>
+    const questions = [
+      { q:"Furosemide in anuric patients is:", opts:["Absolute contraindication","Relative contraindication","Safe dose adjustment","First-line therapy"], ans:0, exp:"Without urine output, loop diuretics are ineffective—absolute CI." },
+      { q:"ACE inhibitors in pregnancy:", opts:["Absolute contraindication","Relative contraindication","Safe if monitored","Dose reduced"], ans:0, exp:"They cause fetal renal damage—absolute CI." },
+      { q:"Nitrofurantoin in late pregnancy:", opts:["Absolute week‑by‑week","Relative contraindication","Safe third trimester","Allowed with hydration"], ans:0, exp:"Contraindicated near term—risk of neonatal hemolysis." },
+      { q:"Use of NSAIDs in severe renal impairment:", opts:["Relative contraindication","Absolute contraindication","Safe if dose reduced","No concerns"], ans:1, exp:"NSAIDs worsen renal function—absolute CI." },
+      { q:"Warfarin in mechanical heart valves:", opts:["Absolute contraindicated","Relative contraindication","Safe alternative exists","Use LMWH"], ans:0, exp:"Critical indication—warfarin required, not contraindicated." },
+      { q:"Metformin in eGFR <30 mL/min:", opts:["Absolute contraindication","Relative contraindication","Safe with monitoring","Dose adjustment only"], ans:0, exp:"High risk of lactic acidosis—absolute CI." },
+      { q:"Statins with active liver disease:", opts:["Relative contraindication","Absolute contraindication","Safe if AST mildly elevated","Use alternative"], ans:1, exp:"Uncontrolled hepatic injury—absolute CI." },
+      { q:"Beta‑blockers in asthma:", opts:["Relative contraindication","Absolute contraindication","Safe selective use","No issue"], ans:0, exp:"Nonselective beta‑blockers may exacerbate asthma—relative CI." },
+      { q:"Use of tetracyclines in children <8 yrs:", opts:["Absolute contraindication","Relative contraindication","Dose adjust","Safe"], ans:0, exp:"Risk of teeth and bone effects—absolute CI." },
+      { q:"Amiodarone in QT prolongation:", opts:["Relative contraindication","Absolute contraindication","Safe if ECG monitored","No issue"], ans:0, exp:"Requires caution—relative CI." },
+      { q:"IV contrast in severe iodine allergy:", opts:["Absolute contraindication","Relative contraindication","Pre‑medicate","Low‑dose safe"], ans:0, exp:"Severe allergy is absolute CI unless emergency." },
+      { q:"Sulfonamides in G6PD deficiency:", opts:["Relative contraindication","Absolute contraindication","Safe short course","Monitor CBC"], ans:0, exp:"May cause hemolysis—relative CI." },
+      { q:"Live vaccines in immunocompromised:", opts:["Absolute contraindication","Relative contraindication","Safe after prophylaxis","Administer abroad"], ans:0, exp:"Risk of infection—absolute CI." },
+      { q:"Use of ACEi with bilateral renal artery stenosis:", opts:["Relative contraindication","Absolute contraindication","Safe low dose","Monitor labs"], ans:0, exp:"May precipitate renal failure—relative CI." },
+      { q:"Opioids with severe respiratory depression:", opts:["Absolute contraindication","Relative contraindication","Adjusted dose","Safe if monitored"], ans:0, exp:"Risk of apnea—absolute CI." },
+      { q:"Heparin in history of HIT (heparin‑induced thrombocytopenia):", opts:["Absolute contraindication","Relative contraindication","Use UF instead","No issue"], ans:0, exp:"Immune‑mediated—absolute CI." },
+      { q:"NSAIDs in peptic ulcer disease:", opts:["Relative contraindication","Absolute contraindication","Safe if PPI given","No issue"], ans:0, exp:"Causes GI bleed risk—relative CI." },
+      { q:"Use of nitrates with sildenafil:", opts:["Absolute contraindication","Relative contraindication","Use spaced dosing","No interaction"], ans:0, exp:"Leads to profound hypotension—absolute CI." },
+      { q:"Ceftriaxone in neonates with hyperbilirubinemia:", opts:["Absolute contraindication","Relative contraindication","Safe if dose reduced","No issue"], ans:0, exp:"Displaces bilirubin—neonatal kernicterus risk." },
+      { q:"Erythromycin IV in neonates:", opts:["Absolute contraindication","Relative contraindication","Safe zone dose","No concern"], ans:0, exp:"Risk of pyloric stenosis or cardiac issues—absolute CI." }
+    ];
+
+    let idx = 0, score = 0;
+    const total = questions.length;
+
+    function shuffle(arr) {
+      return arr.map(x => [x, Math.random()])
+                .sort((a,b) => a[1]-b[1])
+                .map(x => x[0]);
+    }
+
+    function load() {
+      const data = questions[idx];
+      document.getElementById("question").textContent = data.q;
+      document.getElementById("explanation").textContent = "";
+      document.getElementById("nextBtn").style.display = "none";
+      document.getElementById("progress").style.width = ((idx / total) * 100) + "%";
+
+      const optsEl = document.getElementById("options");
+      optsEl.innerHTML = "";
+
+      const correct = data.opts[data.ans];
+      const shuffled = shuffle(data.opts);
+      shuffled.forEach(opt => {
+        const li = document.createElement("li");
+        li.textContent = opt;
+        li.onclick = () => {
+          document.querySelectorAll("li").forEach(li => li.onclick = null);
+          if (opt === correct) {
+            li.classList.add("correct");
+            score++;
+          } else {
+            li.classList.add("incorrect");
+            document.querySelectorAll("li").forEach(el => {
+              if (el.textContent === correct) el.classList.add("correct");
+            });
+          }
+          document.getElementById("explanation").textContent = data.exp;
+          document.getElementById("nextBtn").style.display = "block";
+        };
+        optsEl.appendChild(li);
+      });
+    }
+
+    function nextQuestion() {
+      idx++;
+      if (idx >= total) {
+        alert(`✅ Quiz complete! You scored ${score}/${total}`);
+        idx = 0; score = 0;
+      }
+      load();
+    }
+
+    window.onload = load;
+  </script>
+</body>
+</html>

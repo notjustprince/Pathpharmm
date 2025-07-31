@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clinical Trials Concepts & Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 { text-align: center; margin-bottom: 20px; }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+      gap: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    .info-card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .info-card h3 { margin-bottom: 8px; font-size: 1.1em; }
+    .info-card p { font-size: 0.9em; line-height: 1.4; }
+
+    .quiz-area {
+      max-width: 600px;
+      margin: 30px auto;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 16px;
+      position: relative;
+      padding-bottom: 80px;
+    }
+
+    .progress-bar {
+      background: rgba(255,255,255,0.3);
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #00e0ff;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .question { font-size: 1.2em; margin-bottom: 20px; }
+    ul.options { list-style: none; padding: 0; }
+    ul.options li {
+      background: rgba(255,255,255,0.2);
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    ul.options li:hover { background: rgba(255,255,255,0.3); }
+    ul.options li.correct { background: #4caf50 !important; }
+    ul.options li.incorrect { background: #f44336 !important; }
+
+    #nextBtn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 24px;
+      border: none;
+      background: #00e0ff;
+      color: black;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .explanation {
+      margin-top: 15px;
+      background: rgba(255,255,255,0.1);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Clinical Trials & Design</h1>
+
+  <div class="info-grid">
+    <div class="info-card"><h3>Phase I</h3><p>Safety and dosage in healthy volunteers.</p></div>
+    <div class="info-card"><h3>Phase II</h3><p>Efficacy and side effects in patient group.</p></div>
+    <div class="info-card"><h3>Phase III</h3><p>Large-scale randomized trials to confirm efficacy.</p></div>
+    <div class="info-card"><h3>Phase IV</h3><p>Post-marketing surveillance and long-term safety.</p></div>
+    <div class="info-card"><h3>Randomized Controlled Trial</h3><p>Subjects randomly assigned to intervention/control.</p></div>
+    <div class="info-card"><h3>Blinding</h3><p>Single, double, or triple blinding reduces bias.</p></div>
+  </div>
+
+  <div class="quiz-area">
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <div class="question" id="question">Loading question...</div>
+    <ul class="options" id="options"></ul>
+    <div class="explanation" id="explanation"></div>
+    <button id="nextBtn" onclick="nextQuestion()">Next ➤</button>
+  </div>
+
+  <script>
+    const questions = [
+      {q:"Phase I trials assess primarily:", opts:["Efficacy","Side effects","Dosage and safety","Market price"], ans:2, exp:"Phase I focuses on safety and dose-ranging."},
+      {q:"Phase III trials usually involve:", opts:["Nothing","Large patient population","Healthy volunteers","Animal studies"], ans:1, exp:"Confirm efficacy in large-scale human trials."},
+      {q:"Double-blind design means:", opts:["Only patient unaware","Neither patient nor investigator knows","Only investigator unaware","All parties know"], ans:1, exp:"Both subject and researcher are blinded."},
+      {q:"Randomization minimizes:", opts:["Cost","Bias","Efficacy","Duration"], ans:1, exp:"Reduces selection bias across groups."},
+      {q:"Phase IV studies track:", opts:["Short-term efficacy","Market competition","Long-term safety","Preclinical results"], ans:2, exp:"Post-market surveillance of adverse effects."},
+      {q:"Placebo-controlled trials:", opts:["Use sugar pill","Skip control","Use no treatment","Use historical data only"], ans:0, exp:"Placebo mimics drug but has no active ingredient."},
+      {q:"Crossover trials:", opts:["Each participant receives both treatments","All in one group","Multiple blinding methods","Parallel arms only"], ans:0, exp:"Subjects switch between interventions over time."},
+      {q:"Informed consent means:", opts:["Participation is mandatory","Participation is voluntary","Consent is implied","Consent isn't needed"], ans:1, exp:"Participants must agree voluntarily after information."},
+      {q:"Intention-to-treat analysis includes:", opts:["Only completers","All randomized subjects","Only drug group","Only control group"], ans:1, exp:"Prevents bias by including all allocated subjects."},
+      {q:"Primary endpoint refers to:", opts:["Main outcome measure","Safety only","Side effects","Secondary measure"], ans:0, exp:"Primary endpoint is main outcome assessed."},
+      {q:"Adaptive trial design allows:", opts:["Post-hoc data changes","Protocol modifications during trial","No changes allowed","Manual analysis only"], ans:1, exp:"Permits design adjustments based on interim data."},
+      {q:"Surrogate endpoint is:", opts:["Direct clinical outcome","Indirect marker used as proxy","Unrelated measure","Adverse event only"], ans:1, exp:"A lab measure that predicts clinical outcome."},
+      {q:"Masking/unblinding should not occur:", opts:["During analysis","Before consent","After consent","At end"], ans:1, exp:"Participants must stay unaware until consent."},
+      {q:"Parallel-group trials compare:", opts:["Same subject sequentially","Different groups concurrently","Cross-over only","Single-arm"], ans:1, exp:"Different arms tested simultaneously."},
+      {q:"Control arm serves as:", opts:["Backup data","Baseline comparison","Intervention only","Compliance check"], ans:1, exp:"Helps evaluate treatment effect vs control."},
+      {q:"Equivalence trial shows:", opts:["Superior drug","Accept no difference within margin","Inferior option","Same side effects always"], ans:1, exp:"Tests if new drug falls within margin of old."},
+      {q:"Primary vs secondary endpoints:", opts:["Same importance","Primary is main, secondary supportive","Secondary always safer","Endpoints not relevant"], ans:1, exp:"Secondary adds supportive data."},
+      {q:"Open-label trial means:", opts:["Single blind","Everyone knows treatment","Neither knows","Data hidden"], ans:1, exp:"No blinding at any level."},
+      {q:"Dropouts should be handled by:", opts:["Exclusion only","Imputation or intention-to-treat","Ignoring","Secondary endpoint use"], ans:1, exp:"Maintain analytic integrity with proper handling."},
+      {q:"Ethical clinical trials require:", opts:["No consent","Scientific review board approval","Only sponsor approval","Post-trial only"], ans:1, exp:"Requires ethics board approval before starting."}
+    ];
+
+    let idx=0, score=0, total = questions.length;
+
+    function shuffle(arr) {
+      return arr.map(x => [x, Math.random()]).sort((a,b)=>a[1]-b[1]).map(x=>x[0]);
+    }
+
+    function load() {
+      const data = questions[idx];
+      document.getElementById("question").textContent = data.q;
+      document.getElementById("explanation").textContent = "";
+      document.getElementById("nextBtn").style.display = "none";
+      document.getElementById("progress").style.width = ((idx/total)*100)+"%";
+
+      const optsEl = document.getElementById("options");
+      optsEl.innerHTML = "";
+      const correct = data.opts[data.ans];
+      shuffle(data.opts).forEach(opt=>{
+        const li = document.createElement("li");
+        li.textContent = opt;
+        li.onclick = ()=>{
+          document.querySelectorAll("li").forEach(li=>li.onclick=null);
+          if (opt===correct) { li.classList.add("correct"); score++; }
+          else {
+            li.classList.add("incorrect");
+            document.querySelectorAll("li").forEach(el=>{
+              if(el.textContent===correct) el.classList.add("correct");
+            });
+          }
+          document.getElementById("explanation").textContent = data.exp;
+          document.getElementById("nextBtn").style.display="block";
+        };
+        optsEl.appendChild(li);
+      });
+    }
+
+    function nextQuestion(){
+      idx++;
+      if(idx>=total){
+        alert(`✅ Quiz complete! You scored ${score}/${total}`);
+        idx=0; score=0;
+      }
+      load();
+    }
+
+    window.onload = load;
+  </script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Advanced Formulation Concepts & Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #006064, #00838f);
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 { text-align: center; margin-bottom: 20px; }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    .info-card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .info-card h3 { margin-bottom: 8px; font-size: 1.1em; }
+    .info-card p { font-size: 0.9em; line-height: 1.4; }
+
+    .quiz-area {
+      max-width: 600px;
+      margin: 30px auto;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 16px;
+      position: relative;
+      padding-bottom: 80px;
+    }
+
+    .progress-bar {
+      background: rgba(255,255,255,0.3);
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #00e0ff;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .question { font-size: 1.2em; margin-bottom: 20px; }
+    ul.options { list-style: none; padding: 0; }
+    ul.options li {
+      background: rgba(255,255,255,0.2);
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    ul.options li:hover { background: rgba(255,255,255,0.3); }
+    ul.options li.correct { background: #4caf50 !important; }
+    ul.options li.incorrect { background: #f44336 !important; }
+
+    #nextBtn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 24px;
+      border: none;
+      background: #00e0ff;
+      color: black;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .explanation {
+      margin-top: 15px;
+      background: rgba(255,255,255,0.1);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Advanced Formulation Concepts</h1>
+
+  <div class="info-grid">
+    <div class="info-card"><h3>Bioavailability</h3><p>Rate and extent of drug absorption reaching systemic circulation.</p></div>
+    <div class="info-card"><h3>Excipients</h3><p>Inactive ingredients used to stabilize or deliver the active drug.</p></div>
+    <div class="info-card"><h3>Modified‑release Systems</h3><p>Sustained, delayed or targeted release dosage forms.</p></div>
+    <div class="info-card"><h3>Stability Considerations</h3><p>Factors affecting potency over time: moisture, light, pH.</p></div>
+    <div class="info-card"><h3>Pediatric Formulation</h3><p>Liquid, taste-masking, dose flexibility.</p></div>
+    <div class="info-card"><h3>Geriatric Formulation</h3><p>Swallowability, polypharmacy, dosage adjustments.</p></div>
+  </div>
+
+  <div class="quiz-area">
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <div class="question" id="question">Loading question...</div>
+    <ul class="options" id="options"></ul>
+    <div class="explanation" id="explanation"></div>
+    <button id="nextBtn" onclick="nextQuestion()">Next ➤</button>
+  </div>
+
+  <script>
+    const questions = [
+      {q:"Bioavailability of IV dose is:", opts:["50%","100%","75%","Variable"], ans:1, exp:"IV administration delivers whole dose directly to circulation."},
+      {q:"An excipient that improves flow is:", opts:["Glidant","Disintegrant","Binder","Sorbent"], ans:0, exp:"Glidants reduce friction and improve powder flow."},
+      {q:"Enteric coating prevents drug release in:", opts:["Small intestine","Stomach","Bloodstream","Skin"], ans:1, exp:"It protects drug from acidic gastric environment."},
+      {q:"Taste‑masking is especially needed in:", opts:["Injectables","Tablets for children","Ointments","Inhalers"], ans:1, exp:"Children need pleasant-tasting oral forms."},
+      {q:"Modified‑release tablets help:", opts:["Increase dosing frequency","Reduce first-pass","Allow controlled dosing","Require IV"], ans:2, exp:"They release drug over time to control levels."},
+      {q:"Controlled-release forms reduce:", opts:["Bioavailability","Side effects","Dosing frequency","Absorption rate"], ans:2, exp:"Let patients take less frequent doses."},
+      {q:"Lyophilized products improve:", opts:["Single-dose use","Color stability","Shelf life","Tablet hardness"], ans:2, exp:"Freeze-drying enhances stability."},
+      {q:"Pediatric liquid formulations often include:", opts:["Colorants","Buffers","Sugar or sweetener","Parabens"], ans:2, exp:"Sweeteners help taste and dosing acceptance."},
+      {q:"Gerumatric formulations must consider:", opts:["Efficacy only","Swallowing ability","Tablet color","Taste only"], ans:1, exp:"Difficulty swallowing necessitates easy-to-take forms."},
+      {q:"Film coatings help tablets:", opts:["Disintegrate faster","Mask taste","Increase size","Reduce strength"], ans:1, exp:"Coatings mask taste and aid swallowing."},
+      {q:"pH affects drug stability by:", opts:["Changing solubility","Colour only","Dose strength","Taste"], ans:0, exp:"pH can lead to degradation or precipitation."},
+      {q:"Modified-release patches are:", opts:["Tablet forms","Transdermal delivery","Injectable","Capsule"], ans:1, exp:"Deliver sustained drug through the skin."},
+      {q:"An absorbent excipient is to prevent:", opts:["Flow issues","Degradation","Taste masking","Release control"], ans:1, exp:"Absorbents manage moisture inside tablet."},
+      {q:"Liquid dosage form shelf life is reduced by:", opts:["High sugar","Sunlight only","Moisture uptake","Buffering agent"], ans:2, exp:"Moisture causes microbial or chemical breakdown."},
+      {q:"Multiparticulate beads allow:", opts:["Single release","Taste masking only","Flexible dosing","Solid injection"], ans:2, exp:"Beads can be divided into multiple doses."},
+      {q:"Extended-release tablets benefit:", opts:["Acute therapy","Chronic therapy","Emergency uses","IV dosing"], ans:1, exp:"Ideal in chronic conditions for consistent levels."},
+      {q:"Taste masking excipients include:", opts:["Bitter agents","Sweeteners","Moisture","Color pigments"], ans:1, exp:"Sweeteners mask drug bitterness."},
+      {q:"Enteric-coated capsules resist gastric acid by:", opts:["Dissolving quickly","Neutralizing acid","Coating polymers","Heating"], ans:2, exp:"Polymers withstand acidic pH before dissolving."},
+      {q:"Improved bioavailability can result from:", opts:["Glidants","Particle size reduction","Surface color","Binder removal"], ans:1, exp:"Reducing particle size increases surface area and absorption."},
+      {q:"Geriatric dosing often requires:", opts:["Larger tablets","Frequent dosing","Dose reduction","Color coding"], ans:2, exp:"Dose adjustment due to changes in organ function."}
+    ];
+
+    let idx = 0, score = 0;
+    const total = questions.length;
+
+    function shuffle(arr) {
+      return arr.map(x => [x, Math.random()]).sort((a,b) => a[1]-b[1]).map(x => x[0]);
+    }
+
+    function load() {
+      const data = questions[idx];
+      document.getElementById("question").textContent = data.q;
+      document.getElementById("explanation").textContent = "";
+      document.getElementById("nextBtn").style.display = "none";
+      document.getElementById("progress").style.width = ((idx / total) * 100) + "%";
+
+      const optsEl = document.getElementById("options");
+      optsEl.innerHTML = "";
+      const correct = data.opts[data.ans];
+      shuffle(data.opts).forEach(opt => {
+        const li = document.createElement("li");
+        li.textContent = opt;
+        li.onclick = () => {
+          document.querySelectorAll("li").forEach(li => li.onclick = null);
+          if (opt === correct) {
+            li.classList.add("correct"); score++;
+          } else {
+            li.classList.add("incorrect");
+            document.querySelectorAll("li").forEach(el => { if (el.textContent === correct) el.classList.add("correct"); });
+          }
+          document.getElementById("explanation").textContent = data.exp;
+          document.getElementById("nextBtn").style.display = "block";
+        };
+        optsEl.appendChild(li);
+      });
+    }
+
+    function nextQuestion() {
+      idx++;
+      if (idx >= total) {
+        alert(`✅ Quiz complete! Your score: ${score}/${total}`);
+        idx = 0; score = 0;
+      }
+      load();
+    }
+
+    window.onload = load;
+  </script>
+</body>
+</html>

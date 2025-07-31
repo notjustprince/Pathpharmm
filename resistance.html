@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Drug Resistance Concepts & Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #2e2b5f, #752b29);
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 { text-align: center; margin-bottom: 20px; }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    .info-card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .info-card h3 { margin-bottom: 8px; font-size: 1.1em; }
+    .info-card p { font-size: 0.9em; line-height: 1.4; }
+
+    .quiz-area {
+      max-width: 600px;
+      margin: 30px auto;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 16px;
+      position: relative;
+      padding-bottom: 80px;
+    }
+
+    .progress-bar {
+      background: rgba(255,255,255,0.3);
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #FFD700;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .question { font-size: 1.2em; margin-bottom: 20px; }
+    ul.options { list-style: none; padding: 0; }
+    ul.options li {
+      background: rgba(255,255,255,0.2);
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    ul.options li:hover { background: rgba(255,255,255,0.3); }
+    ul.options li.correct { background: #4caf50 !important; }
+    ul.options li.incorrect { background: #f44336 !important; }
+
+    #nextBtn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 24px;
+      border: none;
+      background: #FFD700;
+      color: black;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .explanation {
+      margin-top: 15px;
+      background: rgba(255,255,255,0.1);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Drug Resistance Mechanisms</h1>
+
+  <div class="info-grid">
+    <div class="info-card"><h3>Enzyme Inactivation</h3><p>Bacteria produce enzymes that inactivate drugs.</p></div>
+    <div class="info-card"><h3>Efflux Pumps</h3><p>Actively remove drugs from cells.</p></div>
+    <div class="info-card"><h3>Target Modification</h3><p>Mutations alter drug binding sites.</p></div>
+    <div class="info-card"><h3>Reduced Permeability</h3><p>Cell walls prevent drug entry.</p></div>
+    <div class="info-card"><h3>Bypass Pathways</h3><p>Alternative metabolic route circumvents drug action.</p></div>
+    <div class="info-card"><h3>Gene Mutation</h3><p>Genetic changes reduce drug efficacy.</p></div>
+  </div>
+
+  <div class="quiz-area">
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <div class="question" id="question">Loading question...</div>
+    <ul class="options" id="options"></ul>
+    <div class="explanation" id="explanation"></div>
+    <button id="nextBtn" onclick="nextQuestion()">Next ➤</button>
+  </div>
+
+  <script>
+    const questions = [
+      { q:"Beta-lactamase production causes resistance by:", opts:["Efflux pumps","Target modification","Enzyme inactivation","Reduced permeability"], ans:2, exp:"Enzyme breaks down beta-lactam antibiotics."},
+      { q:"Efflux pumps confer resistance by:", opts:["Binding drug","Mutating target","Expelling drug","Enhancing absorption"], ans:2, exp:"Transporters remove drugs actively from cells."},
+      { q:"Altered penicillin-binding proteins (PBP) is an example of:", opts:["Enzyme inactivation","Target modification","Permeability change","Bypass pathway"], ans:1, exp:"Target modification reduces drug binding."},
+      { q:"Plasmid-mediated drug resistance is due to:", opts:["Chromosomal mutation","Horizontal gene transfer","Cell wall change","Eukaryotic metabolism"], ans:1, exp:"Resistance genes spread via plasmids."},
+      { q:"Methicillin-resistant Staph aureus (MRSA) uses:", opts:["Efflux pumps","Enzyme inactivation","Target modification","Bypass pathways"], ans:2, exp:"PBP mutation leads to methicillin resistance."},
+      { q:"Resistance via reduced uptake occurs in:", opts:["Gram-positive bacteria","Gram-negative bacteria","Fungi","Viruses"], ans:1, exp:"Outer membrane limits drug entry in Gram‑negatives."},
+      { q:"Plasmodium resistance to chloroquine arises due to:", opts:["Efflux pumps","Enzyme inactivation","Target modification","Bypass pathways"], ans:0, exp:"PfCRT transporter pumps drug out of parasite."},
+      { q:"TMP-SMX resistance via bypass occurs due to:", opts:["Efflux pump","Alternative enzyme","Target modification","Permeability change"], ans:1, exp:"Alternative folate synthesis pathway bypasses drug."},
+      { q:"Rifampin resistance in TB is due to:", opts:["Cell wall change","Target mutation","Efflux pumps","Enzyme inactivation"], ans:1, exp:"Mutations in RNA polymerase binding site."},
+      { q:"Drug resistance gene transfer can occur via:", opts:["Plasmids","Chromosomes only","Ribosomes","Mitochondria"], ans:0, exp:"Plasmids facilitate horizontal gene transfer."},
+      { q:"Extended-spectrum beta‑lactamases (ESBLs) act by:", opts:["Target modification","Drug inactivation","Efflux","Bypass"], ans:1, exp:"Hydrolyze a variety of beta‑lactam antibiotics."},
+      { q:"Efflux-mediated resistance is reversible if:", opts:["Pump blocked","Drug dose high","Genetic mutation","Biofilm present"], ans:0, exp:"Inhibiting the pump restores drug activity."},
+      { q:"Reduced permeability arises from:", opts:["Mutation in porin channels","Enzyme production","Efflux pumps","Bypass"], ans:0, exp:"Porin loss prevents drug entry."},
+      { q:"Resistance from target shielding is a type of:", opts:["Enzyme inactivation","Target modification","Permeability change","Bypass"], ans:1, exp:"Structural change that blocks drug binding."},
+      { q:"Cross‑resistance means:", opts:["Resistant to one drug only","Resistance to similar drugs","Resistance disappears","New susceptibility"], ans:1, exp:"Resistance to one drug confers resistance to similar class."},
+      { q:"Efflux pumps are common in resistance to:", opts:["Aminoglycosides","Macrolides","Tetracyclines","Beta‑lactams"], ans:2, exp:"Tetracycline resistance often via efflux."},
+      { q:"Resistance due to gene mutation is usually:", opts:["Rapid onset","Slow onset","Always reversible","Non-genetic"], ans:0, exp:"Mutations can arise quickly under drug pressure."},
+      { q:"Methotrexate resistance via bypass happens by:", opts:["Target mutation","Drug inactivation","Transport protein change","Alternative pathway"], ans:3, exp:"Cells use alternative folate pathway."},
+      { q:"Vancomycin resistance in enterococci is due to:", opts:["Enzyme modification","Target modification","Efflux pumps","Permeability loss"], ans:1, exp:"Altered cell wall peptide reduces binding."},
+      { q:"Resistance that develops from excessive use is called:", opts:["Intrinsic resistance","Acquired resistance","Adaptive immunity","Drug tolerance"], ans:1, exp:"Microbes acquire resistance through selection."}
+    ];
+
+    let idx = 0, score = 0;
+    const total = questions.length;
+
+    function shuffle(arr) {
+      return arr.map(x => [x, Math.random()])
+                .sort((a,b) => a[1]-b[1])
+                .map(x => x[0]);
+    }
+
+    function load() {
+      const data = questions[idx];
+      document.getElementById("question").textContent = data.q;
+      document.getElementById("explanation").textContent = "";
+      document.getElementById("nextBtn").style.display = "none";
+      document.getElementById("progress").style.width = ((idx / total) * 100) + "%";
+
+      const optsEl = document.getElementById("options");
+      optsEl.innerHTML = "";
+
+      const correct = data.opts[data.ans];
+      const shuffled = shuffle(data.opts);
+      shuffled.forEach(opt => {
+        const li = document.createElement("li");
+        li.textContent = opt;
+        li.onclick = () => {
+          document.querySelectorAll("li").forEach(li => li.onclick = null);
+          if (opt === correct) {
+            li.classList.add("correct");
+            score++;
+          } else {
+            li.classList.add("incorrect");
+            document.querySelectorAll("li").forEach(el => {
+              if (el.textContent === correct) el.classList.add("correct");
+            });
+          }
+          document.getElementById("explanation").textContent = data.exp;
+          document.getElementById("nextBtn").style.display = "block";
+        };
+        optsEl.appendChild(li);
+      });
+    }
+
+    function nextQuestion() {
+      idx++;
+      if (idx >= total) {
+        alert(`✅ Quiz complete! You scored ${score}/${total}`);
+        idx = 0; score = 0;
+      }
+      load();
+    }
+
+    window.onload = load;
+  </script>
+</body>
+</html>
