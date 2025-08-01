@@ -161,37 +161,6 @@
     @media (max-width: 500px) {
       .topic-card { flex: 1 1 100%; }
     }
-
-    #challenge-section input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      margin: 10px 0;
-      font-size: 16px;
-      text-align: center;
-    }
-
-    #challenge-section .btn-invite {
-      background-color: #ff8a00;
-      color: #fff;
-    }
-
-    #challenge-section .btn-accept {
-      background-color: #00ffd5;
-      color: #1a1a1a;
-    }
-
-    #challenge-section .btn-invite:hover,
-    #challenge-section .btn-accept:hover {
-      opacity: 0.85;
-    }
-
-    #challenge-section .message {
-      margin-top: 10px;
-      font-size: 14px;
-      opacity: 0.9;
-    }
   </style>
 </head>
 <body>
@@ -233,15 +202,14 @@
     <button class="btn" onclick="location.href='pathcard.html'"><i class="fas fa-heartbeat"></i> Pathology Flashcards</button>
   </div>
 
+  <!-- ✅ Updated Challenge Section -->
   <div class="glass-card" id="challenge-section">
-    <h2><i class="fas fa-users"></i> Challenge a Friend</h2>
-    <input type="text" id="codeInput" placeholder="Enter friend code (e.g. AB12CD)" maxlength="6" />
-    <button class="btn btn-invite" onclick="sendInvite()"><i class="fas fa-paper-plane"></i> Send Invite</button>
-    <div class="message" id="statusMsg">Your challenge status appears here.</div>
-    <button class="btn btn-accept" id="acceptBtn" style="display:none;" onclick="acceptInvite()"><i class="fas fa-check-circle"></i> Accept Challenge</button>
+    <h2><i class="fas fa-users"></i> Play with Friends</h2>
+    <button class="btn btn-invite" onclick="goToMultiplayer()">
+      <i class="fas fa-gamepad"></i> Play Multiplayer
+    </button>
   </div>
 
-  <!-- Navigation -->
   <div class="bottom-nav">
     <div class="nav-item active" onclick="switchTab('pharma-section', this)"><span><i class="fas fa-pills"></i></span>Pharma</div>
     <div class="nav-item" onclick="switchTab('patho-section', this)"><span><i class="fas fa-flask"></i></span>Patho</div>
@@ -291,7 +259,6 @@
     });
   </script>
 
-  <!-- Navigation & Challenge JS -->
   <script>
     const sections = ["pharma-section", "patho-section", "flashcard-section", "challenge-section"];
     const navItems = document.querySelectorAll('.nav-item');
@@ -302,7 +269,7 @@
       el.classList.add('active');
     }
 
-    switchTab("pharma-section", navItems[0]); // Default tab
+    switchTab("pharma-section", navItems[0]);
 
     let startX = 0, endX = 0;
     document.addEventListener('touchstart', e => startX = e.touches[0].clientX);
@@ -316,30 +283,9 @@
       }
     });
 
-    function updateStatus(msg) {
-      document.getElementById('statusMsg').textContent = msg;
-    }
-
-    function sendInvite() {
-      const code = document.getElementById('codeInput').value.trim().toUpperCase();
-      if (!code || code.length !== 6) {
-        updateStatus('🚫 Please enter a valid 6-character code.');
-        return;
-      }
-      updateStatus(`Invite sent to ${code}. Waiting for them to accept...`);
-      setTimeout(() => {
-        document.getElementById('acceptBtn').style.display = 'block';
-        updateStatus(`Your friend accepted! Ready to begin.`);
-      }, 2000);
-    }
-
-    function acceptInvite() {
-      updateStatus('Starting quiz challenge...');
-      setTimeout(() => {
-        window.location.href = 'quiz.html';
-      }, 1000);
+    function goToMultiplayer() {
+      window.location.href = "multiplayer.html";
     }
   </script>
 
 </body>
-</html>

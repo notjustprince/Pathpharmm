@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Multiplayer Lobby</title>
+  <style>
+    body {
+      background: linear-gradient(to right, #1e3c72, #2a5298);
+      color: white;
+      font-family: sans-serif;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    button {
+      margin: 10px;
+      padding: 14px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #hostBtn { background-color: #00ffd5; color: #111; }
+    #joinBtn { background-color: #ffae00; color: #111; }
+
+    .input-box {
+      margin: 20px auto;
+      max-width: 300px;
+    }
+
+    input {
+      padding: 12px;
+      width: 100%;
+      border-radius: 6px;
+      border: none;
+      margin-top: 10px;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    #status {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    #invite-link {
+      margin-top: 10px;
+      font-size: 14px;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Multiplayer Quiz Lobby</h1>
+
+  <button id="hostBtn">🎮 Host Room</button>
+  <button id="joinBtn">🔑 Join Room</button>
+
+  <div id="joinSection" class="input-box" style="display:none;">
+    <input type="text" id="joinCode" placeholder="Enter Room Code or Link" />
+    <button onclick="joinRoomCode()">Join</button>
+  </div>
+
+  <div id="invite-link" style="display:none;"></div>
+  <div id="status"></div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgRJlAMQVnY5Zu7nkMPmdvS7lc5xMcJz4",
+      authDomain: "pathpharmm.firebaseapp.com",
+      projectId: "pathpharmm",
+      storageBucket: "pathpharmm.appspot.com",
+      messagingSenderId: "836525944124",
+      appId: "1:836525944124:web:9ab28aa79e9f12aeea8239",
+      databaseURL: "https://pathpharmm-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth();
+
+    let currentRoom = '';
+
+    function generateRoomCode(length = 6) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    }
+
+    function watchRoomPlayers(roomCode) {
+      const roomRef = ref(db, `rooms/${roomCode}/players`);
+      onValue(roomRef, snapshot => {
+        const players = snapshot.val();
+        if (players && Object.keys(players).length === 2) {
+          document.getElementById('status').textContent = 'Paired! Redirecting to quiz...';
+          setTimeout(() => {
+            window.location.href = `quiz.html?room=${roomCode}`;
+          }, 1500);
+        }
+      });
+    }
+
+    document.getElementById('hostBtn').onclick = () => {
+      const roomCode = generateRoomCode();
+      currentRoom = roomCode;
+      localStorage.setItem('roomCode', roomCode);
+      document.getElementById('invite-link').style.display = 'block';
+      document.getElementById('invite-link').innerHTML = `
+        Invite your friend with this code or link:<br/>
+        <strong>${roomCode}</strong><br/>
+        <a href="?room=${roomCode}" style="color:#0ff;">${location.origin}${location.pathname}?room=${roomCode}</a>
+      `;
+      document.getElementById('status').textContent = 'Waiting for a player to join...';
+
+      onAuthStateChanged(auth, user => {
+        if (user) {
+          set(ref(db, `rooms/${roomCode}/players/${user.uid}`), {
+            email: user.email,
+            joinedAt: Date.now()
+          });
+          watchRoomPlayers(roomCode);
+        }
+      });
+    };
+
+    document.getElementById('joinBtn').onclick = () => {
+      document.getElementById('joinSection').style.display = 'block';
+    };
+
+    window.joinRoomCode = () => {
+      const input = document.getElementById('joinCode').value.trim().toUpperCase();
+      const code = input.includes('room=') ? new URL(input).searchParams.get('room') : input;
+      if (!code || code.length !== 6) {
+        alert('Please enter a valid 6-character code or link.');
+        return;
+      }
+      currentRoom = code;
+      localStorage.setItem('roomCode', code);
+      document.getElementById('status').textContent = `Joining room ${code}...`;
+
+      onAuthStateChanged(auth, user => {
+        if (user) {
+          set(ref(db, `rooms/${code}/players/${user.uid}`), {
+            email: user.email,
+            joinedAt: Date.now()
+          });
+          watchRoomPlayers(code);
+        }
+      });
+    };
+
+    // If coming via direct invite link
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('room')) {
+      const code = params.get('room').toUpperCase();
+      currentRoom = code;
+      localStorage.setItem('roomCode', code);
+      document.getElementById('status').textContent = `Joining room: ${code}...`;
+
+      onAuthStateChanged(auth, user => {
+        if (user) {
+          set(ref(db, `rooms/${code}/players/${user.uid}`), {
+            email: user.email,
+            joinedAt: Date.now()
+          });
+          watchRoomPlayers(code);
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>

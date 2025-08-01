@@ -1,136 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Path & Pharm Quiz</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz Room</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      height: 100%; width: 100%;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #6a11cb, #2575fc);
-      color: #fff; display: flex; align-items: center; justify-content: center;
+    body {
+      background: linear-gradient(to right, #141e30, #243b55);
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 30px;
     }
-    .quiz-container {
-      background: rgba(255,255,255,0.06);
-      padding: 2rem; border-radius: 1.5rem;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-      max-width: 480px; width: 90%; animation: fadeIn 0.8s ease-in-out;
+
+    #answers button {
+      display: block;
+      margin: 10px auto;
+      padding: 12px 20px;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
     }
-    .question {
-      font-size: 1.2rem; margin-bottom: 1rem;
+
+    #startBtn {
+      background-color: #00ffc3;
+      color: #000;
+      padding: 14px 24px;
+      font-size: 18px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
     }
-    .options {
-      list-style: none; padding: 0;
-    }
-    .options li {
-      background: rgba(255,255,255,0.08);
-      padding: 0.8rem; margin-bottom: 0.8rem;
-      border-radius: 0.75rem; cursor: pointer;
-      transition: background 0.3s;
-      position: relative;
-    }
-    .options li:hover { background: rgba(255,255,255,0.15); }
-    .options li.correct { background: #4caf50; }
-    .options li.incorrect { background: #e74c3c; }
-    .options li.disabled { cursor: default; opacity: 0.8; }
-    .timer-bar {
-      height: 6px; background: rgba(255,255,255,0.2);
-      border-radius: 3px; overflow: hidden; margin-bottom: 1rem;
-    }
-    .timer-fill {
-      width: 0%; height: 100%;
-      background: #ffeb3b; transition: width 1s linear;
-    }
+
     .score {
-      margin-top: 1.2rem; font-size: 1rem; text-align: center;
+      margin-top: 20px;
     }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px);} to { opacity: 1; transform: translateY(0);} }
+
+    #status {
+      margin-top: 20px;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
 
-  <div class="quiz-container">
-    <div class="timer-bar"><div class="timer-fill" id="timer"></div></div>
-    <div class="question" id="question">Question text goes here</div>
-    <ul class="options" id="options"></ul>
-    <div class="score" id="score">Score: 0 / 0</div>
+  <h1>Multiplayer Quiz</h1>
+  <div id="status">Loading room...</div>
+  <div id="question-container" style="display:none;">
+    <h2 id="question-text"></h2>
+    <div id="answers"></div>
+    <p>⏳ Time left: <span id="time-left">-</span></p>
+    <p class="score">Your Score: <span id="score">0</span></p>
   </div>
+  <button id="startBtn" style="display:none;">Start Game</button>
 
-  <script>
-    const quiz = [
-      { q: "What is the primary symptom of hyperglycemia?", options: ["High blood pressure", "Excessive thirst", "Rapid heartbeat", "Blurred vision"], a: 1 },
-      { q: "Which drug is used to treat bacterial infections?", options: ["Ibuprofen", "Amoxicillin", "Atorvastatin", "Metformin"], a: 1 },
-      { q: "Normal adult heart rate (bpm) range:", options: ["60–100", "40–60", "120–140", "100–120"], a: 0 },
-      { q: "Which vitamin is essential for clotting?", options: ["Vitamin A", "Vitamin C", "Vitamin K", "Vitamin D"], a: 2 },
-      { q: "Diluting cough syrup with water does what?", options: ["Increases potency", "Lowers dosage", "Makes it less effective", "Changes flavor"], a: 2 }
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import { getDatabase, ref, set, update, get, onValue, child } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgRJlAMQVnY5Zu7nkMPmdvS7lc5xMcJz4",
+      authDomain: "pathpharmm.firebaseapp.com",
+      projectId: "pathpharmm",
+      storageBucket: "pathpharmm.appspot.com",
+      messagingSenderId: "836525944124",
+      appId: "1:836525944124:web:9ab28aa79e9f12aeea8239",
+      databaseURL: "https://pathpharmm-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth();
+
+    const roomCode = new URLSearchParams(location.search).get('room') || localStorage.getItem('roomCode');
+    const roomRef = ref(db, `rooms/${roomCode}`);
+
+    const questionText = document.getElementById('question-text');
+    const answersDiv = document.getElementById('answers');
+    const scoreEl = document.getElementById('score');
+    const timeLeft = document.getElementById('time-left');
+    const startBtn = document.getElementById('startBtn');
+    const questionContainer = document.getElementById('question-container');
+    const statusMsg = document.getElementById('status');
+
+    const questions = [
+      {
+        question: "Which organ produces insulin?",
+        options: ["Liver", "Pancreas", "Heart", "Kidney"],
+        correct: 1
+      },
+      {
+        question: "What is the main function of red blood cells?",
+        options: ["Fight infection", "Transport oxygen", "Digest food", "Carry fat"],
+        correct: 1
+      }
     ];
-    let current = 0, score = 0, timer;
-    const opts = document.getElementById('options'), quest = document.getElementById('question');
-    const scr = document.getElementById('score'), timerFill = document.getElementById('timer');
 
-    function loadQuestion() {
-      const item = quiz[current];
-      quest.textContent = item.q;
-      opts.innerHTML = '';
-      item.options.forEach((opt, i) => {
-        const li = document.createElement('li');
-        li.textContent = opt;
-        li.addEventListener('click', () => checkAnswer(i, li));
-        opts.append(li);
+    let score = 0;
+    let currentIndex = 0;
+    let isHost = false;
+    let playerId = '';
+    let timer = null;
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) return location.href = 'login.html';
+      playerId = user.uid;
+
+      const playersRef = child(roomRef, 'players');
+      const snapshot = await get(playersRef);
+      const players = snapshot.exists() ? Object.keys(snapshot.val()) : [];
+
+      isHost = players.length === 0;
+      await set(child(playersRef, playerId), { email: user.email, score: 0 });
+
+      if (isHost) {
+        statusMsg.textContent = "You're the host. Start the game when ready.";
+        startBtn.style.display = 'inline-block';
+        startBtn.onclick = () => set(child(roomRef, 'gameStarted'), true);
+      } else {
+        statusMsg.textContent = "Waiting for host to start the game...";
+      }
+
+      onValue(child(roomRef, 'gameStarted'), snap => {
+        if (snap.exists() && snap.val() === true) {
+          startBtn.style.display = 'none';
+          statusMsg.style.display = 'none';
+          questionContainer.style.display = 'block';
+          startQuestion();
+        }
       });
-      startTimer();
-      scr.textContent = `Score: ${score} / ${quiz.length}`;
-    }
+    });
 
-    function startTimer() {
-      let time = 10;
-      timerFill.style.width = '100%';
-      clearInterval(timer);
+    function startQuestion() {
+      const q = questions[currentIndex];
+      questionText.textContent = q.question;
+      answersDiv.innerHTML = '';
+      timeLeft.textContent = 10;
+
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.onclick = () => answerQuestion(i);
+        answersDiv.appendChild(btn);
+      });
+
+      let countdown = 10;
       timer = setInterval(() => {
-        time--;
-        timerFill.style.width = (time * 10) + '%';
-        if (time <= 0) {
+        countdown--;
+        timeLeft.textContent = countdown;
+        if (countdown === 0) {
           clearInterval(timer);
-          disableOptions();
-          setTimeout(nextQuestion, 800);
+          nextQuestion();
         }
       }, 1000);
     }
 
-    function checkAnswer(i, li) {
-      if (li.classList.contains('disabled')) return;
+    function answerQuestion(index) {
       clearInterval(timer);
-      disableOptions();
-      const correct = quiz[current].a;
-      if (i === correct) {
-        li.classList.add('correct');
-        score++;
-      } else {
-        li.classList.add('incorrect');
-        opts.children[correct].classList.add('correct');
+      if (index === questions[currentIndex].correct) {
+        score += 10;
+        scoreEl.textContent = score;
+        update(ref(db, `rooms/${roomCode}/players/${playerId}`), { score });
       }
-      scr.textContent = `Score: ${score} / ${quiz.length}`;
-      setTimeout(nextQuestion, 1000);
-    }
-
-    function disableOptions() {
-      Array.from(opts.children).forEach(li => li.classList.add('disabled'));
+      nextQuestion();
     }
 
     function nextQuestion() {
-      current++;
-      if (current >= quiz.length) {
-        quest.textContent = '🎉 Quiz Complete!';
-        opts.innerHTML = '';
-        scr.textContent = `Final Score: ${score} / ${quiz.length}`;
+      currentIndex++;
+      if (currentIndex < questions.length) {
+        startQuestion();
       } else {
-        loadQuestion();
+        questionText.textContent = "🎉 Quiz Finished!";
+        answersDiv.innerHTML = "";
+        timeLeft.textContent = "-";
       }
     }
-
-    window.addEventListener('load', loadQuestion);
   </script>
 
 </body>
