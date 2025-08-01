@@ -1,44 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Choose Flashcards</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #654ea3, #eaafc8);
-      overflow: hidden;
-      padding-bottom: 80px; /* for bottom nav */
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 20px 100px;
+      position: relative;
     }
 
-    .card {
-      backdrop-filter: blur(15px);
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+    .user-header {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.3);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .greeting {
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .logout-btn {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      background-color: rgba(255,255,255,0.2);
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s ease;
+      z-index: 10;
+    }
+
+    .logout-btn:hover {
+      background-color: rgba(255,255,255,0.4);
+      color: black;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(18px);
       border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
       padding: 40px 30px;
       text-align: center;
-      width: 90%;
+      width: 100%;
       max-width: 420px;
-      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      margin-top: 80px;
     }
 
-    .card h1 {
-      font-size: 28px;
-      font-weight: 600;
+    .glass-card h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: white;
       margin-bottom: 30px;
     }
 
@@ -55,6 +100,7 @@
       color: #fff;
       cursor: pointer;
       backdrop-filter: blur(5px);
+      transition: 0.3s;
     }
 
     .btn:hover {
@@ -65,26 +111,24 @@
       margin-right: 10px;
     }
 
-    /* Bottom Nav */
     .bottom-nav {
       position: fixed;
       bottom: 0;
-      left: 0;
       width: 100%;
       background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(10px);
       display: flex;
       justify-content: space-around;
       padding: 12px 0;
       border-top: 1px solid rgba(255, 255, 255, 0.2);
-      z-index: 999;
     }
 
     .nav-item {
-      color: #fff;
-      font-size: 13px;
+      color: white;
       text-align: center;
       flex: 1;
+      font-size: 13px;
+      transition: 0.3s;
     }
 
     .nav-item span {
@@ -95,41 +139,33 @@
 
     .nav-item.active {
       font-weight: bold;
-      color: #ffffff;
+      color: #fff;
+      background-color: rgba(255, 255, 255, 0.25);
     }
-  </style>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<script>
-  let startX = 0;
-  let endX = 0;
 
-  document.addEventListener('touchstart', function(e) {
-    startX = e.touches[0].clientX;
-  });
-
-  document.addEventListener('touchend', function(e) {
-    endX = e.changedTouches[0].clientX;
-    handleSwipe();
-  });
-
-  function handleSwipe() {
-    const distance = endX - startX;
-
-    if (Math.abs(distance) > 50) {
-      if (distance > 0) {
-        // Swipe right
-        window.location.href = 'pathology.html';  // previous page
-      } else {
-        // Swipe left
-        window.location.href = 'flashcard.html';  // next page
+    @media (max-width: 500px) {
+      .btn {
+        font-size: 15px;
       }
     }
-  }
-</script>
+  </style>
+</head>
 <body>
 
-  <div class="card">
+  <div class="user-header">
+    <script>
+      const cachedName = localStorage.getItem("userName") || "User";
+      const firstName = cachedName.split(" ")[0];
+      document.write(`
+        <div class="user-icon" id="user-icon">${firstName[0].toUpperCase()}</div>
+        <div class="greeting" id="greeting">Hello, ${firstName}</div>
+      `);
+    </script>
+  </div>
+
+  <button class="logout-btn" id="logout-btn">Logout</button>
+
+  <div class="glass-card">
     <h1>What would you like to study?</h1>
     <button class="btn" onclick="location.href='pharmcard.html'">
       <i class="fas fa-pills"></i> Pharmacology Flashcards
@@ -139,7 +175,6 @@
     </button>
   </div>
 
-  <!-- Bottom Navigation -->
   <div class="bottom-nav">
     <div class="nav-item" onclick="location.href='pharmacology.html'">
       <span><i class="fas fa-pills"></i></span>Pharma
@@ -151,6 +186,58 @@
       <span><i class="fas fa-layer-group"></i></span>Cards
     </div>
   </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgRJlAMQVnY5Zu7nkMPmdvS7lc5xMcJz4",
+      authDomain: "pathpharmm.firebaseapp.com",
+      projectId: "pathpharmm",
+      storageBucket: "pathpharmm.appspot.com",
+      messagingSenderId: "836525944124",
+      appId: "1:836525944124:web:9ab28aa79e9f12aeea8239"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, user => {
+      const skipped = localStorage.getItem("skip") === "true";
+      if (!user && !skipped) {
+        window.location.href = "login.html";
+      }
+      if (user) {
+        const name = user.displayName || user.email.split('@')[0];
+        localStorage.setItem("userName", name);
+      }
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      const confirmed = confirm("Are you sure you want to log out?");
+      if (!confirmed) return;
+      try {
+        await signOut(auth);
+        localStorage.removeItem("skip");
+        localStorage.removeItem("userName");
+        window.location.href = "login.html";
+      } catch (err) {
+        alert("Logout failed: " + err.message);
+      }
+    });
+  </script>
+
+  <script>
+    let startX = 0, endX = 0;
+    document.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+    document.addEventListener('touchend', e => {
+      endX = e.changedTouches[0].clientX;
+      if (Math.abs(endX - startX) > 60) {
+        window.location.href = endX < startX ? 'pathology.html' : 'pharmacology.html';
+      }
+    });
+  </script>
 
 </body>
 </html>

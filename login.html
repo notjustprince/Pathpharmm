@@ -224,7 +224,7 @@
         <a href="register.html" class="create-btn">Create Account</a>
       </div>
 
-      <button class="skip-btn" onclick="localStorage.setItem('skip','true'); window.location.href='pharmacology.html';">
+      <button class="skip-btn" onclick="localStorage.setItem('skip','true'); window.location.href='homepage.html';">
         Skip for now
       </button>
     </div>
@@ -254,17 +254,15 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    // Check auth state on load
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        window.location.href = "pharmacology.html";
+        window.location.href = "homepage.html";
       } else {
         document.getElementById("loader").style.display = "none";
         document.getElementById("app").style.display = "block";
       }
     });
 
-    // Login button
     document.getElementById("login-btn").addEventListener("click", async () => {
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
@@ -276,21 +274,20 @@
 
       try {
         await signInWithEmailAndPassword(auth, email, password);
-        localStorage.removeItem("skip"); // Clear skip flag if logged in
+        localStorage.removeItem("skip");
         alert("✅ Login successful!");
-        window.location.href = "pharmacology.html";
+        window.location.href = "homepage.html";
       } catch (error) {
         alert("❌ Login failed: " + error.message);
       }
     });
 
-    // Google login button
     document.getElementById("google-btn").addEventListener("click", async () => {
       try {
         await signInWithPopup(auth, provider);
         localStorage.removeItem("skip");
         alert("🎉 Google sign-in successful!");
-        window.location.href = "pharmacology.html";
+        window.location.href = "homepage.html";
       } catch (error) {
         alert("❌ Google sign-in failed: " + error.message);
       }

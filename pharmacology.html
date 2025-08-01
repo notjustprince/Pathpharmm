@@ -39,20 +39,12 @@
       justify-content: center;
       font-size: 18px;
       font-weight: 700;
-      opacity: 0;
-      animation: fadeIn 0.7s ease forwards;
     }
 
     .greeting {
       color: white;
       font-size: 18px;
       font-weight: 600;
-      opacity: 0;
-      animation: fadeIn 0.7s ease forwards;
-    }
-
-    @keyframes fadeIn {
-      to { opacity: 1; }
     }
 
     .logout-btn {
@@ -174,8 +166,14 @@
 </head>
 <body>
   <div class="user-header">
-    <div class="user-icon" id="user-icon">?</div>
-    <div class="greeting" id="greeting">Hello</div>
+    <script>
+      const cachedName = localStorage.getItem("userName") || "User";
+      const firstName = cachedName.split(" ")[0];
+      document.write(`
+        <div class="user-icon" id="user-icon">${firstName[0].toUpperCase()}</div>
+        <div class="greeting" id="greeting">Hello, ${firstName}</div>
+      `);
+    </script>
   </div>
 
   <button class="logout-btn" id="logout-btn">Logout</button>
@@ -199,7 +197,8 @@
       <span><i class="fas fa-flask"></i></span>Patho
     </div>
     <div class="nav-item" onclick="location.href='flashcard.html'">
-      <span><i class="fas fa-layer-group"></i></span>Cards</div>
+      <span><i class="fas fa-layer-group"></i></span>Cards
+    </div>
   </div>
 
   <script type="module">
@@ -226,9 +225,7 @@
 
       if (user) {
         const name = user.displayName || user.email.split('@')[0];
-        const firstName = name.split(' ')[0];
-        document.getElementById('greeting').textContent = `Hello, ${firstName}`;
-        document.getElementById('user-icon').textContent = firstName.charAt(0).toUpperCase();
+        localStorage.setItem("userName", name); // Cache it for instant load
       }
     });
 
@@ -239,6 +236,7 @@
       try {
         await signOut(auth);
         localStorage.removeItem("skip");
+        localStorage.removeItem("userName");
         window.location.href = "login.html";
       } catch (err) {
         alert('Logout failed: ' + err.message);

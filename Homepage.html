@@ -3,20 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pathology Topics</title>
+  <title>Med Topics</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #6a11cb, #9b37ff);
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
       min-height: 100vh;
+      padding: 20px 20px 100px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 20px 20px 100px;
       position: relative;
     }
 
@@ -79,13 +77,14 @@
       max-width: 460px;
       border: 1px solid rgba(255, 255, 255, 0.2);
       margin-top: 60px;
+      display: none;
     }
 
-    h2 {
-      color: #fff;
+    h2, h1 {
       font-size: 26px;
-      font-weight: 700;
-      margin-bottom: 25px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 20px;
     }
 
     .topic-grid {
@@ -95,37 +94,41 @@
       justify-content: space-between;
     }
 
-    .topic-card {
+    .topic-card, .btn {
       flex: 0 1 calc(50% - 8px);
       background: rgba(255, 255, 255, 0.18);
       backdrop-filter: blur(10px);
       border-radius: 15px;
       padding: 20px;
-      color: #fff;
+      text-align: center;
+      color: white;
       font-weight: 600;
       font-size: 15px;
-      text-align: center;
       border: 1px solid rgba(255, 255, 255, 0.25);
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
       cursor: pointer;
       transition: 0.3s;
     }
 
-    .topic-card:hover {
-      background: rgba(255, 255, 255, 0.35);
+    .btn {
+      width: 100%;
+      margin: 10px 0;
+    }
+
+    .topic-card:hover, .btn:hover {
+      background: rgba(255, 255, 255, 0.3);
       transform: translateY(-4px);
     }
 
-    .topic-card i {
-      display: block;
+    .topic-card i, .btn i {
       font-size: 20px;
       margin-bottom: 8px;
+      display: block;
     }
 
     .bottom-nav {
       position: fixed;
       bottom: 0;
-      left: 0;
       width: 100%;
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
@@ -136,10 +139,11 @@
     }
 
     .nav-item {
-      color: #fff;
-      font-size: 13px;
+      color: white;
       text-align: center;
       flex: 1;
+      font-size: 13px;
+      transition: 0.3s;
     }
 
     .nav-item span {
@@ -148,38 +152,39 @@
       margin-bottom: 2px;
     }
 
-    .nav-item:hover {
-      background-color: rgba(255, 255, 255, 0.2);
-    }
-
     .nav-item.active {
       font-weight: bold;
-      color: #ffffff;
+      color: #fff;
+      background-color: rgba(255, 255, 255, 0.25);
     }
 
     @media (max-width: 500px) {
-      .topic-card {
-        flex: 1 1 100%;
-      }
+      .topic-card { flex: 1 1 100%; }
     }
   </style>
 </head>
-
 <body>
-  <div class="user-header">
-    <script>
-      const cachedName = localStorage.getItem("userName") || "User";
-      const firstName = cachedName.split(" ")[0];
-      document.write(`
-        <div class="user-icon" id="user-icon">${firstName[0].toUpperCase()}</div>
-        <div class="greeting" id="greeting">Hello, ${firstName}</div>
-      `);
-    </script>
+
+  <div class="user-header" id="user-header">
+    <div class="user-icon" id="user-icon">?</div>
+    <div class="greeting" id="greeting">Hello</div>
   </div>
 
   <button class="logout-btn" id="logout-btn">Logout</button>
 
-  <div class="glass-card">
+  <!-- Sections -->
+  <div class="glass-card" id="pharma-section">
+    <h2><i class="fas fa-stethoscope"></i> Pharmacology Topics</h2>
+    <div class="topic-grid">
+      <div class="topic-card" onclick="location.href='intropharm.html'"><i class="fas fa-book-medical"></i> Intro</div>
+      <div class="topic-card" onclick="location.href='autonomic.html'"><i class="fas fa-brain"></i> Autonomics</div>
+      <div class="topic-card" onclick="location.href='quiz_antibiotics.html'"><i class="fas fa-capsules"></i> Antibiotics</div>
+      <div class="topic-card" onclick="location.href='quiz_analgesics.html'"><i class="fas fa-pills"></i> Analgesics</div>
+      <div class="topic-card" onclick="location.href='quiz_cns.html'"><i class="fas fa-head-side-virus"></i> CNS Drugs</div>
+    </div>
+  </div>
+
+  <div class="glass-card" id="patho-section">
     <h2><i class="fas fa-flask"></i> Pathology Topics</h2>
     <div class="topic-grid">
       <div class="topic-card" onclick="location.href='intropath.html'"><i class="fas fa-book"></i> Intro</div>
@@ -191,16 +196,17 @@
     </div>
   </div>
 
+  <div class="glass-card" id="flashcard-section">
+    <h1>What would you like to study?</h1>
+    <button class="btn" onclick="location.href='pharmcard.html'"><i class="fas fa-pills"></i> Pharmacology Flashcards</button>
+    <button class="btn" onclick="location.href='pathcard.html'"><i class="fas fa-heartbeat"></i> Pathology Flashcards</button>
+  </div>
+
+  <!-- Navigation -->
   <div class="bottom-nav">
-    <div class="nav-item" onclick="location.href='pharmacology.html'">
-      <span><i class="fas fa-pills"></i></span>Pharma
-    </div>
-    <div class="nav-item active">
-      <span><i class="fas fa-flask"></i></span>Patho
-    </div>
-    <div class="nav-item" onclick="location.href='flashcard.html'">
-      <span><i class="fas fa-layer-group"></i></span>Cards
-    </div>
+    <div class="nav-item active" onclick="switchTab('pharma-section', this)"><span><i class="fas fa-pills"></i></span>Pharma</div>
+    <div class="nav-item" onclick="switchTab('patho-section', this)"><span><i class="fas fa-flask"></i></span>Patho</div>
+    <div class="nav-item" onclick="switchTab('flashcard-section', this)"><span><i class="fas fa-layer-group"></i></span>Cards</div>
   </div>
 
   <script type="module">
@@ -221,38 +227,53 @@
 
     onAuthStateChanged(auth, user => {
       const skipped = localStorage.getItem("skip") === "true";
-      if (!user && !skipped) {
-        window.location.href = "login.html";
-      }
+      if (!user && !skipped) window.location.href = "login.html";
       if (user) {
         const name = user.displayName || user.email.split('@')[0];
-        localStorage.setItem("userName", name); // Save for future pages
+        localStorage.setItem("userName", name);
+        const first = name.split(" ")[0];
+        document.getElementById("user-icon").textContent = first[0].toUpperCase();
+        document.getElementById("greeting").textContent = `Hello, ${first}`;
       }
     });
 
     document.getElementById('logout-btn').addEventListener('click', async () => {
-      if (confirm("Are you sure you want to log out?")) {
-        try {
-          await signOut(auth);
-          localStorage.removeItem("skip");
-          localStorage.removeItem("userName");
-          window.location.href = "login.html";
-        } catch (err) {
-          alert("Logout failed: " + err.message);
-        }
+      if (!confirm("Are you sure you want to log out?")) return;
+      try {
+        await signOut(auth);
+        localStorage.removeItem("skip");
+        localStorage.removeItem("userName");
+        window.location.href = "login.html";
+      } catch (err) {
+        alert("Logout failed: " + err.message);
       }
     });
   </script>
 
   <script>
+    const sections = ["pharma-section", "patho-section", "flashcard-section"];
+    const navItems = document.querySelectorAll('.nav-item');
+
+    function switchTab(id, el) {
+      sections.forEach(sec => document.getElementById(sec).style.display = (sec === id ? 'block' : 'none'));
+      navItems.forEach(item => item.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    switchTab("pharma-section", navItems[0]); // Default tab
+
     let startX = 0, endX = 0;
     document.addEventListener('touchstart', e => startX = e.touches[0].clientX);
     document.addEventListener('touchend', e => {
       endX = e.changedTouches[0].clientX;
-      if (Math.abs(endX - startX) > 60) {
-        window.location.href = endX < startX ? 'pharmacology.html' : 'flashcard.html';
+      const delta = endX - startX;
+      const currentIndex = sections.findIndex(id => document.getElementById(id).style.display === 'block');
+      if (Math.abs(delta) > 60) {
+        const nextIndex = delta < 0 ? (currentIndex + 1) % 3 : (currentIndex + 2) % 3;
+        switchTab(sections[nextIndex], navItems[nextIndex]);
       }
     });
   </script>
+
 </body>
 </html>

@@ -8,7 +8,12 @@
   <!-- Firebase SDKs -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithPopup,
+      GoogleAuthProvider
+    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCgRJlAMQVnY5Zu7nkMPmdvS7lc5xMcJz4",
@@ -51,8 +56,10 @@
 
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        localStorage.setItem("userName", name);
         alert("🎉 Registration successful!");
-        window.location.href = "pharmacology.html";
+        window.location.href = "homepage.html";
       } catch (error) {
         alert("❌ Error: " + error.message);
         console.error(error);
@@ -63,8 +70,10 @@
       try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
+        const name = user.displayName || user.email.split('@')[0];
+        localStorage.setItem("userName", name);
         alert("🎉 Signed up with Google!");
-        window.location.href = "pharmacology.html";
+        window.location.href = "homepage.html";
       } catch (error) {
         alert("❌ Google sign-in error: " + error.message);
         console.error(error);
@@ -72,9 +81,7 @@
     };
   </script>
 
-  <!-- Google Sign-In button styling only -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-
   <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
