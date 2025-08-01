@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Path & Pharm Quiz</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%; width: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+    }
+    .quiz-container {
+      background: rgba(255,255,255,0.06);
+      padding: 2rem; border-radius: 1.5rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      max-width: 480px; width: 90%; animation: fadeIn 0.8s ease-in-out;
+    }
+    .question {
+      font-size: 1.2rem; margin-bottom: 1rem;
+    }
+    .options {
+      list-style: none; padding: 0;
+    }
+    .options li {
+      background: rgba(255,255,255,0.08);
+      padding: 0.8rem; margin-bottom: 0.8rem;
+      border-radius: 0.75rem; cursor: pointer;
+      transition: background 0.3s;
+      position: relative;
+    }
+    .options li:hover { background: rgba(255,255,255,0.15); }
+    .options li.correct { background: #4caf50; }
+    .options li.incorrect { background: #e74c3c; }
+    .options li.disabled { cursor: default; opacity: 0.8; }
+    .timer-bar {
+      height: 6px; background: rgba(255,255,255,0.2);
+      border-radius: 3px; overflow: hidden; margin-bottom: 1rem;
+    }
+    .timer-fill {
+      width: 0%; height: 100%;
+      background: #ffeb3b; transition: width 1s linear;
+    }
+    .score {
+      margin-top: 1.2rem; font-size: 1rem; text-align: center;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px);} to { opacity: 1; transform: translateY(0);} }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <div class="timer-bar"><div class="timer-fill" id="timer"></div></div>
+    <div class="question" id="question">Question text goes here</div>
+    <ul class="options" id="options"></ul>
+    <div class="score" id="score">Score: 0 / 0</div>
+  </div>
+
+  <script>
+    const quiz = [
+      { q: "What is the primary symptom of hyperglycemia?", options: ["High blood pressure", "Excessive thirst", "Rapid heartbeat", "Blurred vision"], a: 1 },
+      { q: "Which drug is used to treat bacterial infections?", options: ["Ibuprofen", "Amoxicillin", "Atorvastatin", "Metformin"], a: 1 },
+      { q: "Normal adult heart rate (bpm) range:", options: ["60–100", "40–60", "120–140", "100–120"], a: 0 },
+      { q: "Which vitamin is essential for clotting?", options: ["Vitamin A", "Vitamin C", "Vitamin K", "Vitamin D"], a: 2 },
+      { q: "Diluting cough syrup with water does what?", options: ["Increases potency", "Lowers dosage", "Makes it less effective", "Changes flavor"], a: 2 }
+    ];
+    let current = 0, score = 0, timer;
+    const opts = document.getElementById('options'), quest = document.getElementById('question');
+    const scr = document.getElementById('score'), timerFill = document.getElementById('timer');
+
+    function loadQuestion() {
+      const item = quiz[current];
+      quest.textContent = item.q;
+      opts.innerHTML = '';
+      item.options.forEach((opt, i) => {
+        const li = document.createElement('li');
+        li.textContent = opt;
+        li.addEventListener('click', () => checkAnswer(i, li));
+        opts.append(li);
+      });
+      startTimer();
+      scr.textContent = `Score: ${score} / ${quiz.length}`;
+    }
+
+    function startTimer() {
+      let time = 10;
+      timerFill.style.width = '100%';
+      clearInterval(timer);
+      timer = setInterval(() => {
+        time--;
+        timerFill.style.width = (time * 10) + '%';
+        if (time <= 0) {
+          clearInterval(timer);
+          disableOptions();
+          setTimeout(nextQuestion, 800);
+        }
+      }, 1000);
+    }
+
+    function checkAnswer(i, li) {
+      if (li.classList.contains('disabled')) return;
+      clearInterval(timer);
+      disableOptions();
+      const correct = quiz[current].a;
+      if (i === correct) {
+        li.classList.add('correct');
+        score++;
+      } else {
+        li.classList.add('incorrect');
+        opts.children[correct].classList.add('correct');
+      }
+      scr.textContent = `Score: ${score} / ${quiz.length}`;
+      setTimeout(nextQuestion, 1000);
+    }
+
+    function disableOptions() {
+      Array.from(opts.children).forEach(li => li.classList.add('disabled'));
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current >= quiz.length) {
+        quest.textContent = '🎉 Quiz Complete!';
+        opts.innerHTML = '';
+        scr.textContent = `Final Score: ${score} / ${quiz.length}`;
+      } else {
+        loadQuestion();
+      }
+    }
+
+    window.addEventListener('load', loadQuestion);
+  </script>
+
+</body>
+</html>
