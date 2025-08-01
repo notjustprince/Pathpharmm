@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login | PharmEdu</title>
+  <title>Login | PathPharm</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <!-- Fonts and Icons -->
@@ -17,7 +17,7 @@
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #6a11cb, #2575fc);
       min-height: 100vh;
-      display: flex;
+      display: none; /* Hidden until auth check is complete */
       align-items: center;
       justify-content: center;
     }
@@ -189,10 +189,12 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    // Check login state on page load
+    // Delay rendering until auth check is complete
     onAuthStateChanged(auth, (user) => {
       if (user) {
         window.location.href = "pharmacology.html";
+      } else {
+        document.body.style.display = "flex";
       }
     });
 
@@ -215,7 +217,7 @@
       }
     });
 
-    // Google sign-in
+    // Google login
     document.getElementById("google-btn").addEventListener("click", async () => {
       try {
         await signInWithPopup(auth, provider);
