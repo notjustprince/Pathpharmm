@@ -28,9 +28,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-direction: column;
+      gap: 18px;
       color: white;
-      font-size: 18px;
-      font-weight: 600;
+      font-size: 16px;
+      font-weight: 500;
       height: 100vh;
       width: 100vw;
       position: fixed;
@@ -38,6 +40,21 @@
       left: 0;
       z-index: 999;
       background: linear-gradient(135deg, #6a11cb, #2575fc);
+      text-align: center;
+    }
+
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.2);
+      border-top: 4px solid #ffffff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     #app {
@@ -168,8 +185,13 @@
 </head>
 <body>
 
-  <div id="loader"> Checking your session...</div>
+  <!-- Loader with spinner -->
+  <div id="loader">
+    <div class="spinner"></div>
+    <span>Checking your session...</span>
+  </div>
 
+  <!-- Login App -->
   <div id="app">
     <div class="login-box">
       <h2>Welcome Back</h2>
@@ -218,7 +240,7 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    // Handle session check with loader
+    // Check auth state on load
     onAuthStateChanged(auth, (user) => {
       if (user) {
         window.location.href = "pharmacology.html";
@@ -228,7 +250,7 @@
       }
     });
 
-    // Email/password login
+    // Login button
     document.getElementById("login-btn").addEventListener("click", async () => {
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
@@ -247,7 +269,7 @@
       }
     });
 
-    // Google login
+    // Google login button
     document.getElementById("google-btn").addEventListener("click", async () => {
       try {
         await signInWithPopup(auth, provider);

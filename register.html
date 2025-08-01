@@ -3,229 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login | PharmEdu</title>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <title>Register | PharmEdu</title>
 
-  <!-- Fonts and Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-
-  <!-- Styling -->
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #6a11cb, #2575fc);
-      height: 100%;
-    }
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #loader {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 18px;
-      color: white;
-      font-size: 16px;
-      font-weight: 500;
-      height: 100vh;
-      width: 100vw;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 999;
-      background: linear-gradient(135deg, #6a11cb, #2575fc);
-      text-align: center;
-    }
-
-    .spinner {
-      border: 4px solid rgba(255, 255, 255, 0.2);
-      border-top: 4px solid #ffffff;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    #app {
-      display: none;
-      width: 100%;
-    }
-
-    .login-box {
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(16px);
-      border-radius: 20px;
-      padding: 30px 24px;
-      max-width: 340px;
-      width: 100%;
-      margin: 0 auto;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
-      color: #fff;
-      text-align: center;
-      animation: fadeIn 0.8s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .login-box h2 {
-      margin-bottom: 20px;
-      font-size: 22px;
-      font-weight: 700;
-    }
-    input {
-      width: 100%;
-      padding: 10px 14px;
-      margin: 8px 0;
-      border: none;
-      border-radius: 10px;
-      font-size: 14px;
-    }
-    .login-btn {
-      width: 100%;
-      padding: 12px;
-      background: #ff416c;
-      border: none;
-      border-radius: 10px;
-      color: #fff;
-      font-weight: 600;
-      font-size: 15px;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: background 0.3s ease;
-    }
-    .login-btn:hover { background: #ff4b2b; }
-    .divider {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 18px 0;
-      color: #ddd;
-      font-size: 13px;
-    }
-    .divider::before, .divider::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: #ccc;
-      margin: 0 8px;
-    }
-    .google-btn {
-      background: white;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 14px;
-      color: #333;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-      transition: background 0.3s ease;
-    }
-    .google-btn:hover { background: #f3f3f3; }
-    .google-btn img {
-      width: 20px;
-      height: 20px;
-    }
-    .register-link {
-      font-size: 13px;
-      margin-top: 16px;
-      color: #eee;
-      text-align: center;
-    }
-    .create-btn {
-      margin-left: 8px;
-      padding: 6px 14px;
-      background-color: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 10px;
-      text-decoration: none;
-      color: #fff;
-      font-weight: 600;
-      transition: 0.3s ease;
-    }
-    .create-btn:hover {
-      background-color: rgba(255,255,255,0.3);
-      color: #000;
-    }
-    .skip-btn {
-      width: 100%;
-      padding: 10px;
-      background: transparent;
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 10px;
-      color: #fff;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      margin-top: 14px;
-      transition: background 0.3s ease, color 0.3s ease;
-    }
-    .skip-btn:hover {
-      background: rgba(255,255,255,0.15);
-      color: #000;
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Loader with spinner -->
-  <div id="loader">
-    <div class="spinner"></div>
-    <span>Checking your session...</span>
-  </div>
-
-  <!-- Login App -->
-  <div id="app">
-    <div class="login-box">
-      <h2>Welcome Back</h2>
-      <input type="email" placeholder="Email or phone" id="email" required />
-      <input type="password" placeholder="Password" id="password" required />
-      <button class="login-btn" id="login-btn">Login</button>
-
-      <div class="divider">or</div>
-      <button class="google-btn" id="google-btn">
-        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google Logo" />
-        Sign in with Google
-      </button>
-
-      <div class="register-link">
-        <span>New user?</span>
-        <a href="register.html" class="create-btn">Create Account</a>
-      </div>
-
-      <button class="skip-btn" onclick="window.location.href='pharmacology.html'">
-        Skip for now
-      </button>
-    </div>
-  </div>
-
-  <!-- Firebase SDKs & Logic -->
+  <!-- Firebase SDKs -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import {
-      getAuth,
-      signInWithEmailAndPassword,
-      GoogleAuthProvider,
-      signInWithPopup,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCgRJlAMQVnY5Zu7nkMPmdvS7lc5xMcJz4",
@@ -240,45 +23,203 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    // Check auth state on load
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
+    window.submitForm = async function () {
+      document.getElementById('errorName').textContent = '';
+      document.getElementById('errorEmail').textContent = '';
+      document.getElementById('errorPassword').textContent = '';
+
+      const name = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      let valid = true;
+
+      if (!name) {
+        document.getElementById('errorName').textContent = 'Please enter your name.';
+        valid = false;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        document.getElementById('errorEmail').textContent = 'Invalid email format.';
+        valid = false;
+      }
+      if (password.length < 6) {
+        document.getElementById('errorPassword').textContent = 'At least 6 characters.';
+        valid = false;
+      }
+
+      if (!valid) return;
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        alert("🎉 Registration successful!");
         window.location.href = "pharmacology.html";
+      } catch (error) {
+        alert("❌ Error: " + error.message);
+        console.error(error);
+      }
+    };
+
+    window.handleGoogleRegister = async function () {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        alert("🎉 Signed up with Google!");
+        window.location.href = "pharmacology.html";
+      } catch (error) {
+        alert("❌ Google sign-in error: " + error.message);
+        console.error(error);
+      }
+    };
+  </script>
+
+  <!-- Google Sign-In button styling only -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+    .register-box {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(16px);
+      border:1px solid rgba(255,255,255,0.18);
+      border-radius:20px;
+      padding:30px 24px;
+      max-width:360px;
+      width:100%;
+      box-shadow:0 10px 40px rgba(0,0,0,0.25);
+      color:#fff;
+      text-align:center;
+      animation:fadeIn 0.8s ease-in;
+    }
+    @keyframes fadeIn { from {opacity:0; transform:translateY(10px);} to {opacity:1; transform:translateY(0);} }
+    .register-box h2 { margin-bottom:20px; font-size:22px; font-weight:700; }
+    .input-group {
+      position: relative;
+      margin-bottom:14px;
+      text-align:left;
+    }
+    .input-group input {
+      width:100%;
+      padding:10px 14px;
+      border:none;
+      border-radius:10px;
+      font-size:14px;
+    }
+    .input-group i.toggle {
+      position:absolute;
+      top:50%;
+      right:12px;
+      transform:translateY(-50%);
+      color:#333;
+      cursor:pointer;
+    }
+    .register-btn {
+      width:100%;
+      padding:12px;
+      background:#28c76f;
+      border:none;
+      border-radius:10px;
+      font-weight:600;
+      font-size:15px;
+      color:#fff;
+      cursor:pointer;
+      transition:background 0.3s ease;
+      margin-top:10px;
+    }
+    .register-btn:hover { background:#22b96c; }
+    .divider {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin:16px 0;
+      font-size:13px;
+      color:#ddd;
+    }
+    .divider::before, .divider::after {
+      content:""; flex:1; height:1px; background:#ccc; margin:0 8px;
+    }
+    .google-btn {
+      background:white;
+      border:none;
+      border-radius:10px;
+      padding:10px 14px;
+      font-size:14px;
+      color:#333;
+      font-weight:600;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      width:100%;
+      cursor:pointer;
+      box-shadow:0 4px 12px rgba(0,0,0,0.12);
+      transition:background 0.3s ease;
+    }
+    .google-btn:hover { background:#f3f3f3; }
+    .google-btn img { width:20px; height:20px; }
+    .login-link { font-size:13px; margin-top:14px; color:#eee; }
+    .login-link a { color:#fff; text-decoration:underline; }
+    .error-msg { color:#ffb3b3; font-size:12px; margin-top:4px; }
+  </style>
+</head>
+<body>
+
+  <div class="register-box">
+    <h2>Create Account</h2>
+
+    <div class="input-group">
+      <input type="text" id="fullName" placeholder="Full Name" required />
+      <div class="error-msg" id="errorName"></div>
+    </div>
+
+    <div class="input-group">
+      <input type="email" id="email" placeholder="Email" required />
+      <div class="error-msg" id="errorEmail"></div>
+    </div>
+
+    <div class="input-group">
+      <input type="password" id="password" placeholder="Password" required />
+      <i class="fas fa-eye toggle" onclick="togglePassword()"></i>
+      <div class="error-msg" id="errorPassword"></div>
+    </div>
+
+    <button class="register-btn" onclick="submitForm()">Register</button>
+
+    <div class="divider">or</div>
+
+    <button class="google-btn" onclick="handleGoogleRegister()">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google Logo" />
+      Sign up with Google
+    </button>
+
+    <div class="login-link">
+      Already have an account? <a href="login.html">Login</a>
+    </div>
+  </div>
+
+  <script>
+    function togglePassword() {
+      const pw = document.getElementById('password');
+      const icon = document.querySelector('.toggle');
+      if (pw.type === 'password') {
+        pw.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
       } else {
-        document.getElementById("loader").style.display = "none";
-        document.getElementById("app").style.display = "block";
+        pw.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
       }
-    });
-
-    // Login button
-    document.getElementById("login-btn").addEventListener("click", async () => {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-
-      if (!email || !password) {
-        alert("⚠️ Please fill in both fields");
-        return;
-      }
-
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        alert("✅ Login successful!");
-        window.location.href = "pharmacology.html";
-      } catch (error) {
-        alert("❌ Login failed: " + error.message);
-      }
-    });
-
-    // Google login button
-    document.getElementById("google-btn").addEventListener("click", async () => {
-      try {
-        await signInWithPopup(auth, provider);
-        alert("🎉 Google sign-in successful!");
-        window.location.href = "pharmacology.html";
-      } catch (error) {
-        alert("❌ Google sign-in failed: " + error.message);
-      }
-    });
+    }
   </script>
 
 </body>
