@@ -70,7 +70,6 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
     import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
-    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyCgRJlAMQVnY5Zu7nkMPmdvS7lc5xMcJz4",
@@ -84,9 +83,9 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const auth = getAuth();
 
     let currentRoom = '';
+    const guestId = 'guest_' + Math.random().toString(36).substr(2, 6).toUpperCase();
 
     function generateRoomCode(length = 6) {
       const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -97,6 +96,7 @@
       const roomRef = ref(db, `rooms/${roomCode}/players`);
       onValue(roomRef, snapshot => {
         const players = snapshot.val();
+        console.log('👥 Current players:', players);
         if (players && Object.keys(players).length === 2) {
           document.getElementById('status').textContent = 'Paired! Redirecting to quiz...';
           setTimeout(() => {
@@ -118,15 +118,11 @@
       `;
       document.getElementById('status').textContent = 'Waiting for a player to join...';
 
-      onAuthStateChanged(auth, user => {
-        if (user) {
-          set(ref(db, `rooms/${roomCode}/players/${user.uid}`), {
-            email: user.email,
-            joinedAt: Date.now()
-          });
-          watchRoomPlayers(roomCode);
-        }
+      set(ref(db, `rooms/${roomCode}/players/${guestId}`), {
+        id: guestId,
+        joinedAt: Date.now()
       });
+      watchRoomPlayers(roomCode);
     };
 
     document.getElementById('joinBtn').onclick = () => {
@@ -144,18 +140,14 @@
       localStorage.setItem('roomCode', code);
       document.getElementById('status').textContent = `Joining room ${code}...`;
 
-      onAuthStateChanged(auth, user => {
-        if (user) {
-          set(ref(db, `rooms/${code}/players/${user.uid}`), {
-            email: user.email,
-            joinedAt: Date.now()
-          });
-          watchRoomPlayers(code);
-        }
+      set(ref(db, `rooms/${code}/players/${guestId}`), {
+        id: guestId,
+        joinedAt: Date.now()
       });
+      watchRoomPlayers(code);
     };
 
-    // If coming via direct invite link
+    // If user arrives via invite link:
     const params = new URLSearchParams(window.location.search);
     if (params.has('room')) {
       const code = params.get('room').toUpperCase();
@@ -163,15 +155,11 @@
       localStorage.setItem('roomCode', code);
       document.getElementById('status').textContent = `Joining room: ${code}...`;
 
-      onAuthStateChanged(auth, user => {
-        if (user) {
-          set(ref(db, `rooms/${code}/players/${user.uid}`), {
-            email: user.email,
-            joinedAt: Date.now()
-          });
-          watchRoomPlayers(code);
-        }
+      set(ref(db, `rooms/${code}/players/${guestId}`), {
+        id: guestId,
+        joinedAt: Date.now()
       });
+      watchRoomPlayers(code);
     }
   </script>
 
