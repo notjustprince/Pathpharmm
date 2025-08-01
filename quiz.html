@@ -100,7 +100,7 @@
 
     let score = 0;
     let currentIndex = 0;
-    let isHost = false;
+    let isHost = localStorage.getItem("isHost") === "true";
     let timer = null;
 
     // 🎲 Generate or retrieve guest ID
@@ -114,8 +114,6 @@
       const playersRef = child(roomRef, 'players');
       const snapshot = await get(playersRef);
       const players = snapshot.exists() ? Object.keys(snapshot.val()) : [];
-
-      isHost = players.length === 0;
 
       await set(child(playersRef, playerId), { id: playerId, score: 0 });
 

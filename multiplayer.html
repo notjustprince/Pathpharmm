@@ -110,6 +110,7 @@
       const roomCode = generateRoomCode();
       currentRoom = roomCode;
       localStorage.setItem('roomCode', roomCode);
+      localStorage.setItem("isHost", "true");
       document.getElementById('invite-link').style.display = 'block';
       document.getElementById('invite-link').innerHTML = `
         Invite your friend with this code or link:<br/>
