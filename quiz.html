@@ -60,7 +60,6 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
     import { getDatabase, ref, set, update, get, onValue, child } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
-    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyCgRJlAMQVnY5Zu7nkMPmdvS7lc5xMcJz4",
@@ -74,7 +73,6 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const auth = getAuth();
 
     const roomCode = new URLSearchParams(location.search).get('room') || localStorage.getItem('roomCode');
     const roomRef = ref(db, `rooms/${roomCode}`);
@@ -103,19 +101,23 @@
     let score = 0;
     let currentIndex = 0;
     let isHost = false;
-    let playerId = '';
     let timer = null;
 
-    onAuthStateChanged(auth, async user => {
-      if (!user) return location.href = 'login.html';
-      playerId = user.uid;
+    // 🎲 Generate or retrieve guest ID
+    let playerId = localStorage.getItem('playerId');
+    if (!playerId) {
+      playerId = 'guest_' + Math.random().toString(36).substr(2, 6).toUpperCase();
+      localStorage.setItem('playerId', playerId);
+    }
 
+    async function initGame() {
       const playersRef = child(roomRef, 'players');
       const snapshot = await get(playersRef);
       const players = snapshot.exists() ? Object.keys(snapshot.val()) : [];
 
       isHost = players.length === 0;
-      await set(child(playersRef, playerId), { email: user.email, score: 0 });
+
+      await set(child(playersRef, playerId), { id: playerId, score: 0 });
 
       if (isHost) {
         statusMsg.textContent = "You're the host. Start the game when ready.";
@@ -133,7 +135,9 @@
           startQuestion();
         }
       });
-    });
+    }
+
+    initGame();
 
     function startQuestion() {
       const q = questions[currentIndex];
