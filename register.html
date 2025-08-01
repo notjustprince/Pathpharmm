@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register | PharmEdu</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+    .register-box {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(16px);
+      border:1px solid rgba(255,255,255,0.18);
+      border-radius:20px;
+      padding:30px 24px;
+      max-width:360px;
+      width:100%;
+      box-shadow:0 10px 40px rgba(0,0,0,0.25);
+      color:#fff;
+      text-align:center;
+      animation:fadeIn 0.8s ease-in;
+    }
+    @keyframes fadeIn { from {opacity:0; transform:translateY(10px);} to {opacity:1; transform:translateY(0);} }
+    .register-box h2 { margin-bottom:20px; font-size:22px; font-weight:700; }
+    .input-group {
+      position: relative;
+      margin-bottom:14px;
+      text-align:left;
+    }
+    .input-group input {
+      width:100%;
+      padding:10px 14px;
+      border:none;
+      border-radius:10px;
+      font-size:14px;
+    }
+    .input-group i.toggle {
+      position:absolute;
+      top:50%;
+      right:12px;
+      transform:translateY(-50%);
+      color:#333;
+      cursor:pointer;
+    }
+    .register-btn {
+      width:100%;
+      padding:12px;
+      background:#28c76f;
+      border:none;
+      border-radius:10px;
+      font-weight:600;
+      font-size:15px;
+      color:#fff;
+      cursor:pointer;
+      transition:background 0.3s ease;
+      margin-top:10px;
+    }
+    .register-btn:hover { background:#22b96c; }
+    .divider {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin:16px 0;
+      font-size:13px;
+      color:#ddd;
+    }
+    .divider::before, .divider::after {
+      content:""; flex:1; height:1px; background:#ccc; margin:0 8px;
+    }
+    .google-btn {
+      background:white;
+      border:none;
+      border-radius:10px;
+      padding:10px 14px;
+      font-size:14px;
+      color:#333;
+      font-weight:600;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      width:100%;
+      cursor:pointer;
+      box-shadow:0 4px 12px rgba(0,0,0,0.12);
+      transition:background 0.3s ease;
+    }
+    .google-btn:hover { background:#f3f3f3; }
+    .google-btn img { width:20px; height:20px; }
+    .login-link { font-size:13px; margin-top:14px; color:#eee; }
+    .login-link a { color:#fff; text-decoration:underline; }
+    .error-msg { color:#ffb3b3; font-size:12px; margin-top:4px; }
+  </style>
+</head>
+<body>
+
+  <div class="register-box">
+    <h2>Create Account</h2>
+
+    <div class="input-group">
+      <input type="text" id="fullName" placeholder="Full Name" required />
+      <div class="error-msg" id="errorName"></div>
+    </div>
+
+    <div class="input-group">
+      <input type="email" id="email" placeholder="Email" required />
+      <div class="error-msg" id="errorEmail"></div>
+    </div>
+
+    <div class="input-group">
+      <input type="password" id="password" placeholder="Password" required />
+      <i class="fas fa-eye toggle" onclick="togglePassword()"></i>
+      <div class="error-msg" id="errorPassword"></div>
+    </div>
+
+    <button class="register-btn" onclick="submitForm()">Register</button>
+
+    <div class="divider">or</div>
+
+    <button class="google-btn" onclick="handleGoogleRegister()">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google Logo" />
+      Sign up with Google
+    </button>
+
+    <div class="login-link">
+      Already have an account? <a href="login.html">Login</a>
+    </div>
+  </div>
+
+  <script>
+    function togglePassword() {
+      const pw = document.getElementById('password');
+      const icon = document.querySelector('.toggle');
+      if (pw.type === 'password') {
+        pw.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        pw.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    }
+
+    function validateEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function submitForm() {
+      document.getElementById('errorName').textContent = '';
+      document.getElementById('errorEmail').textContent = '';
+      document.getElementById('errorPassword').textContent = '';
+
+      const name = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      let valid = true;
+
+      if (!name) {
+        document.getElementById('errorName').textContent = 'Please enter your name.';
+        valid = false;
+      }
+      if (!validateEmail(email)) {
+        document.getElementById('errorEmail').textContent = 'Invalid email format.';
+        valid = false;
+      }
+      if (password.length < 6) {
+        document.getElementById('errorPassword').textContent = 'At least 6 characters.';
+        valid = false;
+      }
+
+      if (!valid) return;
+      alert(`✅ Registered!\nName: ${name}\nEmail: ${email}`);
+      // send form data to server here...
+    }
+
+    function handleGoogleRegister() {
+      google.accounts.id.initialize({
+        client_id: "YOUR_GOOGLE_CLIENT_ID_HERE",
+        callback: response => {
+          console.log("Google token:", response.credential);
+          alert("Google Sign-up successful!");
+        }
+      });
+      google.accounts.id.prompt();
+    }
+  </script>
+
+</body>
+</html>
