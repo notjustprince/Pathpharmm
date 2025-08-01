@@ -5,16 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login | PharmEdu</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <!-- Fonts and Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
+  <!-- Styling -->
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #6a11cb, #2575fc);
@@ -23,33 +21,27 @@
       align-items: center;
       justify-content: center;
     }
-
     .login-box {
       background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.18);
       backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
       border-radius: 20px;
       padding: 30px 24px;
-      width: 100%;
       max-width: 340px;
+      width: 100%;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
       color: #fff;
       text-align: center;
       animation: fadeIn 0.8s ease;
     }
-
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     .login-box h2 {
       margin-bottom: 20px;
-      font-weight: 700;
       font-size: 22px;
+      font-weight: 700;
     }
-
     input {
       width: 100%;
       padding: 10px 14px;
@@ -58,25 +50,20 @@
       border-radius: 10px;
       font-size: 14px;
     }
-
     .login-btn {
       width: 100%;
       padding: 12px;
       background: #ff416c;
       border: none;
       border-radius: 10px;
-      font-weight: 600;
       color: #fff;
+      font-weight: 600;
       font-size: 15px;
       cursor: pointer;
       margin-top: 10px;
       transition: background 0.3s ease;
     }
-
-    .login-btn:hover {
-      background: #ff4b2b;
-    }
-
+    .login-btn:hover { background: #ff4b2b; }
     .divider {
       display: flex;
       align-items: center;
@@ -85,16 +72,13 @@
       color: #ddd;
       font-size: 13px;
     }
-
-    .divider::before,
-    .divider::after {
+    .divider::before, .divider::after {
       content: "";
       flex: 1;
       height: 1px;
       background: #ccc;
       margin: 0 8px;
     }
-
     .google-btn {
       background: white;
       border: none;
@@ -112,25 +96,48 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.12);
       transition: background 0.3s ease;
     }
-
-    .google-btn:hover {
-      background: #f3f3f3;
-    }
-
+    .google-btn:hover { background: #f3f3f3; }
     .google-btn img {
       width: 20px;
       height: 20px;
     }
-
     .register-link {
       font-size: 13px;
-      margin-top: 14px;
+      margin-top: 16px;
       color: #eee;
+      text-align: center;
     }
-
-    .register-link a {
+    .create-btn {
+      margin-left: 8px;
+      padding: 6px 14px;
+      background-color: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 10px;
+      text-decoration: none;
       color: #fff;
-      text-decoration: underline;
+      font-weight: 600;
+      transition: 0.3s ease;
+    }
+    .create-btn:hover {
+      background-color: rgba(255,255,255,0.3);
+      color: #000;
+    }
+    .skip-btn {
+      width: 100%;
+      padding: 10px;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 10px;
+      color: #fff;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 14px;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    .skip-btn:hover {
+      background: rgba(255,255,255,0.15);
+      color: #000;
     }
   </style>
 </head>
@@ -138,60 +145,86 @@
 
   <div class="login-box">
     <h2>Welcome Back</h2>
-
-    <input type="email" placeholder="Email" />
-    <input type="password" placeholder="Password" />
-    <button class="login-btn">Login</button>
+    <input type="email" placeholder="Email or phone" id="email" required />
+    <input type="password" placeholder="Password" id="password" required />
+    <button class="login-btn" id="login-btn">Login</button>
 
     <div class="divider">or</div>
-
-    <button class="google-btn" onclick="handleGoogleLogin()">
+    <button class="google-btn" id="google-btn">
       <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google Logo" />
       Sign in with Google
     </button>
-<div class="register-link">
-  <span>New user?</span>
-  <a href="register.html" class="create-btn">Create Account</a>
-</div>
 
-<style>
-  .register-link {
-    margin-top: 16px;
-    font-size: 13px;
-    color: #eee;
-    text-align: center;
-  }
+    <div class="register-link">
+      <span>New user?</span>
+      <a href="register.html" class="create-btn">Create Account</a>
+    </div>
 
-  .create-btn {
-    margin-left: 8px;
-    padding: 6px 14px;
-    background-color: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 10px;
-    text-decoration: none;
-    color: #fff;
-    font-weight: 600;
-    transition: 0.3s ease;
-  }
-
-  .create-btn:hover {
-    background-color: rgba(255,255,255,0.3);
-    color: #000;
-  }
-</style>
+    <button class="skip-btn" onclick="window.location.href='pharmacology.html'">
+      Skip for now
+    </button>
   </div>
 
-  <script>
-    function handleGoogleLogin() {
-      google.accounts.id.initialize({
-        client_id: "YOUR_GOOGLE_CLIENT_ID_HERE",
-        callback: (response) => {
-          console.log("ID Token:", response.credential);
-          alert("Logged in with Google successfully");
-        }
-      });
-      google.accounts.id.prompt();
-    }
+  <!-- Firebase SDKs & Login Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      GoogleAuthProvider,
+      signInWithPopup,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgRJlAMQVnY5Zu7nkMPmdvS7lc5xMcJz4",
+      authDomain: "pathpharmm.firebaseapp.com",
+      projectId: "pathpharmm",
+      storageBucket: "pathpharmm.appspot.com",
+      messagingSenderId: "836525944124",
+      appId: "1:836525944124:web:9ab28aa79e9f12aeea8239"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // Check login state on page load
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = "pharmacology.html";
+      }
+    });
+
+    // Email/password login
+    document.getElementById("login-btn").addEventListener("click", async () => {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (!email || !password) {
+        alert("⚠️ Please fill in both fields");
+        return;
+      }
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        alert("✅ Login successful!");
+        window.location.href = "pharmacology.html";
+      } catch (error) {
+        alert("❌ Login failed: " + error.message);
+      }
+    });
+
+    // Google sign-in
+    document.getElementById("google-btn").addEventListener("click", async () => {
+      try {
+        await signInWithPopup(auth, provider);
+        alert("🎉 Google sign-in successful!");
+        window.location.href = "pharmacology.html";
+      } catch (error) {
+        alert("❌ Google sign-in failed: " + error.message);
+      }
+    });
   </script>
 
 </body>

@@ -4,9 +4,80 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Register | PharmEdu</title>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgRJlAMQVnY5Zu7nkMPmdvS7lc5xMcJz4",
+      authDomain: "pathpharmm.firebaseapp.com",
+      projectId: "pathpharmm",
+      storageBucket: "pathpharmm.appspot.com",
+      messagingSenderId: "836525944124",
+      appId: "1:836525944124:web:9ab28aa79e9f12aeea8239"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    window.submitForm = async function () {
+      document.getElementById('errorName').textContent = '';
+      document.getElementById('errorEmail').textContent = '';
+      document.getElementById('errorPassword').textContent = '';
+
+      const name = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      let valid = true;
+
+      if (!name) {
+        document.getElementById('errorName').textContent = 'Please enter your name.';
+        valid = false;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        document.getElementById('errorEmail').textContent = 'Invalid email format.';
+        valid = false;
+      }
+      if (password.length < 6) {
+        document.getElementById('errorPassword').textContent = 'At least 6 characters.';
+        valid = false;
+      }
+
+      if (!valid) return;
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        alert("🎉 Registration successful!");
+        window.location.href = "pharmacology.html";
+      } catch (error) {
+        alert("❌ Error: " + error.message);
+        console.error(error);
+      }
+    };
+
+    window.handleGoogleRegister = async function () {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        alert("🎉 Signed up with Google!");
+        window.location.href = "pharmacology.html";
+      } catch (error) {
+        alert("❌ Google sign-in error: " + error.message);
+        console.error(error);
+      }
+    };
+  </script>
+
+  <!-- Google Sign-In button styling only -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+
   <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
     body {
@@ -148,49 +219,6 @@
         pw.type = 'password';
         icon.classList.replace('fa-eye-slash', 'fa-eye');
       }
-    }
-
-    function validateEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-
-    function submitForm() {
-      document.getElementById('errorName').textContent = '';
-      document.getElementById('errorEmail').textContent = '';
-      document.getElementById('errorPassword').textContent = '';
-
-      const name = document.getElementById('fullName').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      let valid = true;
-
-      if (!name) {
-        document.getElementById('errorName').textContent = 'Please enter your name.';
-        valid = false;
-      }
-      if (!validateEmail(email)) {
-        document.getElementById('errorEmail').textContent = 'Invalid email format.';
-        valid = false;
-      }
-      if (password.length < 6) {
-        document.getElementById('errorPassword').textContent = 'At least 6 characters.';
-        valid = false;
-      }
-
-      if (!valid) return;
-      alert(`✅ Registered!\nName: ${name}\nEmail: ${email}`);
-      // send form data to server here...
-    }
-
-    function handleGoogleRegister() {
-      google.accounts.id.initialize({
-        client_id: "YOUR_GOOGLE_CLIENT_ID_HERE",
-        callback: response => {
-          console.log("Google token:", response.credential);
-          alert("Google Sign-up successful!");
-        }
-      });
-      google.accounts.id.prompt();
     }
   </script>
 
