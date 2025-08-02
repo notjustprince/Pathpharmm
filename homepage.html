@@ -6,7 +6,18 @@
   <title>Med Topics</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+    }
+    button, .btn, .topic-card, .nav-item {
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #6a11cb, #2575fc);
@@ -145,6 +156,7 @@
       flex: 1;
       font-size: 13px;
       transition: 0.3s;
+      cursor: pointer;
     }
 
     .nav-item span {
@@ -174,9 +186,8 @@
     <div class="greeting" id="greeting">Hello</div>
   </div>
 
-  <button class="logout-btn" id="logout-btn" style="display: none;"></button>
+  <button class="logout-btn" id="logout-btn"></button>
 
-  <!-- Sections -->
   <div class="glass-card" id="pharma-section">
     <h2><i class="fas fa-stethoscope"></i> Pharmacology Topics</h2>
     <div class="topic-grid">
@@ -220,7 +231,6 @@
     <div class="nav-item" onclick="switchTab('challenge-section', this)"><span><i class="fas fa-users"></i></span>Challenge</div>
   </div>
 
-  <!-- Firebase Auth Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
@@ -306,6 +316,5 @@
       window.location.href = "multiplayer.html";
     }
   </script>
-
 </body>
 </html>
