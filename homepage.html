@@ -13,36 +13,43 @@
       -webkit-tap-highlight-color: transparent;
       -webkit-touch-callout: none;
     }
-    button, .btn, .topic-card, .nav-item {
-      outline: none;
-      -webkit-tap-highlight-color: transparent;
-    }
 
     body {
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #6a11cb, #2575fc);
+      padding: 100px 20px 100px;
       min-height: 100vh;
-      padding: 20px 20px 100px;
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      position: relative;
     }
 
     .user-header {
-      position: absolute;
+      position: fixed;
       top: 16px;
-      left: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 500px;
+      height: 56px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: space-between;
+      padding: 0 16px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      border-radius: 12px;
+      z-index: 1000;
     }
 
     .user-icon {
       width: 40px;
       height: 40px;
       background: rgba(255,255,255,0.3);
-      color: white;
+      color: #fff;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -52,50 +59,47 @@
     }
 
     .greeting {
-      color: white;
+      color: #fff;
       font-size: 18px;
       font-weight: 600;
+      margin-left: 10px;
     }
 
     .logout-btn {
-      position: absolute;
-      top: 16px;
-      right: 20px;
-      background-color: rgba(255,255,255,0.2);
-      color: white;
-      border: none;
-      padding: 8px 14px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
       border-radius: 10px;
       font-weight: 600;
+      padding: 6px 12px;
       cursor: pointer;
-      transition: 0.3s ease;
-      z-index: 10;
-      display: none;
+      transition: background 0.3s;
     }
 
     .logout-btn:hover {
-      background-color: rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.3);
       color: black;
     }
 
     .glass-card {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255,255,255,0.12);
       backdrop-filter: blur(18px);
       border-radius: 20px;
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
       padding: 30px 20px;
-      text-align: center;
       width: 100%;
       max-width: 460px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      margin-top: 60px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.2);
+      margin-top: 20px;
       display: none;
     }
 
     h2, h1 {
+      color: #fff;
       font-size: 26px;
       font-weight: bold;
-      color: white;
       margin-bottom: 20px;
     }
 
@@ -108,18 +112,18 @@
 
     .topic-card, .btn {
       flex: 0 1 calc(50% - 8px);
-      background: rgba(255, 255, 255, 0.18);
+      background: rgba(255,255,255,0.18);
       backdrop-filter: blur(10px);
       border-radius: 15px;
       padding: 20px;
       text-align: center;
-      color: white;
+      color: #fff;
       font-weight: 600;
       font-size: 15px;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.25);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
       transition: 0.3s;
+      cursor: pointer;
     }
 
     .btn {
@@ -128,35 +132,29 @@
     }
 
     .topic-card:hover, .btn:hover {
-      background: rgba(255, 255, 255, 0.3);
+      background: rgba(255,255,255,0.3);
       transform: translateY(-4px);
-    }
-
-    .topic-card i, .btn i {
-      font-size: 20px;
-      margin-bottom: 8px;
-      display: block;
     }
 
     .bottom-nav {
       position: fixed;
       bottom: 0;
       width: 100%;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255,255,255,0.1);
       backdrop-filter: blur(10px);
       display: flex;
       justify-content: space-around;
       padding: 12px 0;
-      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      border-top: 1px solid rgba(255,255,255,0.2);
     }
 
     .nav-item {
-      color: white;
+      color: #fff;
       text-align: center;
       flex: 1;
       font-size: 13px;
-      transition: 0.3s;
       cursor: pointer;
+      transition: 0.3s;
     }
 
     .nav-item span {
@@ -167,8 +165,7 @@
 
     .nav-item.active {
       font-weight: bold;
-      color: #fff;
-      background-color: rgba(255, 255, 255, 0.25);
+      background-color: rgba(255,255,255,0.25);
       border-radius: 15px;
       padding: 5px 8px;
       margin: 0 6px;
@@ -182,46 +179,45 @@
 <body>
 
   <div class="user-header" id="user-header">
-    <div class="user-icon" id="user-icon">?</div>
-    <div class="greeting" id="greeting">Hello</div>
+    <div style="display: flex; align-items: center;">
+      <div class="user-icon" id="user-icon">?</div>
+      <div class="greeting" id="greeting">Hello</div>
+    </div>
+    <button class="logout-btn" id="logout-btn">Login</button>
   </div>
-
-  <button class="logout-btn" id="logout-btn"></button>
 
   <div class="glass-card" id="pharma-section">
     <h2><i class="fas fa-stethoscope"></i> Pharmacology Topics</h2>
     <div class="topic-grid">
-      <div class="topic-card" onclick="location.href='intropharm.html'"><i class="fas fa-book-medical"></i> Intro</div>
-      <div class="topic-card" onclick="location.href='autonomic.html'"><i class="fas fa-brain"></i> Autonomics</div>
-      <div class="topic-card" onclick="location.href='quiz_antibiotics.html'"><i class="fas fa-capsules"></i> Antibiotics</div>
-      <div class="topic-card" onclick="location.href='quiz_analgesics.html'"><i class="fas fa-pills"></i> Analgesics</div>
-      <div class="topic-card" onclick="location.href='quiz_cns.html'"><i class="fas fa-head-side-virus"></i> CNS Drugs</div>
+      <div class="topic-card" onclick="location.replace('intropharm.html')"><i class="fas fa-book-medical"></i> Intro</div>
+      <div class="topic-card" onclick="location.replace('autonomic.html')"><i class="fas fa-brain"></i> Autonomics</div>
+      <div class="topic-card" onclick="location.replace('quiz_antibiotics.html')"><i class="fas fa-capsules"></i> Antibiotics</div>
+      <div class="topic-card" onclick="location.replace('quiz_analgesics.html')"><i class="fas fa-pills"></i> Analgesics</div>
+      <div class="topic-card" onclick="location.replace('quiz_cns.html')"><i class="fas fa-head-side-virus"></i> CNS Drugs</div>
     </div>
   </div>
 
   <div class="glass-card" id="patho-section">
     <h2><i class="fas fa-flask"></i> Pathology Topics</h2>
     <div class="topic-grid">
-      <div class="topic-card" onclick="location.href='intropath.html'"><i class="fas fa-book"></i> Intro</div>
-      <div class="topic-card" onclick="location.href='quiz_inflammation.html'"><i class="fas fa-fire"></i> Inflammation</div>
-      <div class="topic-card" onclick="location.href='quiz_healing.html'"><i class="fas fa-band-aid"></i> Healing</div>
-      <div class="topic-card" onclick="location.href='quiz_neoplasia.html'"><i class="fas fa-dna"></i> Neoplasia</div>
-      <div class="topic-card" onclick="location.href='quiz_immunopathology.html'"><i class="fas fa-shield-virus"></i> Immuno</div>
-      <div class="topic-card" onclick="location.href='quiz_cell_injury.html'"><i class="fas fa-bolt"></i> Cell Injury</div>
+      <div class="topic-card" onclick="location.replace('intropath.html')"><i class="fas fa-book"></i> Intro</div>
+      <div class="topic-card" onclick="location.replace('quiz_inflammation.html')"><i class="fas fa-fire"></i> Inflammation</div>
+      <div class="topic-card" onclick="location.replace('quiz_healing.html')"><i class="fas fa-band-aid"></i> Healing</div>
+      <div class="topic-card" onclick="location.replace('quiz_neoplasia.html')"><i class="fas fa-dna"></i> Neoplasia</div>
+      <div class="topic-card" onclick="location.replace('quiz_immunopathology.html')"><i class="fas fa-shield-virus"></i> Immuno</div>
+      <div class="topic-card" onclick="location.replace('quiz_cell_injury.html')"><i class="fas fa-bolt"></i> Cell Injury</div>
     </div>
   </div>
 
   <div class="glass-card" id="flashcard-section">
     <h1>What would you like to study?</h1>
-    <button class="btn" onclick="location.href='pharmcard.html'"><i class="fas fa-pills"></i> Pharmacology Flashcards</button>
-    <button class="btn" onclick="location.href='pathcard.html'"><i class="fas fa-heartbeat"></i> Pathology Flashcards</button>
+    <button class="btn" onclick="location.replace('pharmcard.html')"><i class="fas fa-pills"></i> Pharmacology Flashcards</button>
+    <button class="btn" onclick="location.replace('pathcard.html')"><i class="fas fa-heartbeat"></i> Pathology Flashcards</button>
   </div>
 
   <div class="glass-card" id="challenge-section">
     <h2><i class="fas fa-users"></i> Play with Friends</h2>
-    <button class="btn btn-invite" onclick="goToMultiplayer()">
-      <i class="fas fa-gamepad"></i> Play Multiplayer
-    </button>
+    <button class="btn" onclick="location.replace('multiplayer.html')"><i class="fas fa-gamepad"></i> Play Multiplayer</button>
   </div>
 
   <div class="bottom-nav">
@@ -236,12 +232,12 @@
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyCgRJlAMQVnY5Zu7nkMPmdvS7lc5xMcJz4",
-      authDomain: "pathpharmm.firebaseapp.com",
-      projectId: "pathpharmm",
-      storageBucket: "pathpharmm.appspot.com",
-      messagingSenderId: "836525944124",
-      appId: "1:836525944124:web:9ab28aa79e9f12aeea8239"
+      apiKey: "YOUR_KEY",
+      authDomain: "YOUR_DOMAIN",
+      projectId: "YOUR_PROJECT",
+      storageBucket: "YOUR_BUCKET",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -265,16 +261,11 @@
         logoutBtn.textContent = "Logout";
         logoutBtn.onclick = async () => {
           if (!confirm("Are you sure you want to log out?")) return;
-          try {
-            await signOut(auth);
-            localStorage.removeItem("skip");
-            localStorage.removeItem("userName");
-            window.location.href = "login.html";
-          } catch (err) {
-            alert("Logout failed: " + err.message);
-          }
+          await signOut(auth);
+          localStorage.removeItem("skip");
+          localStorage.removeItem("userName");
+          window.location.href = "login.html";
         };
-        logoutBtn.style.display = "block";
       } else if (skipped) {
         document.getElementById("user-icon").textContent = "?";
         document.getElementById("greeting").textContent = "Welcome!";
@@ -283,7 +274,6 @@
           localStorage.removeItem("skip");
           window.location.href = "login.html";
         };
-        logoutBtn.style.display = "block";
       }
     });
   </script>
@@ -293,28 +283,25 @@
     const navItems = document.querySelectorAll('.nav-item');
 
     function switchTab(id, el) {
-      sections.forEach(sec => document.getElementById(sec).style.display = (sec === id ? 'block' : 'none'));
+      sections.forEach(sec => {
+        document.getElementById(sec).style.display = (sec === id ? 'block' : 'none');
+      });
       navItems.forEach(item => item.classList.remove('active'));
       el.classList.add('active');
     }
 
     switchTab("pharma-section", navItems[0]);
 
-    let startX = 0, endX = 0;
+    let startX = 0;
     document.addEventListener('touchstart', e => startX = e.touches[0].clientX);
     document.addEventListener('touchend', e => {
-      endX = e.changedTouches[0].clientX;
-      const delta = endX - startX;
-      const currentIndex = sections.findIndex(id => document.getElementById(id).style.display === 'block');
+      const delta = e.changedTouches[0].clientX - startX;
+      const i = sections.findIndex(id => document.getElementById(id).style.display === 'block');
       if (Math.abs(delta) > 60) {
-        const nextIndex = delta < 0 ? (currentIndex + 1) % 4 : (currentIndex + 3) % 4;
-        switchTab(sections[nextIndex], navItems[nextIndex]);
+        const next = delta < 0 ? (i + 1) % 4 : (i + 3) % 4;
+        switchTab(sections[next], navItems[next]);
       }
     });
-
-    function goToMultiplayer() {
-      window.location.href = "multiplayer.html";
-    }
   </script>
 </body>
 </html>
