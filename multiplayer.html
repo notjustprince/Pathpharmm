@@ -37,7 +37,7 @@
       border-radius: 20px;
       padding: 30px 24px;
       width: 100%;
-      max-width: 380px;
+      max-width: 400px;
       box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
       text-align: center;
       animation: rainbowGlow 12s infinite alternate;
@@ -50,37 +50,58 @@
       color: #fff;
     }
 
-    button {
-      background: rgba(255, 255, 255, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: white;
-      padding: 12px 20px;
-      margin-top: 14px;
-      font-size: 15px;
-      font-weight: 600;
-      border-radius: 14px;
-      width: 100%;
+    .how-to-connect {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+
+    .how-to-connect i {
       cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
-      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
-      animation: rainbowGlow 12s infinite alternate;
+      color: #ffeb3b;
+      font-size: 16px;
+      transition: transform 0.2s;
     }
 
-    button:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: scale(1.04);
+    .how-to-connect i:hover {
+      transform: scale(1.2);
     }
 
-    #hostBtn {
-      background: rgba(0, 255, 195, 0.15);
+    .card-button {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 16px;
+      padding: 14px 20px;
+      margin: 10px 0;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 500;
+      text-align: left;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 6px 24px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
 
-    #joinBtn {
-      background: rgba(255, 193, 7, 0.15);
+    .card-button:hover {
+      transform: translateY(-4px) scale(1.02);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .card-button i {
+      font-size: 22px;
     }
 
     .input-box {
-      margin-top: 20px;
+      margin-top: 18px;
       display: none;
     }
 
@@ -186,6 +207,61 @@
       animation: fadeIn 1s ease forwards;
     }
 
+    .modal, .overlay {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 24px;
+      border-radius: 14px;
+      width: 90%;
+      max-width: 340px;
+      z-index: 999;
+      transition: transform 0.3s ease;
+    }
+
+    .modal.active {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .overlay {
+      transform: none;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      z-index: 998;
+    }
+
+    .overlay.active {
+      display: block;
+    }
+
+    .modal h2 {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+
+    .modal ol {
+      margin-left: 18px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .modal .close-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 6px 14px;
+      border-radius: 10px;
+      margin-top: 18px;
+      cursor: pointer;
+    }
+
     @keyframes rainbowGlow {
       0% { box-shadow: 0 0 4px #ff0000; }
       20% { box-shadow: 0 0 4px #ff9900; }
@@ -194,18 +270,51 @@
       80% { box-shadow: 0 0 4px #9933ff; }
       100% { box-shadow: 0 0 4px #ff0000; }
     }
+    .confirm-join-btn {
+  background: linear-gradient(145deg, #00ffb3, #00bfff);
+  border: none;
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  border-radius: 12px;
+  cursor: pointer;
+  width: 100%;
+  box-shadow: 0 4px 18px rgba(0, 255, 195, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.confirm-join-btn:hover {
+  background: linear-gradient(145deg, #00ffcc, #33ccff);
+  transform: scale(1.04);
+  box-shadow: 0 6px 24px rgba(0, 255, 195, 0.6);
+}
+
+.confirm-join-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 12px rgba(0, 255, 195, 0.3);
+}
   </style>
 </head>
 <body>
   <div class="container">
     <h1><i class="fas fa-users"></i> Multiplayer Quiz Lobby</h1>
 
-    <button id="hostBtn">Host Room</button>
-    <button id="joinBtn">Join Room</button>
+    <div class="how-to-connect">
+      <span>How to connect</span>
+      <i class="fas fa-question-circle" id="helpIcon"></i>
+    </div>
+
+    <div onclick="hostRoom()" class="card-button"><i class="fas fa-user-plus"></i> Host Room</div>
+    <div onclick="toggleJoinSection()" class="card-button"><i class="fas fa-sign-in-alt"></i> Join Room</div>
 
     <div class="input-box" id="joinSection">
       <input type="text" id="joinCode" placeholder="Enter Room Code" maxlength="6"/>
-      <button onclick="joinRoomCode()">Join</button>
+      <button class="confirm-join-btn" onclick="joinRoomCode()">
+  <i class="fas fa-door-open"></i> Join
+</button>
     </div>
 
     <div id="status"></div>
@@ -216,6 +325,18 @@
     </div>
 
     <div class="success-msg" id="pairedSuccess">✅ Players Paired! Launching game...</div>
+  </div>
+
+  <div class="overlay" id="overlay"></div>
+  <div class="modal" id="instructionModal">
+    <h2>How to Connect</h2>
+    <ol>
+      <li><strong>Host Room</strong>: Creates a room and gives you a code.</li>
+      <li><strong>Share</strong> that code with your friend.</li>
+      <li><strong>Join Room</strong>: Use that code to connect.</li>
+      <li>Once 2 players are in the same room, the quiz starts automatically.</li>
+    </ol>
+    <button class="close-btn" id="closeModal">Got it!</button>
   </div>
 
   <script type="module">
@@ -258,7 +379,7 @@
       });
     }
 
-    document.getElementById('hostBtn').onclick = () => {
+    window.hostRoom = () => {
       const roomCode = generateRoomCode();
       currentRoom = roomCode;
       localStorage.setItem('roomCode', roomCode);
@@ -290,7 +411,7 @@
       watchRoomPlayers(roomCode);
     };
 
-    document.getElementById('joinBtn').onclick = () => {
+    window.toggleJoinSection = () => {
       document.getElementById('joinSection').style.display = 'block';
     };
 
@@ -312,6 +433,23 @@
 
       watchRoomPlayers(input);
     };
+
+    const helpIcon = document.getElementById('helpIcon');
+    const modal = document.getElementById('instructionModal');
+    const overlay = document.getElementById('overlay');
+    const closeBtn = document.getElementById('closeModal');
+
+    helpIcon.onclick = () => {
+      modal.classList.add('active');
+      overlay.classList.add('active');
+    };
+
+    closeBtn.onclick = () => {
+      modal.classList.remove('active');
+      overlay.classList.remove('active');
+    };
+
+    overlay.onclick = closeBtn.onclick;
   </script>
 </body>
 </html>
