@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Intro to Pharmacology</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <!-- 🔁 Prefetch commonly visited pages -->
+  <link rel="prefetch" href="drugbasics.html">
+  <link rel="prefetch" href="administration.html">
+  <link rel="prefetch" href="mechanism.html">
+  <link rel="prefetch" href="dose_response.html">
+  <link rel="prefetch" href="kinetics.html">
+  <link rel="prefetch" href="contraindications.html">
+  <link rel="prefetch" href="resistance.html">
+  <link rel="prefetch" href="formulations.html">
+  <link rel="prefetch" href="bioavailability.html">
+  <link rel="prefetch" href="trials.html">
+
   <style>
     * {
       margin: 0;
@@ -66,7 +79,6 @@
       cursor: pointer;
       transition: transform 0.2s ease, background 0.3s ease;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-      -webkit-tap-highlight-color: transparent;
     }
 
     .card:hover {
@@ -91,7 +103,6 @@
       cursor: pointer;
       backdrop-filter: blur(8px);
       transition: 0.3s;
-      -webkit-tap-highlight-color: transparent;
     }
 
     .back-btn:hover {
@@ -105,16 +116,16 @@
   <p>Explore key foundation topics below:</p>
 
   <div class="grid-container">
-    <div class="card" onclick="location.href='drugbasics.html'"><i class="fas fa-dna"></i> Drug Basics</div>
-    <div class="card" onclick="location.href='administration.html'"><i class="fas fa-syringe"></i> Administration</div>
-    <div class="card" onclick="location.href='mechanism.html'"><i class="fas fa-balance-scale"></i> Mechanism</div>
-    <div class="card" onclick="location.href='dose_response.html'"><i class="fas fa-chart-line"></i> Dose Response</div>
-    <div class="card" onclick="location.href='kinetics.html'"><i class="fas fa-hourglass-half"></i> Kinetics</div>
-    <div class="card" onclick="location.href='contraindications.html'"><i class="fas fa-ban"></i> Contraindications</div>
-    <div class="card" onclick="location.href='resistance.html'"><i class="fas fa-viruses"></i> Resistance</div>
-    <div class="card" onclick="location.href='formulations.html'"><i class="fas fa-capsules"></i> Formulations</div>
-    <div class="card" onclick="location.href='bioavailability.html'"><i class="fas fa-chart-area"></i> Bioavailability</div>
-    <div class="card" onclick="location.href='trials.html'"><i class="fas fa-vial"></i> Trials</div>
+    <div class="card" onclick="location.replace('drugbasics.html')"><i class="fas fa-dna"></i> Drug Basics</div>
+    <div class="card" onclick="location.replace('administration.html')"><i class="fas fa-syringe"></i> Administration</div>
+    <div class="card" onclick="location.replace('mechanism.html')"><i class="fas fa-balance-scale"></i> Mechanism</div>
+    <div class="card" onclick="location.replace('dose_response.html')"><i class="fas fa-chart-line"></i> Dose Response</div>
+    <div class="card" onclick="location.replace('kinetics.html')"><i class="fas fa-hourglass-half"></i> Kinetics</div>
+    <div class="card" onclick="location.replace('contraindications.html')"><i class="fas fa-ban"></i> Contraindications</div>
+    <div class="card" onclick="location.replace('resistance.html')"><i class="fas fa-viruses"></i> Resistance</div>
+    <div class="card" onclick="location.replace('formulations.html')"><i class="fas fa-capsules"></i> Formulations</div>
+    <div class="card" onclick="location.replace('bioavailability.html')"><i class="fas fa-chart-area"></i> Bioavailability</div>
+    <div class="card" onclick="location.replace('trials.html')"><i class="fas fa-vial"></i> Trials</div>
   </div>
 
   <button class="back-btn" onclick="history.back()"><i class="fas fa-arrow-left"></i> Back</button>
