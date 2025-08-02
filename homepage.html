@@ -17,12 +17,12 @@
     body {
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #6a11cb, #2575fc);
-      padding: 100px 20px 100px;
+      padding: 80px 20px 100px;
       min-height: 100vh;
-      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
+      position: relative;
     }
 
     .user-header {
@@ -63,6 +63,10 @@
       font-size: 18px;
       font-weight: 600;
       margin-left: 10px;
+      min-width: 100px;
+      height: 24px;
+      display: flex;
+      align-items: center;
     }
 
     .logout-btn {
@@ -75,6 +79,7 @@
       padding: 6px 12px;
       cursor: pointer;
       transition: background 0.3s;
+      display: none;
     }
 
     .logout-btn:hover {
@@ -181,45 +186,47 @@
   <div class="user-header" id="user-header">
     <div style="display: flex; align-items: center;">
       <div class="user-icon" id="user-icon">?</div>
-      <div class="greeting" id="greeting">Hello</div>
+      <div class="greeting" id="greeting">...</div>
     </div>
     <button class="logout-btn" id="logout-btn">Login</button>
   </div>
 
+  <!-- 📘 Sections -->
   <div class="glass-card" id="pharma-section">
     <h2><i class="fas fa-stethoscope"></i> Pharmacology Topics</h2>
     <div class="topic-grid">
-      <div class="topic-card" onclick="location.replace('intropharm.html')"><i class="fas fa-book-medical"></i> Intro</div>
-      <div class="topic-card" onclick="location.replace('autonomic.html')"><i class="fas fa-brain"></i> Autonomics</div>
-      <div class="topic-card" onclick="location.replace('quiz_antibiotics.html')"><i class="fas fa-capsules"></i> Antibiotics</div>
-      <div class="topic-card" onclick="location.replace('quiz_analgesics.html')"><i class="fas fa-pills"></i> Analgesics</div>
-      <div class="topic-card" onclick="location.replace('quiz_cns.html')"><i class="fas fa-head-side-virus"></i> CNS Drugs</div>
+      <div class="topic-card" onclick="location.href='intropharm.html'"><i class="fas fa-book-medical"></i> Intro</div>
+      <div class="topic-card" onclick="location.href='autonomic.html'"><i class="fas fa-brain"></i> Autonomics</div>
+      <div class="topic-card" onclick="location.href='quiz_antibiotics.html'"><i class="fas fa-capsules"></i> Antibiotics</div>
+      <div class="topic-card" onclick="location.href='quiz_analgesics.html'"><i class="fas fa-pills"></i> Analgesics</div>
+      <div class="topic-card" onclick="location.href='quiz_cns.html'"><i class="fas fa-head-side-virus"></i> CNS Drugs</div>
     </div>
   </div>
 
   <div class="glass-card" id="patho-section">
     <h2><i class="fas fa-flask"></i> Pathology Topics</h2>
     <div class="topic-grid">
-      <div class="topic-card" onclick="location.replace('intropath.html')"><i class="fas fa-book"></i> Intro</div>
-      <div class="topic-card" onclick="location.replace('quiz_inflammation.html')"><i class="fas fa-fire"></i> Inflammation</div>
-      <div class="topic-card" onclick="location.replace('quiz_healing.html')"><i class="fas fa-band-aid"></i> Healing</div>
-      <div class="topic-card" onclick="location.replace('quiz_neoplasia.html')"><i class="fas fa-dna"></i> Neoplasia</div>
-      <div class="topic-card" onclick="location.replace('quiz_immunopathology.html')"><i class="fas fa-shield-virus"></i> Immuno</div>
-      <div class="topic-card" onclick="location.replace('quiz_cell_injury.html')"><i class="fas fa-bolt"></i> Cell Injury</div>
+      <div class="topic-card" onclick="location.href='intropath.html'"><i class="fas fa-book"></i> Intro</div>
+      <div class="topic-card" onclick="location.href='quiz_inflammation.html'"><i class="fas fa-fire"></i> Inflammation</div>
+      <div class="topic-card" onclick="location.href='quiz_healing.html'"><i class="fas fa-band-aid"></i> Healing</div>
+      <div class="topic-card" onclick="location.href='quiz_neoplasia.html'"><i class="fas fa-dna"></i> Neoplasia</div>
+      <div class="topic-card" onclick="location.href='quiz_immunopathology.html'"><i class="fas fa-shield-virus"></i> Immuno</div>
+      <div class="topic-card" onclick="location.href='quiz_cell_injury.html'"><i class="fas fa-bolt"></i> Cell Injury</div>
     </div>
   </div>
 
   <div class="glass-card" id="flashcard-section">
     <h1>What would you like to study?</h1>
-    <button class="btn" onclick="location.replace('pharmcard.html')"><i class="fas fa-pills"></i> Pharmacology Flashcards</button>
-    <button class="btn" onclick="location.replace('pathcard.html')"><i class="fas fa-heartbeat"></i> Pathology Flashcards</button>
+    <button class="btn" onclick="location.href='pharmcard.html'"><i class="fas fa-pills"></i> Pharmacology Flashcards</button>
+    <button class="btn" onclick="location.href='pathcard.html'"><i class="fas fa-heartbeat"></i> Pathology Flashcards</button>
   </div>
 
   <div class="glass-card" id="challenge-section">
     <h2><i class="fas fa-users"></i> Play with Friends</h2>
-    <button class="btn" onclick="location.replace('multiplayer.html')"><i class="fas fa-gamepad"></i> Play Multiplayer</button>
+    <button class="btn" onclick="location.href='multiplayer.html'"><i class="fas fa-gamepad"></i> Play Multiplayer</button>
   </div>
 
+  <!-- 🔽 Bottom Nav -->
   <div class="bottom-nav">
     <div class="nav-item active" onclick="switchTab('pharma-section', this)"><span><i class="fas fa-pills"></i></span>Pharma</div>
     <div class="nav-item" onclick="switchTab('patho-section', this)"><span><i class="fas fa-flask"></i></span>Patho</div>
@@ -227,6 +234,22 @@
     <div class="nav-item" onclick="switchTab('challenge-section', this)"><span><i class="fas fa-users"></i></span>Challenge</div>
   </div>
 
+  <!-- 🚀 Instant Greeting Fix -->
+  <script>
+    const storedName = localStorage.getItem("userName");
+    if (storedName) {
+      const first = storedName.split(" ")[0];
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("user-icon").textContent = first[0].toUpperCase();
+        document.getElementById("greeting").textContent = `Hello, ${first}`;
+        const btn = document.getElementById("logout-btn");
+        btn.textContent = "Logout";
+        btn.style.display = "block";
+      });
+    }
+  </script>
+
+  <!-- 🔐 Firebase Auth -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
@@ -243,47 +266,53 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    window.addEventListener("DOMContentLoaded", () => {
+    onAuthStateChanged(auth, user => {
+      const skipped = localStorage.getItem("skip") === "true";
       const logoutBtn = document.getElementById("logout-btn");
-      onAuthStateChanged(auth, user => {
-        const skipped = localStorage.getItem("skip") === "true";
-        if (!user && !skipped) {
+
+      if (!user && !skipped) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      if (user) {
+        const name = user.displayName || user.email.split('@')[0];
+        localStorage.setItem("userName", name);
+        const first = name.split(" ")[0];
+        document.getElementById("user-icon").textContent = first[0].toUpperCase();
+        document.getElementById("greeting").textContent = `Hello, ${first}`;
+        logoutBtn.textContent = "Logout";
+        logoutBtn.onclick = async () => {
+          if (!confirm("Are you sure you want to log out?")) return;
+          await signOut(auth);
+          localStorage.removeItem("skip");
+          localStorage.removeItem("userName");
           window.location.href = "login.html";
-          return;
-        }
-        if (user) {
-          const name = user.displayName || user.email.split('@')[0];
-          localStorage.setItem("userName", name);
-          const first = name.split(" ")[0];
-          document.getElementById("user-icon").textContent = first[0].toUpperCase();
-          document.getElementById("greeting").textContent = `Hello, ${first}`;
-          logoutBtn.textContent = "Logout";
-          logoutBtn.onclick = async () => {
-            if (!confirm("Are you sure you want to log out?")) return;
-            await signOut(auth);
-            localStorage.removeItem("skip");
-            localStorage.removeItem("userName");
-            window.location.href = "login.html";
-          };
-        } else if (skipped) {
-          document.getElementById("user-icon").textContent = "?";
-          document.getElementById("greeting").textContent = "Welcome!";
-          logoutBtn.textContent = "Login";
-          logoutBtn.onclick = () => {
-            localStorage.removeItem("skip");
-            window.location.href = "login.html";
-          };
-        }
-      });
+        };
+        logoutBtn.style.display = "block";
+      } else if (skipped) {
+        const name = localStorage.getItem("userName") || "Guest";
+        document.getElementById("user-icon").textContent = name[0].toUpperCase();
+        document.getElementById("greeting").textContent = `Welcome, ${name}`;
+        logoutBtn.textContent = "Login";
+        logoutBtn.onclick = () => {
+          localStorage.removeItem("skip");
+          window.location.href = "login.html";
+        };
+        logoutBtn.style.display = "block";
+      }
     });
   </script>
 
+  <!-- 🔄 Tab + Swipe -->
   <script>
     const sections = ["pharma-section", "patho-section", "flashcard-section", "challenge-section"];
     const navItems = document.querySelectorAll('.nav-item');
 
     function switchTab(id, el) {
-      sections.forEach(sec => document.getElementById(sec).style.display = (sec === id ? 'block' : 'none'));
+      sections.forEach(sec => {
+        document.getElementById(sec).style.display = (sec === id ? 'block' : 'none');
+      });
       navItems.forEach(item => item.classList.remove('active'));
       el.classList.add('active');
     }
@@ -294,9 +323,9 @@
     document.addEventListener('touchstart', e => startX = e.touches[0].clientX);
     document.addEventListener('touchend', e => {
       const delta = e.changedTouches[0].clientX - startX;
-      const current = sections.findIndex(sec => document.getElementById(sec).style.display === 'block');
+      const i = sections.findIndex(id => document.getElementById(id).style.display === 'block');
       if (Math.abs(delta) > 60) {
-        const next = delta < 0 ? (current + 1) % 4 : (current + 3) % 4;
+        const next = delta < 0 ? (i + 1) % 4 : (i + 3) % 4;
         switchTab(sections[next], navItems[next]);
       }
     });

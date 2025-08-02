@@ -3,152 +3,59 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Multiplayer Quiz</title>
+  <title>Quiz Room</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #6B48FF, #A445B1);
-      color: #333;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      overflow: hidden;
-    }
-    .glass-container {
-      max-width: 400px;
-      width: 90%;
+      background: linear-gradient(to right, #141e30, #243b55);
+      color: white;
+      font-family: sans-serif;
       text-align: center;
+      padding: 30px;
     }
-    .card {
-      background: #FFF;
-      border-radius: 20px;
-      padding: 15px;
-      margin: 10px 0;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .header .level {
-      font-size: 18px;
-      font-weight: bold;
-    }
-    .header .timer {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #6B48FF;
-      color: #FFF;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-    }
-    .header .score {
-      font-size: 14px;
-    }
-    #progress {
-      background: #D1C4E9;
-      border-radius: 10px;
-      padding: 5px;
-      margin: 10px 0;
-      font-size: 14px;
-    }
-    #question-card {
-      font-size: 18px;
-      line-height: 1.4;
-    }
-    .answer-card {
+
+    #answers button {
       display: block;
-      width: 100%;
-      padding: 12px;
-      background: #FFF;
-      color: #333;
-      border: 2px solid #6B48FF;
-      border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-align: left;
-    }
-    .answer-card:hover {
-      background: #F5F5F5;
-    }
-    .answer-card.correct {
-      background: #4CAF50;
-      color: #FFF;
-      border-color: #4CAF50;
-    }
-    .answer-card.selected {
-      background: #CE93D8;
-      color: #FFF;
-      border-color: #CE93D8;
-    }
-    .controls {
-      display: flex;
-      justify-content: space-around;
-      margin: 20px 0;
-    }
-    .controls button {
-      background: #6B48FF;
+      margin: 10px auto;
+      padding: 12px 20px;
+      background: rgba(255,255,255,0.15);
+      color: white;
       border: none;
-      border-radius: 10px;
-      color: #FFF;
-      padding: 10px;
+      border-radius: 8px;
       cursor: pointer;
     }
-    #next-btn {
-      background: #6B48FF;
+
+    #startBtn {
+      background-color: #00ffc3;
+      color: #000;
+      padding: 14px 24px;
+      font-size: 18px;
+      margin-top: 20px;
       border: none;
-      border-radius: 10px;
-      color: #FFF;
-      padding: 10px 20px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: 0.2s;
     }
-    #next-btn:hover {
-      filter: brightness(1.1);
+
+    .score {
+      margin-top: 20px;
     }
+
     #status {
-      margin-bottom: 20px;
+      margin-top: 20px;
       font-size: 16px;
-      min-height: 24px;
     }
   </style>
 </head>
 <body>
-  <div class="glass-container">
-    <div class="header">
-      <div class="level">Level 1</div>
-      <div class="timer">30</div>
-      <div class="score">0 / 0</div>
-    </div>
-    <div id="progress" class="card">1 / 10</div>
-    <div id="status">Loading room...</div>
-    <button id="startBtn">Start Game</button>
-    <div id="question-container" style="display: none;">
-      <div id="question-card" class="card">Which battle of World War 1 saw the greatest number of fatalities?</div>
-      <div id="answers">
-        <div class="answer-card">A) Battle of Jutland</div>
-        <div class="answer-card">B) Battle of Verdun</div>
-        <div class="answer-card">C) Battle of Cambrai</div>
-        <div class="answer-card correct">D) Battle of the Somme</div>
-      </div>
-      <div class="controls">
-        <button>50%</button>
-        <button>🔊</button>
-        <button>👥</button>
-        <button>🌙</button>
-      </div>
-      <button id="next-btn" style="display: none;">Next</button>
-    </div>
+
+  <h1>Multiplayer Quiz</h1>
+  <div id="status">Loading room...</div>
+  <div id="question-container" style="display:none;">
+    <h2 id="question-text"></h2>
+    <div id="answers"></div>
+    <p>⏳ Time left: <span id="time-left">-</span></p>
+    <p class="score">Your Score: <span id="score">0</span></p>
   </div>
+  <button id="startBtn" style="display:none;">Start Game</button>
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
@@ -166,108 +73,115 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+
     const roomCode = new URLSearchParams(location.search).get('room') || localStorage.getItem('roomCode');
     const roomRef = ref(db, `rooms/${roomCode}`);
 
-    const statusEl = document.getElementById('status');
+    const questionText = document.getElementById('question-text');
+    const answersDiv = document.getElementById('answers');
+    const scoreEl = document.getElementById('score');
+    const timeLeft = document.getElementById('time-left');
     const startBtn = document.getElementById('startBtn');
     const questionContainer = document.getElementById('question-container');
-    const questionCard = document.getElementById('question-card');
-    const answersDiv = document.getElementById('answers');
-    const timeLeftEl = document.querySelector('.timer');
-    const nextBtn = document.getElementById('next-btn');
-    const progressEl = document.getElementById('progress');
+    const statusMsg = document.getElementById('status');
 
     const questions = [
-      { question: "Which battle of World War 1 saw the greatest number of fatalities?", options: ["Battle of Jutland", "Battle of Verdun", "Battle of Cambrai", "Battle of the Somme"], correct: 3 },
-      { question: "Which organ produces insulin?", options: ["Liver", "Pancreas", "Heart", "Kidney"], correct: 1 },
-      { question: "Red blood cells main function?", options: ["Fight infection", "Transport oxygen", "Digest food", "Carry fat"], correct: 1 }
+      {
+        question: "Which organ produces insulin?",
+        options: ["Liver", "Pancreas", "Heart", "Kidney"],
+        correct: 1
+      },
+      {
+        question: "What is the main function of red blood cells?",
+        options: ["Fight infection", "Transport oxygen", "Digest food", "Carry fat"],
+        correct: 1
+      }
     ];
 
-    let score = 0, idx = 0;
+    let score = 0;
+    let currentIndex = 0;
     let isHost = localStorage.getItem("isHost") === "true";
-    let guestId = localStorage.getItem('playerId') || ('guest_' + Math.random().toString(36).substr(2, 6).toUpperCase());
-    localStorage.setItem('playerId', guestId);
+    let timer = null;
+
+    // 🎲 Generate or retrieve guest ID
+    let playerId = localStorage.getItem('playerId');
+    if (!playerId) {
+      playerId = 'guest_' + Math.random().toString(36).substr(2, 6).toUpperCase();
+      localStorage.setItem('playerId', playerId);
+    }
 
     async function initGame() {
-      const playersSnapshot = await get(child(roomRef, 'players'));
-      const players = playersSnapshot.exists() ? Object.keys(playersSnapshot.val()) : [];
-      await set(child(roomRef, `players/${guestId}`), { id: guestId, score: 0 });
+      const playersRef = child(roomRef, 'players');
+      const snapshot = await get(playersRef);
+      const players = snapshot.exists() ? Object.keys(snapshot.val()) : [];
+
+      await set(child(playersRef, playerId), { id: playerId, score: 0 });
 
       if (isHost) {
-        statusEl.textContent = "You're the host. Ready to start.";
+        statusMsg.textContent = "You're the host. Start the game when ready.";
         startBtn.style.display = 'inline-block';
         startBtn.onclick = () => set(child(roomRef, 'gameStarted'), true);
       } else {
-        statusEl.textContent = "Waiting for host to start...";
+        statusMsg.textContent = "Waiting for host to start the game...";
       }
 
       onValue(child(roomRef, 'gameStarted'), snap => {
         if (snap.exists() && snap.val() === true) {
           startBtn.style.display = 'none';
-          statusEl.style.display = 'none';
+          statusMsg.style.display = 'none';
           questionContainer.style.display = 'block';
           startQuestion();
         }
       });
     }
 
+    initGame();
+
     function startQuestion() {
-      const q = questions[idx];
-      questionCard.textContent = q.question;
+      const q = questions[currentIndex];
+      questionText.textContent = q.question;
       answersDiv.innerHTML = '';
-      timeLeftEl.textContent = 30;
-      progressEl.textContent = `${idx + 1} / ${questions.length}`;
+      timeLeft.textContent = 10;
 
       q.options.forEach((opt, i) => {
-        const card = document.createElement('div');
-        card.className = 'answer-card';
-        card.textContent = `${String.fromCharCode(65 + i)}) ${opt}`;
-        card.onclick = () => answerQuestion(i, card);
-        answersDiv.appendChild(card);
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.onclick = () => answerQuestion(i);
+        answersDiv.appendChild(btn);
       });
 
-      let count = 30;
-      const t = setInterval(() => {
-        if (--count <= 0) {
-          clearInterval(t);
+      let countdown = 10;
+      timer = setInterval(() => {
+        countdown--;
+        timeLeft.textContent = countdown;
+        if (countdown === 0) {
+          clearInterval(timer);
           nextQuestion();
         }
-        timeLeftEl.textContent = count;
       }, 1000);
     }
 
-    function answerQuestion(i, card) {
-      const q = questions[idx];
-      answersDiv.querySelectorAll('.answer-card').forEach(c => c.style.pointerEvents = 'none');
-      if (i === q.correct) {
-        card.classList.add('correct');
-      } else {
-        card.classList.add('selected');
-        answersDiv.querySelectorAll('.answer-card')[q.correct].classList.add('correct');
+    function answerQuestion(index) {
+      clearInterval(timer);
+      if (index === questions[currentIndex].correct) {
+        score += 10;
+        scoreEl.textContent = score;
+        update(ref(db, `rooms/${roomCode}/players/${playerId}`), { score });
       }
-      nextBtn.style.display = 'block';
+      nextQuestion();
     }
 
     function nextQuestion() {
-      idx++;
-      if (idx < questions.length) {
+      currentIndex++;
+      if (currentIndex < questions.length) {
         startQuestion();
-        nextBtn.style.display = 'none';
-        answersDiv.querySelectorAll('.answer-card').forEach(c => {
-          c.style.pointerEvents = 'auto';
-          c.classList.remove('selected', 'correct');
-        });
       } else {
-        questionCard.textContent = "🎉  Over!";
-        answersDiv.innerHTML = '';
-        timeLeftEl.style.display = 'none';
-        nextBtn.style.display = 'none';
+        questionText.textContent = "🎉 Quiz Finished!";
+        answersDiv.innerHTML = "";
+        timeLeft.textContent = "-";
       }
     }
-
-    nextBtn.onclick = nextQuestion;
-    initGame();
   </script>
+
 </body>
 </html>

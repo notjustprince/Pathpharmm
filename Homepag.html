@@ -228,56 +228,57 @@
   </div>
 
   <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-  
-  const firebaseConfig = { /* your config */ };
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const logoutBtn = document.getElementById("logout-btn");
-  
-  const sections = ["pharma-section", "patho-section", "flashcard-section", "challenge-section"];
-  
-  onAuthStateChanged(auth, user => {
-    console.log('[Auth state] user:', user, 'skipped:', localStorage.getItem('skip'));
-    const skipped = localStorage.getItem("skip") === "true";
-    
-    if (user) {
-      const name = user.displayName || user.email.split('@')[0];
-      localStorage.setItem("userName", name);
-      const first = name.split(" ")[0];
-      document.getElementById("user-icon").textContent = first[0].toUpperCase();
-      document.getElementById("greeting").textContent = `Hello, ${first}`;
-      logoutBtn.textContent = "Logout";
-      logoutBtn.onclick = async () => {
-        if (!confirm("Logout?")) return;
-        await signOut(auth);
-        localStorage.removeItem("skip");
-        localStorage.removeItem("userName");
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgRJlAMQVnY5Zu7nkMPmdvS7lc5xMcJz4",
+      authDomain: "pathpharmm.firebaseapp.com",
+      projectId: "pathpharmm",
+      storageBucket: "pathpharmm.appspot.com",
+      messagingSenderId: "836525944124",
+      appId: "1:836525944124:web:9ab28aa79e9f12aeea8239"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, user => {
+      const skipped = localStorage.getItem("skip") === "true";
+      const logoutBtn = document.getElementById("logout-btn");
+
+      if (!user && !skipped) {
         window.location.href = "login.html";
-      };
-      showAllSections();
-    } else if (skipped) {
-      const name = localStorage.getItem("userName") || "Guest";
-      document.getElementById("user-icon").textContent = name[0].toUpperCase();
-      document.getElementById("greeting").textContent = `Welcome, ${name}`;
-      logoutBtn.textContent = "Login";
-      logoutBtn.onclick = () => {
-        localStorage.removeItem("skip");
-        window.location.href = "login.html";
-      };
-      showAllSections();
-    } else {
-      window.location.href = "login.html";
-    }
-  });
-  
-  function showAllSections() {
-    sections.forEach(id => {
-      document.getElementById(id).style.display = 'block';
+        return;
+      }
+
+      if (user) {
+        const name = user.displayName || user.email.split('@')[0];
+        localStorage.setItem("userName", name);
+        const first = name.split(" ")[0];
+        document.getElementById("user-icon").textContent = first[0].toUpperCase();
+        document.getElementById("greeting").textContent = `Hello, ${first}`;
+        logoutBtn.textContent = "Logout";
+        logoutBtn.onclick = async () => {
+          if (!confirm("Are you sure you want to log out?")) return;
+          await signOut(auth);
+          localStorage.removeItem("skip");
+          localStorage.removeItem("userName");
+          window.location.href = "login.html";
+        };
+      } else if (skipped) {
+        const name = localStorage.getItem("userName") || "Guest";
+        document.getElementById("user-icon").textContent = name[0].toUpperCase();
+        document.getElementById("greeting").textContent = `Welcome, ${name}`;
+        logoutBtn.textContent = "Login";
+        logoutBtn.onclick = () => {
+          localStorage.removeItem("skip");
+          window.location.href = "login.html";
+        };
+      }
     });
-  }
-</script>
+  </script>
+
   <script>
     const sections = ["pharma-section", "patho-section", "flashcard-section", "challenge-section"];
     const navItems = document.querySelectorAll('.nav-item');
