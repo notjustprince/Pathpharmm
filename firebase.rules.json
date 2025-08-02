@@ -1,0 +1,36 @@
+{
+  "rules": {
+    "rooms": {
+      "$room": {
+        ".read": true,
+        ".write": "auth == null || true", // or adjust if using auth
+        "players": {
+          "$player": {
+            ".write": "(!data.exists() && $player === playerId) || (data.exists() && $player === playerId)",
+            ".validate": "newData.hasChildren(['id','score'])"
+          }
+        },
+        "chosenCategory": {
+          ".write": "(!data.exists() && root.child('rooms/'+$room+'/players/'+playerId).exists())",
+          ".validate": "newData === 'pathology' || newData === 'pharmacology'"
+        },
+        "gameStarted": {
+          ".write": "root.child('rooms/'+$room+'/players/'+playerId+'/id').val() === playerId",
+          ".validate": "newData === true"
+        },
+        "currentQuestion": {
+          ".write": "root.child('rooms/'+$room+'/players/'+playerId+'/id').val() === playerId",
+          ".validate": "newData is int && newData >= 0"
+        },
+        "questionStartTime": {
+          ".write": "root.child('rooms/'+$room+'/players/'+playerId+'/id').val() === playerId",
+          ".validate": "newData is number"
+        },
+        "quizEnded": {
+          ".write": "root.child('rooms/'+$room+'/players/'+playerId+'/id').val() === playerId",
+          ".validate": "newData === true"
+        }
+      }
+    }
+  }
+}
