@@ -127,7 +127,6 @@
     .register-link { font-size:13px; margin-top:16px; color:#eee; }
     .register-link a { color:#fff; text-decoration:underline; }
 
-    /* Modal Styles */
     .modal-backdrop {
       position:fixed; inset:0; background:rgba(0,0,0,0.6);
       display:none; align-items:center; justify-content:center;
@@ -242,6 +241,11 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
+
+    // ⏩ Auto-redirect guest if they previously clicked "Skip for now"
+    if (localStorage.getItem("skip") === "true") {
+      window.location.href = "homepage.html";
+    }
 
     onAuthStateChanged(auth, user => {
       if (user) {
