@@ -59,6 +59,7 @@
       cursor: pointer;
       transition: 0.3s ease;
       z-index: 10;
+      display: none; /* 🔒 hidden by default */
     }
 
     .logout-btn:hover {
@@ -156,6 +157,9 @@
       font-weight: bold;
       color: #fff;
       background-color: rgba(255, 255, 255, 0.25);
+      border-radius: 15px;
+      padding: 5px 8px;
+      margin: 0 6px;
     }
 
     @media (max-width: 500px) {
@@ -202,7 +206,6 @@
     <button class="btn" onclick="location.href='pathcard.html'"><i class="fas fa-heartbeat"></i> Pathology Flashcards</button>
   </div>
 
-  <!-- ✅ Updated Challenge Section -->
   <div class="glass-card" id="challenge-section">
     <h2><i class="fas fa-users"></i> Play with Friends</h2>
     <button class="btn btn-invite" onclick="goToMultiplayer()">
@@ -236,13 +239,22 @@
 
     onAuthStateChanged(auth, user => {
       const skipped = localStorage.getItem("skip") === "true";
-      if (!user && !skipped) window.location.href = "login.html";
+      const logoutBtn = document.getElementById('logout-btn');
+      if (!user && !skipped) {
+        window.location.href = "login.html";
+      }
+
       if (user) {
         const name = user.displayName || user.email.split('@')[0];
         localStorage.setItem("userName", name);
         const first = name.split(" ")[0];
         document.getElementById("user-icon").textContent = first[0].toUpperCase();
         document.getElementById("greeting").textContent = `Hello, ${first}`;
+        logoutBtn.style.display = 'block';
+      } else if (skipped) {
+        document.getElementById("user-icon").textContent = "?";
+        document.getElementById("greeting").textContent = "Welcome!";
+        logoutBtn.style.display = 'none';
       }
     });
 
@@ -289,3 +301,4 @@
   </script>
 
 </body>
+</html>
