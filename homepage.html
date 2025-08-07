@@ -6,6 +6,7 @@
   <title>Med Topics</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
+    /* Add your CSS exactly as in your original file */
     * {
       margin: 0;
       padding: 0;
@@ -191,7 +192,7 @@
     <button class="logout-btn" id="logout-btn">Login</button>
   </div>
 
-  <!-- 📘 Sections -->
+  <!-- Topics Sections -->
   <div class="glass-card" id="pharma-section">
     <h2><i class="fas fa-stethoscope"></i> Pharmacology Topics</h2>
     <div class="topic-grid">
@@ -226,7 +227,7 @@
     <button class="btn" onclick="location.href='multiplayer.html'"><i class="fas fa-gamepad"></i> Play Multiplayer</button>
   </div>
 
-  <!-- 🔽 Bottom Nav -->
+  <!-- Bottom Navigation -->
   <div class="bottom-nav">
     <div class="nav-item active" onclick="switchTab('pharma-section', this)"><span><i class="fas fa-pills"></i></span>Pharma</div>
     <div class="nav-item" onclick="switchTab('patho-section', this)"><span><i class="fas fa-flask"></i></span>Patho</div>
@@ -234,8 +235,8 @@
     <div class="nav-item" onclick="switchTab('challenge-section', this)"><span><i class="fas fa-users"></i></span>Challenge</div>
   </div>
 
-  <!-- 🚀 Instant Greeting Fix -->
   <script>
+    // Instant greeting if available
     const storedName = localStorage.getItem("userName");
     if (storedName) {
       const first = storedName.split(" ")[0];
@@ -249,7 +250,6 @@
     }
   </script>
 
-  <!-- 🔐 Firebase Auth -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
@@ -262,7 +262,6 @@
       messagingSenderId: "836525944124",
       appId: "1:836525944124:web:9ab28aa79e9f12aeea8239"
     };
-
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
@@ -271,7 +270,7 @@
       const logoutBtn = document.getElementById("logout-btn");
 
       if (!user && !skipped) {
-        window.location.href = "login.html";
+        window.location.href = "index.html";
         return;
       }
 
@@ -287,7 +286,7 @@
           await signOut(auth);
           localStorage.removeItem("skip");
           localStorage.removeItem("userName");
-          window.location.href = "login.html";
+          window.location.href = "index.html";
         };
         logoutBtn.style.display = "block";
       } else if (skipped) {
@@ -297,14 +296,13 @@
         logoutBtn.textContent = "Login";
         logoutBtn.onclick = () => {
           localStorage.removeItem("skip");
-          window.location.href = "login.html";
+          window.location.href = "index.html";
         };
         logoutBtn.style.display = "block";
       }
     });
   </script>
 
-  <!-- 🔄 Tab + Swipe -->
   <script>
     const sections = ["pharma-section", "patho-section", "flashcard-section", "challenge-section"];
     const navItems = document.querySelectorAll('.nav-item');
@@ -330,6 +328,5 @@
       }
     });
   </script>
-
 </body>
 </html>

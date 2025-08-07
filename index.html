@@ -2,260 +2,77 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Path & Pharm Challenge</title>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-      -webkit-touch-callout: none;
-    }
+    /* CORE STYLES */
+    * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+    html, body { height:100%; width:100%; font-family:'Segoe UI',sans-serif; background:linear-gradient(135deg,#6a11cb,#2575fc); overflow:hidden; color:#fff; }
+    button, .btn { outline:none; cursor:pointer; }
 
-    button, .btn {
-      outline: none;
-      -webkit-tap-highlight-color: transparent;
-    }
+    /* LOADER */
+    .loader-screen { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:inherit; z-index:1000; animation:fadeOut 0.5s ease forwards; animation-delay:3s; }
+    .loader-content { text-align:center; }
+    .loading-text { font-size:1rem; margin-bottom:1rem; animation:glowText 1.5s ease-in-out infinite alternate; }
+    .progress-bar { width:80%; max-width:300px; height:10px; background:rgba(255,255,255,0.2); border-radius:999px; overflow:hidden; margin:0 auto; position:relative; }
+    .progress-fill { width:0; height:100%; border-radius:999px; background:linear-gradient(270deg,#ff0040,#ff8000,#ffff00,#00ff80,#00ffff,#0080ff,#8000ff,#ff0080,#ff0040); background-size:1200% 1200%; animation:fillGrow 1.5s ease-out forwards, rainbowFlow 3s ease-in-out infinite; }
+    @keyframes fillGrow { from { width:0%; } to { width:100%; } }
+    @keyframes rainbowFlow { 0% { background-position:0% 50%; } 100% { background-position:100% 50%; } }
+    @keyframes glowText { from { text-shadow:0 0 4px #fff; } to { text-shadow:0 0 12px #fff, 0 0 18px #6a11cb; } }
+    @keyframes fadeOut { to { opacity:0; visibility:hidden; } }
 
-    html, body {
-      height: 100%; width: 100%;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #6a11cb, #2575fc);
-      overflow: hidden; color: #fff;
-    }
+    /* PAGE CONTENT */
+    .page-content { display:none; flex-direction:column; align-items:center; justify-content:space-between; height:100%; padding:1.5rem 1rem; text-align:center; }
+    .page-content.show { display:flex; }
 
-    .loader-screen {
-      position: fixed; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      background: inherit; z-index: 1000;
-      animation: fadeOut 0.8s ease forwards; animation-delay: 2.4s;
-    }
+    header { width:100%; display:flex; justify-content:center; font-size:0.9rem; }
+    .logo { font-size:1.3rem; font-weight:700; text-shadow:0 0 3px rgba(255,255,255,0.3); }
 
-    .loader-content { text-align: center; }
-    .loading-text {
-      font-size: 1rem; margin-bottom: 1rem;
-      animation: glowText 1.5s ease-in-out infinite alternate;
-    }
+    .hero { flex-grow:1; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .hero .title { font-size:1.75rem; margin-bottom:0.5rem; animation:glow 1.5s ease-in-out infinite alternate; }
+    .hero .subtitle { font-size:1rem; opacity:0.85; }
+    .click-hint { margin-top:1.5rem; font-size:0.85rem; opacity:0.8; animation:hintGlow 0.5s ease-in-out infinite alternate; text-shadow:0 0 4px rgba(255,255,255,0.3); }
+    @keyframes hintGlow { from { opacity:0.6; text-shadow:0 0 6px #fff; } to { opacity:1; text-shadow:0 0 12px #ffcc00; } }
+    @keyframes glow { from { text-shadow:0 0 4px #fff, 0 0 10px #6a11cb; } to { text-shadow:0 0 8px #fff, 0 0 20px #2575fc; } }
 
-    .progress-bar {
-      width: 80%; max-width: 300px; height: 10px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 999px; overflow: hidden;
-      margin: 0 auto;
-      position: relative;
-    }
+    .actions { margin-top:1.5rem; display:flex; justify-content:center; }
+    .btn { display:flex; align-items:center; justify-content:center; gap:0.5rem; padding:1rem 2rem; font-size:1.1rem; font-weight:700; border:none; border-radius:1rem; transition:transform .2s, background .3s; box-shadow:0 6px 15px rgba(0,0,0,0.35); }
+    .btn-play { background:linear-gradient(to right,#ff4b2b,#ff416c); color:#fff; }
+    .btn-play:hover { transform:scale(1.05); }
 
-    .progress-fill {
-      width: 0; height: 100%;
-      border-radius: 999px;
-      background: linear-gradient(270deg, #ff0040, #ff8000, #ffff00, #00ff80, #00ffff, #0080ff, #8000ff, #ff0080, #ff0040);
-      background-size: 1200% 1200%;
-      animation: fillGrow 2s ease-out forwards, rainbowFlow 6s ease-in-out infinite;
-    }
+    .features { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:1rem; width:100%; max-width:480px; margin-bottom:2rem; }
+    .feature-card { background:rgba(255,255,255,0.04); padding:1rem; border-radius:1rem; font-size:0.75rem; opacity:0; transform:translateY(20px); animation:slideInUp 0.5s ease-out forwards; box-shadow:0 4px 8px rgba(0,0,0,0.5); }
+    .feature-card:nth-child(1) { animation-delay:0.1s; }
+    .feature-card:nth-child(2) { animation-delay:0.12s; }
+    .feature-card:nth-child(3) { animation-delay:0.14s; }
+    .feature-card:nth-child(4) { animation-delay:0.16s; }
+    @keyframes slideInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .feature-card i { font-size:1.25rem; margin-bottom:0.25rem; }
+    .feature-card h3 { font-size:0.9rem; margin-bottom:0.25rem; }
+    .feature-card p { font-size:0.75rem; opacity:0.8; }
 
-    @keyframes fillGrow {
-      from { width: 0%; }
-      to { width: 100%; }
-    }
-
-    @keyframes rainbowFlow {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 100% 50%; }
-    }
-
-    @keyframes glowText {
-      from { text-shadow: 0 0 4px #fff; }
-      to { text-shadow: 0 0 12px #fff, 0 0 18px #6a11cb; }
-    }
-
-    @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
-
-    .page-content {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      height: 100%;
-      padding: 1.5rem 1rem;
-      text-align: center;
-    }
-
-    .page-content.show { display: flex; }
-
-    header {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      font-size: 0.9rem;
-    }
-
-    .logo {
-      font-size: 1.3rem;
-      font-weight: 700;
-      text-shadow: 0 0 3px rgba(255,255,255,0.3);
-    }
-
-    .hero {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .hero .title {
-      font-size: 1.75rem;
-      margin-bottom: 0.5rem;
-      animation: glow 1.5s ease-in-out infinite alternate;
-    }
-
-    .hero .subtitle {
-      font-size: 1rem;
-      opacity: 0.85;
-    }
-
-    .click-hint {
-      margin-top: 1.5rem;
-      font-size: 0.85rem;
-      opacity: 0.8;
-      animation: hintGlow 0.5s ease-in-out infinite alternate;
-      text-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
-    }
-
-    @keyframes hintGlow {
-      from { opacity: 0.6; text-shadow: 0 0 6px #fff; }
-      to { opacity: 1; text-shadow: 0 0 12px #ffcc00; }
-    }
-
-    .actions {
-      margin-top: 1.5rem;
-      display: flex;
-      justify-content: center;
-    }
-
-    .btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      padding: 1rem 2rem;
-      font-size: 1.1rem;
-      font-weight: 700;
-      border: none;
-      border-radius: 1rem;
-      cursor: pointer;
-      transition: transform 0.2s, background 0.3s;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.35);
-    }
-
-    .btn-play {
-      background: linear-gradient(to right, #ff4b2b, #ff416c);
-      color: #fff;
-    }
-
-    .btn-play:hover {
-      transform: scale(1.05);
-    }
-
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 1rem;
-      width: 100%;
-      max-width: 480px;
-      margin-bottom: 2rem;
-    }
-
-    .feature-card {
-      position: relative;
-      background: rgba(255,255,255,0.04);
-      padding: 1rem;
-      border-radius: 1rem;
-      font-size: 0.75rem;
-      animation: slideInUp 0.5s ease-out forwards;
-      opacity: 0;
-      transform: translateY(20px);
-      z-index: 1;
-      overflow: visible;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-    }
-
-    .feature-card::before {
-      content: '';
-      position: absolute;
-      top: -12px;
-      left: -12px;
-      right: -12px;
-      bottom: -12px;
-      z-index: -1;
-      border-radius: 1.5rem;
-      background: linear-gradient(135deg, #ff416c, #ffcc00, #00ffcc, #6a11cb);
-      background-size: 200% 200%;
-      animation: auraGlow 10s ease-in-out infinite;
-      filter: blur(40px);
-      opacity: 0.22;
-      will-change: filter, background-position;
-    }
-
-    @keyframes auraGlow {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 100% 50%; }
-    }
-
-    .feature-card:hover {
-      transform: scale(1.02);
-      transition: all 0.1s ease;
-    }
-
-    .feature-card:nth-child(1) { animation-delay: 0.1s; }
-    .feature-card:nth-child(2) { animation-delay: 0.12s; }
-    .feature-card:nth-child(3) { animation-delay: 0.14s; }
-    .feature-card:nth-child(4) { animation-delay: 0.16s; }
-
-    @keyframes slideInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .feature-card i {
-      font-size: 1.25rem;
-      margin-bottom: 0.25rem;
-    }
-
-    .feature-card h3 {
-      font-size: 0.9rem;
-      margin-bottom: 0.25rem;
-    }
-
-    .feature-card p {
-      font-size: 0.75rem;
-      opacity: 0.8;
-    }
-
-    @keyframes glow {
-      from {
-        text-shadow: 0 0 4px #fff, 0 0 10px #6a11cb;
-      }
-      to {
-        text-shadow: 0 0 8px #fff, 0 0 20px #2575fc;
-      }
-    }
-
-    audio { display: none; }
+    /* MODALS */
+    .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:2000; }
+    .login-box, .reset-box { background:rgba(255,255,255,0.08); backdrop-filter:blur(16px); padding:30px 24px; border-radius:20px; box-shadow:0 10px 40px rgba(0,0,0,0.25); color:#fff; text-align:center; width:90%; max-width:360px; position:relative; }
+    .close-btn { position:absolute; top:12px; right:12px; color:#fff; font-size:1.2rem; cursor:pointer; }
+    .login-box input, .reset-box input { width:100%; padding:10px 14px; margin:8px 0; border:none; border-radius:10px; font-size:14px; }
+    .password-wrapper { position:relative; }
+    .password-wrapper i { position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#ccc; cursor:pointer; }
+    .login-btn, .google-btn, .skip-btn, .reset-btn, .cancel-btn { width:100%; padding:12px; font-size:15px; font-weight:600; border:none; border-radius:10px; margin-top:10px; }
+    .login-btn { background:#ff416c; color:#fff; }
+    .google-btn { background:#fff; color:#333; display:flex; align-items:center; justify-content:center; gap:10px; }
+    .skip-btn { background:transparent; border:1px solid rgba(255,255,255,0.3); color:#fff; }
+    .divider { margin:14px 0; color:#ccc; font-size:13px; }
+    .register-link { font-size:13px; margin-top:16px; color: ; }
+    .reset-btn { background:#28c76f; color:#fff; }
+    .cancel-btn { background:rgba(255,255,255,0.3); color:#fff; }
+    .reset-box p { font-size:13px; margin-bottom:12px; color:#ddd; }
   </style>
 </head>
 <body>
-
-  <!-- Loader -->
+  <!-- LOADER -->
   <div class="loader-screen">
     <div class="loader-content">
       <div class="loading-text">Loading your adventure...</div>
@@ -263,61 +80,81 @@
     </div>
   </div>
 
-  <!-- Main Content -->
+  <!-- PAGE CONTENT -->
   <div class="page-content">
-    <header>
-      <div class="logo"><i class="fas fa-dna"></i> Path & Pharm</div>
-    </header>
-
+    <header><div class="logo"><i class="fas fa-dna"></i> Path & Pharm</div></header>
     <section class="hero">
-     <h1 class="title">
-  <i class="fas fa-microscope"></i>
-  Path & Pharm Challenge
-</h1>
+      <h1 class="title"><i class="fas fa-microscope"></i> Path & Pharm Challenge</h1>
       <p class="subtitle">Sharpen your brain, one question at a time!</p>
       <div class="actions">
-        <button class="btn btn-play" onclick="startGame(); playClickSound()">
-          <i class="fas fa-play-circle"></i> Start Game
-        </button>
+        <button class="btn btn-play"><i class="fas fa-play-circle"></i> Start Game</button>
       </div>
       <p class="click-hint">Click anywhere to begin your challenge</p>
     </section>
-
     <section class="features">
-      <div class="feature-card">
-        <i class="fas fa-stethoscope"></i>
-        <h3>100 Path Qs</h3>
-        <p>Test disease knowledge.</p>
-      </div>
-      <div class="feature-card">
-        <i class="fas fa-pills"></i>
-        <h3>100 Pharm Qs</h3>
-        <p>Master drug effects.</p>
-      </div>
-      <div class="feature-card">
-        <i class="fas fa-chart-line"></i>
-        <h3>Progress</h3>
-        <p>Track your score.</p>
-      </div>
-      <div class="feature-card">
-        <i class="fas fa-user-friends"></i>
-        <h3>Multiplayer</h3>
-        <p>Compete with friends.</p>
-      </div>
+      <div class="feature-card"><i class="fas fa-stethoscope"></i><h3>100 Path Qs</h3><p>Test disease knowledge.</p></div>
+      <div class="feature-card"><i class="fas fa-pills"></i><h3>100 Pharm Qs</h3><p>Master drug effects.</p></div>
+      <div class="feature-card"><i class="fas fa-chart-line"></i><h3>Progress</h3><p>Track your score.</p></div>
+      <div class="feature-card"><i class="fas fa-user-friends"></i><h3>Multiplayer</h3><p>Compete with friends.</p></div>
     </section>
+  </div>
+
+  <!-- LOGIN MODAL -->
+  <div class="modal-backdrop" id="login-modal">
+    <div class="login-box">
+      <div class="close-btn" onclick="hideLoginModal()">&times;</div>
+      <h2>Welcome Back</h2>
+      <input type="email" id="login-email" placeholder="Email or phone" required />
+      <div class="password-wrapper">
+        <input type="password" id="login-password" placeholder="Password" required />
+        <i class="fas fa-eye" id="toggleLoginPassword"></i>
+      </div>
+      <button class="login-btn" id="loginBtn">Login</button>
+      <div class="divider">or</div>
+      <button class="google-btn" id="googleBtn">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" width="20"/> Sign in with Google
+      </button>
+      <div class="register-link"><a href="register.html">Create Account</a></div>
+      <button class="skip-btn" onclick="handleSkip()">Skip for now</button>
+      <div style="margin-top:12px;"><a href="#" id="forgotPasswordLink" style="color:#ddd;font-size:13px;">Forgot password?</a></div>
+    </div>
+  </div>
+
+  <!-- RESET MODAL -->
+  <div class="modal-backdrop" id="reset-modal">
+    <div class="reset-box">
+      <div class="close-btn" onclick="hideResetModal()">&times;</div>
+      <h3>Reset Password</h3>
+      <p>📬 If you don’t see it, check your Spam or Promotions folder.</p>
+      <input type="email" id="reset-email" placeholder="Your email" />
+      <button class="reset-btn" id="sendResetBtn">Send Reset Email</button>
+      <button class="cancel-btn" onclick="hideResetModal()">Cancel</button>
+    </div>
   </div>
 
   <audio id="click" src="click.wav"></audio>
 
   <script>
-    function playClickSound() {
-      const audio = document.getElementById("click");
-      if (audio) audio.play();
+    function playClickSound() { document.getElementById("click")?.play(); }
+    function showLoginModal() { document.getElementById("login-modal").style.display = "flex"; }
+    function hideLoginModal() { document.getElementById("login-modal").style.display = "none"; }
+    function showResetModal() { document.getElementById("reset-modal").style.display = "flex"; }
+    function hideResetModal() { document.getElementById("reset-modal").style.display = "none"; }
+    function handleSkip() {
+      localStorage.setItem("skip", "true");
+      location.href = "homepage.html";
     }
 
-    function startGame() {
-      window.location.href = "login.html";
-    }
+    document.getElementById("toggleLoginPassword").addEventListener("click", () => {
+      const pw = document.getElementById("login-password");
+      pw.type = pw.type === "password" ? "text" : "password";
+    });
+
+    document.getElementById("forgotPasswordLink").addEventListener("click", (e) => {
+      e.preventDefault();
+      hideLoginModal();
+      showResetModal();
+    });
 
     window.addEventListener("load", () => {
       setTimeout(() => {
@@ -325,15 +162,87 @@
         document.querySelector(".page-content").classList.add("show");
       }, 3100);
     });
-
-    document.addEventListener("click", function handleAnyClick(e) {
-      document.removeEventListener("click", handleAnyClick);
-      playClickSound();
-      setTimeout(() => {
-        startGame();
-      }, 200);
-    });
   </script>
 
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      GoogleAuthProvider,
+      signInWithPopup,
+      sendPasswordResetEmail
+    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgRJlAMQVnY5Zu7nkMPmdvS7lc5xMcJz4",
+      authDomain: "pathpharmm.firebaseapp.com",
+      projectId: "pathpharmm",
+      storageBucket: "pathpharmm.appspot.com",
+      messagingSenderId: "836525944124",
+      appId: "1:836525944124:web:9ab28aa79e9f12aeea8239"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    onAuthStateChanged(auth, (user) => {
+  const skip = localStorage.getItem("skip") === "true";
+  
+  if (user || skip) {
+    location.href = "homepage.html";
+  } else {
+    document.addEventListener("click", (e) => {
+      const isInsideModal = e.target.closest(".modal-backdrop");
+      const modalOpen = document.getElementById("login-modal").style.display === "flex";
+      if (!isInsideModal && !modalOpen) {
+        playClickSound();
+        setTimeout(showLoginModal, 200);
+      }
+    });
+  }
+});
+
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value;
+      if (!email || !password) return alert("⚠️ Fill both fields");
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        localStorage.removeItem("skip");
+        alert("✅ Login successful!");
+        hideLoginModal();
+        location.href = "homepage.html";
+      } catch (err) {
+        alert("❌ " + err.message);
+      }
+    });
+
+    document.getElementById("googleBtn").addEventListener("click", async () => {
+      try {
+        await signInWithPopup(auth, provider);
+        localStorage.removeItem("skip");
+        alert("🎉 Google sign-in successful!");
+        hideLoginModal();
+        location.href = "homepage.html";
+      } catch (err) {
+        alert("❌ " + err.message);
+      }
+    });
+
+    document.getElementById("sendResetBtn").addEventListener("click", async () => {
+      const email = document.getElementById("reset-email").value.trim();
+      if (!email) return alert("⚠️ Enter your email");
+      try {
+        await sendPasswordResetEmail(auth, email);
+        alert("✅ Reset email sent! Check spam/promotions.");
+        hideResetModal();
+      } catch (err) {
+        alert("❌ " + err.message);
+      }
+    });
+  </script>
 </body>
 </html>

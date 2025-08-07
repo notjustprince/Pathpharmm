@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Path & Pharm Challenge</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+    }
+
+    button, .btn {
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%; width: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      overflow: hidden; color: #fff;
+    }
+
+    .loader-screen {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: inherit; z-index: 1000;
+      animation: fadeOut 0.8s ease forwards; animation-delay: 2.4s;
+    }
+
+    .loader-content { text-align: center; }
+    .loading-text {
+      font-size: 1rem; margin-bottom: 1rem;
+      animation: glowText 1.5s ease-in-out infinite alternate;
+    }
+
+    .progress-bar {
+      width: 80%; max-width: 300px; height: 10px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 999px; overflow: hidden;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .progress-fill {
+      width: 0; height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(270deg, #ff0040, #ff8000, #ffff00, #00ff80, #00ffff, #0080ff, #8000ff, #ff0080, #ff0040);
+      background-size: 1200% 1200%;
+      animation: fillGrow 2s ease-out forwards, rainbowFlow 6s ease-in-out infinite;
+    }
+
+    @keyframes fillGrow {
+      from { width: 0%; }
+      to { width: 100%; }
+    }
+
+    @keyframes rainbowFlow {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
+    @keyframes glowText {
+      from { text-shadow: 0 0 4px #fff; }
+      to { text-shadow: 0 0 12px #fff, 0 0 18px #6a11cb; }
+    }
+
+    @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+
+    .page-content {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+      padding: 1.5rem 1rem;
+      text-align: center;
+    }
+
+    .page-content.show { display: flex; }
+
+    header {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 700;
+      text-shadow: 0 0 3px rgba(255,255,255,0.3);
+    }
+
+    .hero {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero .title {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+      animation: glow 1.5s ease-in-out infinite alternate;
+    }
+
+    .hero .subtitle {
+      font-size: 1rem;
+      opacity: 0.85;
+    }
+
+    .click-hint {
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      opacity: 0.8;
+      animation: hintGlow 0.5s ease-in-out infinite alternate;
+      text-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+    }
+
+    @keyframes hintGlow {
+      from { opacity: 0.6; text-shadow: 0 0 6px #fff; }
+      to { opacity: 1; text-shadow: 0 0 12px #ffcc00; }
+    }
+
+    .actions {
+      margin-top: 1.5rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.35);
+    }
+
+    .btn-play {
+      background: linear-gradient(to right, #ff4b2b, #ff416c);
+      color: #fff;
+    }
+
+    .btn-play:hover {
+      transform: scale(1.05);
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      width: 100%;
+      max-width: 480px;
+      margin-bottom: 2rem;
+    }
+
+    .feature-card {
+      position: relative;
+      background: rgba(255,255,255,0.04);
+      padding: 1rem;
+      border-radius: 1rem;
+      font-size: 0.75rem;
+      animation: slideInUp 0.5s ease-out forwards;
+      opacity: 0;
+      transform: translateY(20px);
+      z-index: 1;
+      overflow: visible;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: -12px;
+      left: -12px;
+      right: -12px;
+      bottom: -12px;
+      z-index: -1;
+      border-radius: 1.5rem;
+      background: linear-gradient(135deg, #ff416c, #ffcc00, #00ffcc, #6a11cb);
+      background-size: 200% 200%;
+      animation: auraGlow 10s ease-in-out infinite;
+      filter: blur(40px);
+      opacity: 0.22;
+      will-change: filter, background-position;
+    }
+
+    @keyframes auraGlow {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
+    .feature-card:hover {
+      transform: scale(1.02);
+      transition: all 0.1s ease;
+    }
+
+    .feature-card:nth-child(1) { animation-delay: 0.1s; }
+    .feature-card:nth-child(2) { animation-delay: 0.12s; }
+    .feature-card:nth-child(3) { animation-delay: 0.14s; }
+    .feature-card:nth-child(4) { animation-delay: 0.16s; }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .feature-card i {
+      font-size: 1.25rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .feature-card h3 {
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .feature-card p {
+      font-size: 0.75rem;
+      opacity: 0.8;
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 4px #fff, 0 0 10px #6a11cb;
+      }
+      to {
+        text-shadow: 0 0 8px #fff, 0 0 20px #2575fc;
+      }
+    }
+
+    audio { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Loader -->
+  <div class="loader-screen">
+    <div class="loader-content">
+      <div class="loading-text">Loading your adventure...</div>
+      <div class="progress-bar"><div class="progress-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="page-content">
+    <header>
+      <div class="logo"><i class="fas fa-dna"></i> Path & Pharm</div>
+    </header>
+
+    <section class="hero">
+     <h1 class="title">
+  <i class="fas fa-microscope"></i>
+  Path & Pharm Challenge
+</h1>
+      <p class="subtitle">Sharpen your brain, one question at a time!</p>
+      <div class="actions">
+        <button class="btn btn-play" onclick="startGame(); playClickSound()">
+          <i class="fas fa-play-circle"></i> Start Game
+        </button>
+      </div>
+      <p class="click-hint">Click anywhere to begin your challenge</p>
+    </section>
+
+    <section class="features">
+      <div class="feature-card">
+        <i class="fas fa-stethoscope"></i>
+        <h3>100 Path Qs</h3>
+        <p>Test disease knowledge.</p>
+      </div>
+      <div class="feature-card">
+        <i class="fas fa-pills"></i>
+        <h3>100 Pharm Qs</h3>
+        <p>Master drug effects.</p>
+      </div>
+      <div class="feature-card">
+        <i class="fas fa-chart-line"></i>
+        <h3>Progress</h3>
+        <p>Track your score.</p>
+      </div>
+      <div class="feature-card">
+        <i class="fas fa-user-friends"></i>
+        <h3>Multiplayer</h3>
+        <p>Compete with friends.</p>
+      </div>
+    </section>
+  </div>
+
+  <audio id="click" src="click.wav"></audio>
+
+  <script>
+    function playClickSound() {
+      const audio = document.getElementById("click");
+      if (audio) audio.play();
+    }
+
+    function startGame() {
+      window.location.href = "login.html";
+    }
+
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        document.querySelector(".loader-screen").style.display = "none";
+        document.querySelector(".page-content").classList.add("show");
+      }, 3100);
+    });
+
+    document.addEventListener("click", function handleAnyClick(e) {
+      document.removeEventListener("click", handleAnyClick);
+      playClickSound();
+      setTimeout(() => {
+        startGame();
+      }, 200);
+    });
+  </script>
+
+</body>
+</html>
