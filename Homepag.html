@@ -3,306 +3,127 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Med Topics</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-      -webkit-touch-callout: none;
-    }
-
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #6a11cb, #2575fc);
-      padding: 100px 20px 100px;
-      min-height: 100vh;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .user-header {
-      position: fixed;
-      top: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 32px);
-      max-width: 500px;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.2);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      border-radius: 12px;
-      z-index: 1000;
-    }
-
-    .user-icon {
-      width: 40px;
-      height: 40px;
-      background: rgba(255,255,255,0.3);
-      color: #fff;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .greeting {
-      color: #fff;
-      font-size: 18px;
-      font-weight: 600;
-      margin-left: 10px;
-    }
-
-    .logout-btn {
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.2);
-      color: #fff;
-      border-radius: 10px;
-      font-weight: 600;
-      padding: 6px 12px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .logout-btn:hover {
-      background: rgba(255,255,255,0.3);
-      color: black;
-    }
-
-    .glass-card {
-      background: rgba(255,255,255,0.12);
-      backdrop-filter: blur(18px);
-      border-radius: 20px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-      padding: 30px 20px;
-      width: 100%;
-      max-width: 460px;
-      text-align: center;
-      border: 1px solid rgba(255,255,255,0.2);
-      margin-top: 20px;
-      display: none;
-    }
-
-    h2, h1 {
-      color: #fff;
-      font-size: 26px;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-
-    .topic-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      justify-content: space-between;
-    }
-
-    .topic-card, .btn {
-      flex: 0 1 calc(50% - 8px);
-      background: rgba(255,255,255,0.18);
-      backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 20px;
-      text-align: center;
-      color: #fff;
-      font-weight: 600;
-      font-size: 15px;
-      border: 1px solid rgba(255,255,255,0.25);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-      transition: 0.3s;
-      cursor: pointer;
-    }
-
-    .btn {
-      width: 100%;
-      margin: 10px 0;
-    }
-
-    .topic-card:hover, .btn:hover {
-      background: rgba(255,255,255,0.3);
-      transform: translateY(-4px);
-    }
-
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(10px);
-      display: flex;
-      justify-content: space-around;
-      padding: 12px 0;
-      border-top: 1px solid rgba(255,255,255,0.2);
-    }
-
-    .nav-item {
-      color: #fff;
-      text-align: center;
-      flex: 1;
-      font-size: 13px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .nav-item span {
-      display: block;
-      font-size: 20px;
-      margin-bottom: 2px;
-    }
-
-    .nav-item.active {
-      font-weight: bold;
-      background-color: rgba(255,255,255,0.25);
-      border-radius: 15px;
-      padding: 5px 8px;
-      margin: 0 6px;
-    }
-
-    @media (max-width: 500px) {
-      .topic-card { flex: 1 1 100%; }
-    }
-  </style>
+  <title>Multiplayer Quiz – Game (Offline Test)</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-
-  <div class="user-header" id="user-header">
-    <div style="display: flex; align-items: center;">
-      <div class="user-icon" id="user-icon">?</div>
-      <div class="greeting" id="greeting">Hello</div>
-    </div>
-    <button class="logout-btn" id="logout-btn">Login</button>
+  <h1>Multiplayer Quiz</h1>
+  <div id="question-container">
+    <h2 id="question-text">Loading...</h2>
+    <div id="answers"></div>
+    <p>⏳ Time left: <span id="time-left">-</span></p>
+    <p class="score">Your Score: <span id="score">0</span></p>
   </div>
-
-  <div class="glass-card" id="pharma-section">
-    <h2><i class="fas fa-stethoscope"></i> Pharmacology Topics</h2>
-    <div class="topic-grid">
-      <div class="topic-card" onclick="location.replace('intropharm.html')"><i class="fas fa-book-medical"></i> Intro</div>
-      <div class="topic-card" onclick="location.replace('autonomic.html')"><i class="fas fa-brain"></i> Autonomics</div>
-      <div class="topic-card" onclick="location.replace('quiz_antibiotics.html')"><i class="fas fa-capsules"></i> Antibiotics</div>
-      <div class="topic-card" onclick="location.replace('quiz_analgesics.html')"><i class="fas fa-pills"></i> Analgesics</div>
-      <div class="topic-card" onclick="location.replace('quiz_cns.html')"><i class="fas fa-head-side-virus"></i> CNS Drugs</div>
-    </div>
-  </div>
-
-  <div class="glass-card" id="patho-section">
-    <h2><i class="fas fa-flask"></i> Pathology Topics</h2>
-    <div class="topic-grid">
-      <div class="topic-card" onclick="location.replace('intropath.html')"><i class="fas fa-book"></i> Intro</div>
-      <div class="topic-card" onclick="location.replace('quiz_inflammation.html')"><i class="fas fa-fire"></i> Inflammation</div>
-      <div class="topic-card" onclick="location.replace('quiz_healing.html')"><i class="fas fa-band-aid"></i> Healing</div>
-      <div class="topic-card" onclick="location.replace('quiz_neoplasia.html')"><i class="fas fa-dna"></i> Neoplasia</div>
-      <div class="topic-card" onclick="location.replace('quiz_immunopathology.html')"><i class="fas fa-shield-virus"></i> Immuno</div>
-      <div class="topic-card" onclick="location.replace('quiz_cell_injury.html')"><i class="fas fa-bolt"></i> Cell Injury</div>
-    </div>
-  </div>
-
-  <div class="glass-card" id="flashcard-section">
-    <h1>What would you like to study?</h1>
-    <button class="btn" onclick="location.replace('pharmcard.html')"><i class="fas fa-pills"></i> Pharmacology Flashcards</button>
-    <button class="btn" onclick="location.replace('pathcard.html')"><i class="fas fa-heartbeat"></i> Pathology Flashcards</button>
-  </div>
-
-  <div class="glass-card" id="challenge-section">
-    <h2><i class="fas fa-users"></i> Play with Friends</h2>
-    <button class="btn" onclick="location.replace('multiplayer.html')"><i class="fas fa-gamepad"></i> Play Multiplayer</button>
-  </div>
-
-  <div class="bottom-nav">
-    <div class="nav-item active" onclick="switchTab('pharma-section', this)"><span><i class="fas fa-pills"></i></span>Pharma</div>
-    <div class="nav-item" onclick="switchTab('patho-section', this)"><span><i class="fas fa-flask"></i></span>Patho</div>
-    <div class="nav-item" onclick="switchTab('flashcard-section', this)"><span><i class="fas fa-layer-group"></i></span>Cards</div>
-    <div class="nav-item" onclick="switchTab('challenge-section', this)"><span><i class="fas fa-users"></i></span>Challenge</div>
-  </div>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCgRJlAMQVnY5Zu7nkMPmdvS7lc5xMcJz4",
-      authDomain: "pathpharmm.firebaseapp.com",
-      projectId: "pathpharmm",
-      storageBucket: "pathpharmm.appspot.com",
-      messagingSenderId: "836525944124",
-      appId: "1:836525944124:web:9ab28aa79e9f12aeea8239"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    onAuthStateChanged(auth, user => {
-      const skipped = localStorage.getItem("skip") === "true";
-      const logoutBtn = document.getElementById("logout-btn");
-
-      if (!user && !skipped) {
-        window.location.href = "login.html";
-        return;
-      }
-
-      if (user) {
-        const name = user.displayName || user.email.split('@')[0];
-        localStorage.setItem("userName", name);
-        const first = name.split(" ")[0];
-        document.getElementById("user-icon").textContent = first[0].toUpperCase();
-        document.getElementById("greeting").textContent = `Hello, ${first}`;
-        logoutBtn.textContent = "Logout";
-        logoutBtn.onclick = async () => {
-          if (!confirm("Are you sure you want to log out?")) return;
-          await signOut(auth);
-          localStorage.removeItem("skip");
-          localStorage.removeItem("userName");
-          window.location.href = "login.html";
-        };
-      } else if (skipped) {
-        const name = localStorage.getItem("userName") || "Guest";
-        document.getElementById("user-icon").textContent = name[0].toUpperCase();
-        document.getElementById("greeting").textContent = `Welcome, ${name}`;
-        logoutBtn.textContent = "Login";
-        logoutBtn.onclick = () => {
-          localStorage.removeItem("skip");
-          window.location.href = "login.html";
-        };
-      }
-    });
-  </script>
 
   <script>
-    const sections = ["pharma-section", "patho-section", "flashcard-section", "challenge-section"];
-    const navItems = document.querySelectorAll('.nav-item');
+    // Sample questions
+    const pathology = [
+      { question: "What cell type proliferates in acute inflammation?", options: ["Neutrophil", "Lymphocyte", "Macrophage", "Basophil"], correct: 0 },
+      { question: "Which organ is most affected by amyloidosis?", options: ["Liver", "Heart", "Brain", "Lung"], correct: 1 },
+      { question: "Which type of necrosis is typical in myocardial infarction?", options: ["Coagulative", "Liquefactive", "Caseous", "Fat"], correct: 0 },
+    ];
 
-    function switchTab(id, el) {
-      sections.forEach(sec => {
-        document.getElementById(sec).style.display = (sec === id ? 'block' : 'none');
-      });
-      navItems.forEach(item => item.classList.remove('active'));
-      el.classList.add('active');
+    const pharmacology = [
+      { question: "Which drug is a β‑blocker?", options: ["Propranolol", "Lisinopril", "Losartan", "Verapamil"], correct: 0 },
+      { question: "Which drug inhibits ACE?", options: ["Lisinopril", "Losartan", "Hydralazine", "Propranolol"], correct: 0 },
+      { question: "Which is a loop diuretic?", options: ["Furosemide", "HCTZ", "Spironolactone", "Acetazolamide"], correct: 0 },
+    ];
+
+    // Choose one category manually here for testing
+    const category = 'pathology'; // or 'pharmacology'
+    const questions = shuffle(category === 'pathology' ? pathology : pharmacology);
+
+    // Quiz variables
+    let score = 0;
+    let currentIndex = 0;
+    let timerInterval = null;
+
+    // DOM elements
+    const questionText = document.getElementById('question-text');
+    const answersDiv = document.getElementById('answers');
+    const timeLeft = document.getElementById('time-left');
+    const scoreEl = document.getElementById('score');
+
+    function shuffle(arr) {
+      return [...arr].sort(() => Math.random() - 0.5);
     }
 
-    switchTab("pharma-section", navItems[0]);
+    function startGame() {
+      setTimeout(() => startQuestionLoop(), 500);
+    }
 
-    let startX = 0;
-    document.addEventListener('touchstart', e => startX = e.touches[0].clientX);
-    document.addEventListener('touchend', e => {
-      const delta = e.changedTouches[0].clientX - startX;
-      const i = sections.findIndex(id => document.getElementById(id).style.display === 'block');
-      if (Math.abs(delta) > 60) {
-        const next = delta < 0 ? (i + 1) % 4 : (i + 3) % 4;
-        switchTab(sections[next], navItems[next]);
+    function startQuestionLoop() {
+      clearInterval(timerInterval);
+      displayQuestion();
+      let startTime = Date.now();
+
+      timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const rem = 10 - elapsed;
+        timeLeft.textContent = rem > 0 ? rem : 0;
+        if (rem <= 0) {
+          clearInterval(timerInterval);
+          lockButtons();
+          goNextQuestion();
+        }
+      }, 200);
+    }
+
+    function displayQuestion() {
+      const q = questions[currentIndex];
+      if (!q) {
+        showEndScreen();
+        return;
       }
-    });
+      questionText.textContent = q.question;
+      answersDiv.innerHTML = '';
+      scoreEl.textContent = score;
+
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.onclick = () => answerQuestion(i);
+        answersDiv.appendChild(btn);
+      });
+    }
+
+    function lockButtons() {
+      document.querySelectorAll('#answers button').forEach(btn => btn.disabled = true);
+    }
+
+    function answerQuestion(index) {
+      const q = questions[currentIndex];
+      const btns = answersDiv.querySelectorAll('button');
+      lockButtons();
+
+      if (index === q.correct) {
+        btns[index].classList.add('correct');
+        score += 10;
+      } else {
+        btns[index].classList.add('incorrect');
+        btns[q.correct].classList.add('correct');
+      }
+
+      scoreEl.textContent = score;
+    }
+
+    function goNextQuestion() {
+      currentIndex++;
+      if (currentIndex < questions.length) {
+        startQuestionLoop();
+      } else {
+        showEndScreen();
+      }
+    }
+
+    function showEndScreen() {
+      clearInterval(timerInterval);
+      questionText.textContent = "🎉 Quiz Complete!";
+      answersDiv.innerHTML = '';
+      timeLeft.textContent = '-';
+    }
+
+    startGame();
   </script>
 </body>
 </html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial‑scale=1.0"/>
+  <title>Quiz Lobby</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <h1>Multiplayer Quiz Lobby</h1>
+  <div id="status">Connecting to room...</div>
+
+  <div id="category-chooser" style="display:none;">
+    <h2>Select Quiz Category:</h2>
+    <button data-cat="pathology">Pathology</button>
+    <button data-cat="pharmacology">Pharmacology</button>
+  </div>
+
+  <div id="lobby" style="display:none;">
+    <h2>Players in Lobby:</h2>
+    <ul id="players"></ul>
+    <div id="leaderboard"></div>
+    <button id="start-game" style="display:none;">Start Quiz</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import { getDatabase, ref, set, update, onValue, get } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+    const app = initializeApp({ databaseURL: "https://pathpharmm-default‑rtdb.firebaseio.com/" });
+    const db = getDatabase(app);
+
+    const roomCode = new URLSearchParams(location.search).get('room') || localStorage.getItem('roomCode');
+    if (!roomCode) {
+      alert("No room code provided");
+      throw new Error("Missing room code");
+    }
+    localStorage.setItem('roomCode', roomCode);
+
+    const playerId = localStorage.getItem('playerId') || ('guest_' + Math.random().toString(36).substr(2,6).toUpperCase());
+    localStorage.setItem('playerId', playerId);
+    const isHost = localStorage.getItem('isHost') === 'true';
+
+    const statusMsg = document.getElementById('status');
+    const categoryChooser = document.getElementById('category-chooser');
+    const lobbyDiv = document.getElementById('lobby');
+    const playersList = document.getElementById('players');
+    const leaderboard = document.getElementById('leaderboard');
+    const startBtn = document.getElementById('start-game');
+
+    const roomPlayersRef = ref(db, `rooms/${roomCode}/players`);
+    const roomChoiceRef = ref(db, `rooms/${roomCode}/chosenCategory`);
+    const roomStartedRef = ref(db, `rooms/${roomCode}/gameStarted`);
+
+    async function joinRoom() {
+      const snap = await get(roomPlayersRef);
+      if (!snap.exists()) {
+        await set(roomPlayersRef, { [playerId]: { score: 0 } });
+      } else {
+        await update(roomPlayersRef, { [playerId]: { score: 0 } });
+      }
+      onValue(roomPlayersRef, snapshot => {
+        const data = snapshot.val() || {};
+        playersList.innerHTML = Object.keys(data).map(id => `<li>${id}</li>`).join('');
+        leaderboard.innerHTML = "<h3>Leaderboard:</h3>" + Object.entries(data)
+          .sort(([, a], [, b]) => b.score - a.score)
+          .map(([id, p]) => `<div>${id}: ${p.score}</div>`).join('');
+      });
+    }
+
+    function setupCategorySelection() {
+      if (isHost) {
+        categoryChooser.style.display = 'block';
+        statusMsg.textContent = 'You are host. Pick a category.';
+        categoryChooser.querySelectorAll('button').forEach(btn => {
+          btn.onclick = () => set(roomChoiceRef, btn.dataset.cat);
+        });
+      } else {
+        statusMsg.textContent = 'Waiting for host to choose category...';
+      }
+    }
+
+    onValue(roomChoiceRef, snap => {
+      if (!snap.exists()) return;
+      categoryChooser.style.display = 'none';
+      lobbyDiv.style.display = 'block';
+      statusMsg.textContent = isHost ? 'Ready to start' : 'Waiting for host to start quiz';
+      if (isHost) startBtn.style.display = 'inline‑block';
+    });
+
+    startBtn.onclick = async () => {
+      startBtn.disabled = true;
+      await set(roomStartedRef, true);
+      await set(ref(db, `rooms/${roomCode}/currentQuestion`), 0);
+      await set(ref(db, `rooms/${roomCode}/questionStartTime`), Date.now());
+    };
+
+    onValue(roomStartedRef, snap => {
+      if (snap.exists() && snap.val()) {
+        window.location.href = `game.html?room=${roomCode}`;
+      }
+    });
+
+    joinRoom();
+    setupCategorySelection();
+  </script>
+</body>
+</html>

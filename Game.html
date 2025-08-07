@@ -1,193 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Home | PharmEdu</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #6a11cb, #2575fc);
-      min-height: 100vh;
-      padding: 20px 20px 100px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-    }
-
-    .user-header {
-      position: absolute;
-      top: 16px;
-      left: 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .user-icon {
-      width: 40px;
-      height: 40px;
-      background: rgba(255,255,255,0.3);
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .greeting {
-      color: white;
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .logout-btn {
-      position: absolute;
-      top: 16px;
-      right: 20px;
-      background-color: rgba(255,255,255,0.2);
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.3s ease;
-      z-index: 10;
-    }
-
-    .logout-btn:hover {
-      background-color: rgba(255,255,255,0.4);
-      color: black;
-    }
-
-    .glass-card {
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(18px);
-      border-radius: 20px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-      padding: 30px 20px;
-      text-align: center;
-      width: 100%;
-      max-width: 460px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      margin-top: 60px;
-    }
-
-    h2 {
-      font-size: 26px;
-      font-weight: bold;
-      color: white;
-      margin-bottom: 20px;
-    }
-
-    .nav-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      justify-content: space-between;
-    }
-
-    .nav-card {
-      flex: 0 1 calc(50% - 8px);
-      background: rgba(255, 255, 255, 0.18);
-      backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 20px;
-      text-align: center;
-      color: white;
-      font-weight: 600;
-      font-size: 15px;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .nav-card:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: translateY(-4px);
-    }
-
-    .nav-card i {
-      font-size: 20px;
-      margin-bottom: 8px;
-      display: block;
-    }
-
-    @media (max-width: 500px) {
-      .nav-card {
-        flex: 1 1 100%;
-      }
-    }
-  </style>
+  <meta charset="UTF‑8"/>
+  <meta name="viewport" content="width=device‑width, initial‑scale=1.0"/>
+  <title>Quiz Game</title>
+  <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
-
-  <div class="user-header">
-    <div class="user-icon" id="user-icon">?</div>
-    <div class="greeting" id="greeting">Hello</div>
+  <h1>Quiz Time</h1>
+  <div id="game">
+    <h2 id="question">Loading...</h2>
+    <div id="answers"></div>
+    <p>Time left: <span id="timer">-</span></p>
+    <p>Your Score: <span id="score">0</span></p>
+    <p id="error" style="color:red;display:none;">Error: failed to load question.</p>
   </div>
 
-  <button class="logout-btn" id="logout-btn">Logout</button>
-
-  <div class="glass-card">
-    <h2><i class="fas fa-home"></i> Welcome to PharmEdu</h2>
-    <div class="nav-grid">
-      <div class="nav-card" onclick="location.href='pharmacology.html'"><i class="fas fa-pills"></i> Pharmacology</div>
-      <div class="nav-card" onclick="location.href='pathology.html'"><i class="fas fa-flask"></i> Pathology</div>
-      <div class="nav-card" onclick="location.href='flashcard.html'"><i class="fas fa-layer-group"></i> Flashcards</div>
-    </div>
-  </div>
-
-  <!-- Firebase Auth + Greeting + Logout -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import { getDatabase, ref, onValue, update, set } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCgRJlAMQVnY5Zu7nkMPmdvS7lc5xMcJz4",
-      authDomain: "pathpharmm.firebaseapp.com",
-      projectId: "pathpharmm",
-      storageBucket: "pathpharmm.appspot.com",
-      messagingSenderId: "836525944124",
-      appId: "1:836525944124:web:9ab28aa79e9f12aeea8239"
+    const app = initializeApp({ databaseURL: "https://pathpharmm-default‑rtdb.firebaseio.com/" });
+    const db = getDatabase(app);
+
+    const roomCode = new URLSearchParams(location.search).get('room');
+    const playerId = localStorage.getItem('playerId');
+    const isHost = localStorage.getItem('isHost') === 'true';
+    const paths = {
+      category: `rooms/${roomCode}/chosenCategory`,
+      currentQuestion: `rooms/${roomCode}/currentQuestion`,
+      questionStartTime: `rooms/${roomCode}/questionStartTime`,
+      quizEnded: `rooms/${roomCode}/quizEnded`,
+      playerScore: `rooms/${roomCode}/players/${playerId}`
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    let questions = [], index = 0, score = 0, timer = null;
 
-    onAuthStateChanged(auth, (user) => {
-      const skip = localStorage.getItem("skip") === "true";
-      if (!user && !skip) {
-        window.location.href = "login.html";
+    const qElem = document.getElementById('question');
+    const answersDiv = document.getElementById('answers');
+    const timerElem = document.getElementById('timer');
+    const scoreElem = document.getElementById('score');
+    const errorElem = document.getElementById('error');
+
+    const categoryQs = {
+      pathology: [
+        { q: "What cell type proliferates in acute inflammation?", opts: ["Neutrophil","Lymphocyte","Macrophage","Basophil"], ans: 0},
+        { q: "Which organ is most affected by amyloidosis?", opts: ["Liver","Heart","Brain","Lung"], ans: 1 },
+        { q: "Which necrosis in MI?", opts: ["Coagulative","Liquefactive","Caseous","Fat"], ans: 0 }
+      ],
+      pharmacology: [
+        { q: "Which is a β-blocker?", opts: ["Propranolol","Lisinopril","Losartan","Verapamil"], ans: 0 },
+        { q: "Which inhibits ACE?", opts: ["Lisinopril","Losartan","Hydralazine","Propranolol"], ans: 0 },
+        { q: "Which is a loop diuretic?", opts: ["Furosemide","HCTZ","Spironolactone","Acetazolamide"], ans: 0 }
+      ]
+    };
+
+    function shuffle(a){return [...a].sort(()=>Math.random()-0.5);}
+
+    onValue(ref(db, paths.category), snap => {
+      const cat = snap.val();
+      if (!cat || !categoryQs[cat]) {
+        errorElem.textContent = "⛔ Invalid category.";
+        errorElem.style.display = 'block';
+        return;
       }
-
-      const userName = localStorage.getItem("userName") || user?.displayName || "User";
-      const first = userName.split(" ")[0];
-      document.getElementById("user-icon").textContent = first[0].toUpperCase();
-      document.getElementById("greeting").textContent = `Hello, ${first}`;
+      questions = shuffle(categoryQs[cat]);
+      console.log("Questions loaded:", questions);
     });
 
-    document.getElementById("logout-btn").addEventListener("click", async () => {
-      if (confirm("Are you sure you want to log out?")) {
-        try {
-          await signOut(auth);
-          localStorage.removeItem("skip");
-          localStorage.removeItem("userName");
-          window.location.href = "login.html";
-        } catch (err) {
-          alert("Logout failed: " + err.message);
+    onValue(ref(db, paths.currentQuestion), snap => {
+      index = snap.exists() ? snap.val() : 0;
+    });
+
+    onValue(ref(db, paths.questionStartTime), snap => {
+      if (snap.exists()) startLoop(snap.val());
+    });
+
+    onValue(ref(db, paths.quizEnded), snap => {
+      if (snap.val()) endQuiz();
+    });
+
+    function startLoop(startTs) {
+      clearInterval(timer);
+      renderQuestion();
+      timer = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTs)/1000);
+        const rem = 10 - elapsed;
+        timerElem.textContent = rem > 0 ? rem : 0;
+        if (rem <= 0) {
+          clearInterval(timer);
+          disableAnswers();
+          if (isHost) nextQuestion();
         }
-      }
-    });
-  </script>
+      }, 200);
+    }
 
+    function renderQuestion() {
+      const obj = questions[index];
+      console.log("Rendering Q#", index, obj);
+      if (!obj) {
+        errorElem.textContent = "❗ Question not found.";
+        errorElem.style.display = 'block';
+        qElem.textContent = '';
+        return;
+      }
+      errorElem.style.display = 'none';
+      qElem.textContent = obj.q;
+      answersDiv.innerHTML = '';
+      scoreElem.textContent = score;
+      obj.opts.forEach((opt,i) => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.onclick = () => answer(i, obj.ans, btn);
+        answersDiv.appendChild(btn);
+      });
+    }
+
+    function disableAnswers(){
+      answersDiv.querySelectorAll('button').forEach(b=>b.disabled=true);
+    }
+
+    async function answer(chosen, correct, btn) {
+      if (answersDiv.querySelector('button:disabled')) return;
+      disableAnswers();
+      if (chosen === correct) {
+        btn.classList.add('correct');
+        score += 10;
+        scoreElem.textContent = score;
+        await update(ref(db, paths.playerScore), { score });
+      } else {
+        btn.classList.add('incorrect');
+        const cs = answersDiv.children[correct];
+        if (cs) cs.classList.add('correct');
+      }
+    }
+
+    async function nextQuestion(){
+      const newIndex = index + 1;
+      if (newIndex < questions.length) {
+        await set(ref(db, paths.currentQuestion), newIndex);
+        await set(ref(db, paths.questionStartTime), Date.now());
+      } else {
+        await set(ref(db, paths.quizEnded), true);
+      }
+    }
+
+    function endQuiz(){
+      clearInterval(timer);
+      qElem.textContent = "🎉 Quiz Complete!";
+      answersDiv.innerHTML = '';
+      timerElem.textContent = '-';
+    }
+  </script>
 </body>
 </html>

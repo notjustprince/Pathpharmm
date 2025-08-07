@@ -1,154 +1,372 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pharmacology Flashcards</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box;
+    button, .btn, .close-btn, .fab, .fab-menu .btn {
+  -webkit-tap-highlight-color: transparent;
+}}
     body {
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Segoe UI', 'Inter', Arial, sans-serif;
       background: linear-gradient(135deg, #6a85b6, #bac8e0);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      min-height: 100vh;
       animation: fadeIn 0.3s ease-in-out;
     }
-
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.97); }
-      to { opacity: 1; transform: scale(1); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      width: 100%;
+      min-height: 75vh;
     }
 
     .card-container {
       perspective: 1200px;
-      margin-bottom: 100px;
+      margin-bottom: 24px;
       position: relative;
-      width: 280px;
-      height: 180px;
+      width: 320px;
+      height: 200px;
+      transition: box-shadow 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-
     .card {
       width: 100%;
       height: 100%;
       position: absolute;
       transform-style: preserve-3d;
-      transition: transform 0.6s ease, opacity 0.4s ease;
+      transition: transform 0.6s cubic-bezier(.75,0,.25,1), opacity 0.4s;
       cursor: pointer;
-      border-radius: 20px;
+      border-radius: 24px;
     }
-
     .card-content {
       position: absolute;
       width: 100%;
       height: 100%;
       backface-visibility: hidden;
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 20px;
+      background: rgba(255,255,255,0.14);
+      backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(255,255,255,0.25);
+      border-radius: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 24px;
       text-align: center;
-      font-size: 1rem;
+      font-size: 1.1rem;
       color: #fff;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 38px rgba(36, 51, 73, 0.23);
     }
-
-    .card-back {
-      transform: rotateY(180deg);
-    }
-
-    .card.flipped {
-      transform: rotateY(180deg);
-    }
-
-    .card.animate-next {
-      animation: slideOutLeft 0.4s forwards ease;
-    }
-
-    .card.animate-prev {
-      animation: slideOutRight 0.4s forwards ease;
-    }
-
-    @keyframes slideOutLeft {
-      0% { opacity: 1; transform: translateX(0); }
-      100% { opacity: 0; transform: translateX(-300px); }
-    }
-
-    @keyframes slideOutRight {
-      0% { opacity: 1; transform: translateX(0); }
-      100% { opacity: 0; transform: translateX(300px); }
-    }
+    .card-back { transform: rotateY(180deg); }
+    .card.flipped { transform: rotateY(180deg); }
+    .card.animate-next { animation: slideOutLeft 0.4s forwards; }
+    .card.animate-prev { animation: slideOutRight 0.4s forwards; }
+    @keyframes slideOutLeft { 0% { opacity: 1; transform: translateX(0); } 100% { opacity: 0; transform: translateX(-320px); } }
+    @keyframes slideOutRight { 0% { opacity: 1; transform: translateX(0); } 100% { opacity: 0; transform: translateX(320px); } }
 
     .buttons {
       display: flex;
       gap: 14px;
       flex-wrap: wrap;
       justify-content: center;
+      align-items: center;
+      margin-bottom: 32px;
+      width: 100%;
     }
-
     .btn {
-      padding: 10px 24px;
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 11px 28px;
+      background: rgba(255,255,255,0.14);
+      backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(255,255,255,0.25);
+      border-radius: 14px;
       color: #fff;
       font-weight: 600;
-      border-radius: 12px;
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-      transition: all 0.3s ease;
+      box-shadow: 0 3px 10px rgba(36,51,73,0.10);
+      font-size: 1rem;
+      letter-spacing: 0.03em;
+      position: relative;
+      transition: background 0.25s, transform 0.18s, color 0.18s;
+      outline: none;
+    }
+    .btn:active {
+      transform: scale(0.98);
+      background: rgba(255,255,255,0.2);
+      color: #eaf0fa;
+    }
+    .btn:hover, .btn:focus {
+      background: rgba(255,255,255,0.18);
+      color: #34495e;
     }
 
-    .btn:hover {
-      background: rgba(255, 255, 255, 0.25);
-      transform: scale(1.05);
+    /* Remove blue highlight on button click (focus) */
+    button:focus, .btn:focus, .close-btn:focus {
+      outline: none !important;
+      box-shadow: none !important;
     }
 
-    @media (max-width: 400px) {
-      .card-container {
-        width: 85vw;
-        height: 150px;
-      }
-
-      .btn {
-        padding: 8px 18px;
-        font-size: 0.9rem;
-      }
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(26,32,44,0.38);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      animation: modalFadeIn 0.27s;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .modal-content {
+      background: #f9fbfdcc;
+      backdrop-filter: blur(18px);
+      padding: 32px 28px 24px 28px;
+      border-radius: 20px;
+      max-width: 420px;
+      width: 90vw;
+      box-shadow: 0 12px 36px rgba(36, 51, 73, 0.20);
+      color: #222;
+      position: relative;
+      animation: modalSlideIn 0.22s;
+    }
+    @keyframes modalSlideIn {
+      from { transform: translateY(40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-content h2 { margin-top: 0; }
+    .modal-content input, .modal-content textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 12px 0;
+      border-radius: 10px;
+      border: 1px solid #d6e0ee;
+      font-size: 1rem;
+      background: #f2f5f8;
+      transition: border 0.2s;
+      outline: none;
+    }
+    .modal-content input:focus, .modal-content textarea:focus {
+      border: 1.5px solid #6a85b6;
+      background: #e9f0fa;
+    }
+    .close-btn {
+      background: rgba(255,255,255,0.14);
+      backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(255,255,255,0.25);
+      color: #e74c3c;
+      margin-top: 10px;
+      border-radius: 10px;
+      padding: 11px 28px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(36,51,73,0.10);
+      transition: background 0.23s, color 0.13s, transform 0.13s;
+      outline: none;
+    }
+    .close-btn:hover, .close-btn:focus { background: rgba(255,255,255,0.18); color: #c0392b; }
+    .saved-list {
+      max-height: 250px;
+      overflow-y: auto;
+      margin-top: 12px;
+    }
+    .flashcard-entry {
+      background: #f7faff;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 14px;
+      position: relative;
+      border-left: 5px solid #6a85b6;
+      box-shadow: 0 2px 8px rgba(36, 51, 73, 0.12);
+      font-size: 0.99rem;
+    }
+    .delete-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(255,255,255,0.14);
+      backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(255,255,255,0.25);
+      color: #e74c3c;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(36, 51, 73, 0.12);
+      transition: background 0.3s, color 0.15s;
+      outline: none;
+    }
+    .delete-btn:hover { background: rgba(255,255,255,0.18); color: #c0392b; }
+    /* Redesigned FAB */
+    .fab-container {
+      position: fixed;
+      bottom: 34px;
+      right: 34px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    .fab-menu {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 14px;
+      transform: translateY(20px) scale(0.96);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(.7,0,.3,1);
+    }
+    .fab-menu.show {
+      display: flex;
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    .fab {
+      background: rgba(255,255,255,0.14);
+      backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(255,255,255,0.25);
+      border-radius: 50%;
+      width: 64px;
+      height: 64px;
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 18px rgba(36,51,73,0.17);
+      cursor: pointer;
+      border: none;
+      outline: none;
+      position: relative;
+      transition: box-shadow 0.22s, transform 0.22s, background 0.24s, color 0.18s;
+      color: #fff;
+      overflow: hidden;
+    }
+    .fab::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2.5px solid rgba(255,255,255,0.18);
+      pointer-events: none;
+    }
+    .fab:hover, .fab:focus {
+      background: rgba(255,255,255,0.18);
+      color: #34495e;
+      transform: scale(1.12) rotate(10deg);
+      box-shadow: 0 9px 32px rgba(36,51,73,0.23);
+    }
+    .fab svg {
+      width: 2.2em;
+      height: 2.2em;
+      transition: transform 0.2s;
+      transform: scale(1);
+    }
+    .fab.active svg {
+      transform: scale(1.15) rotate(45deg);
+    }
+    /* FAB menu buttons */
+    .fab-menu .btn {
+      padding: 10px 22px;
+      font-size: 1rem;
+      background: rgba(255,255,255,0.14);
+      backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(255,255,255,0.25);
+      color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(36, 51, 73, 0.13);
+      transition: background 0.23s, color 0.15s;
+      outline: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .fab-menu .btn:hover, .fab-menu .btn:focus {
+      background: rgba(255,255,255,0.18);
+      color: #34495e;
+    }
+    /* Responsive */
+    @media (max-width: 500px) {
+      .main-content { min-height: 68vh; }
+      .card-container { width: 94vw; height: 140px; }
+      .btn, .close-btn { font-size: 0.95rem; padding: 9px 16px; }
+      .modal-content { padding: 18px 6vw 16px 6vw; }
+      .fab-container { bottom: 22px; right: 16px; }
+      .fab { width: 54px; height: 54px; font-size: 1.5rem; }
+      .fab-menu .btn { font-size: 0.97rem; padding: 8px 12px; }
     }
   </style>
 </head>
 <body>
-
-  <div class="card-container">
-    <div class="card" onclick="flipCard()" id="flashcard">
-      <div class="card-content card-front" id="question">
-        What is the mechanism of action of Aspirin?
+  <div class="main-content">
+    <div class="card-container">
+      <div class="card" onclick="flipCard()" id="flashcard">
+        <div class="card-content card-front" id="question">Question?</div>
+        <div class="card-content card-back" id="answer">Answer.</div>
       </div>
-      <div class="card-content card-back" id="answer">
-        Aspirin irreversibly inhibits COX-1 and COX-2 enzymes.
-      </div>
+    </div>
+    <div class="buttons">
+      <button class="btn" onclick="prevCard()"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn" onclick="flipCard()"><i class="fas fa-retweet"></i> Flip</button>
+      <button class="btn" onclick="nextCard()"><i class="fas fa-arrow-right"></i> Next</button>
     </div>
   </div>
 
-  <div class="buttons">
-    <button class="btn" onclick="prevCard()">Back</button>
-    <button class="btn" onclick="flipCard()">Flip</button>
-    <button class="btn" onclick="nextCard()">Next</button>
+  <!-- Professional Floating Action Button -->
+  <div class="fab-container">
+    <div class="fab-menu" id="fabMenu">
+      <button class="btn" onclick="openModal('addModal');toggleFabMenu();"><span><i class="fas fa-plus"></i></span> Add New Card</button>
+      <button class="btn" onclick="openModal('viewModal');toggleFabMenu();"><span><i class="fas fa-list"></i></span> View Saved Cards</button>
+    </div>
+    <button class="fab" id="fabBtn" onclick="toggleFabMenu()" aria-label="Open actions" title="More actions">
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="12" fill="none"/>
+        <path d="M12 6v12M6 12h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Add Card Modal -->
+  <div class="modal" id="addModal">
+    <div class="modal-content">
+      <h2><i class="fas fa-plus-circle"></i> Add New Flashcard</h2>
+      <input type="text" id="newQuestion" placeholder="Enter question..." autocomplete="off"/>
+      <textarea id="newAnswer" placeholder="Enter answer..." rows="4"></textarea>
+      <button class="btn" onclick="saveNewCard()"><i class="fas fa-save"></i> Save</button>
+      <button class="close-btn" onclick="closeModal('addModal')"><i class="fas fa-times"></i> Close</button>
+    </div>
+  </div>
+
+  <!-- View Cards Modal -->
+  <div class="modal" id="viewModal">
+    <div class="modal-content">
+      <h2><i class="fas fa-list-ul"></i> All Saved Flashcards</h2>
+      <div class="saved-list" id="savedList"></div>
+      <button class="close-btn" onclick="closeModal('viewModal')"><i class="fas fa-times"></i> Close</button>
+    </div>
   </div>
 
   <script>
-    const flashcards = [
+    const defaultCards = [
       {
         question: "What is the mechanism of action of Aspirin?",
         answer: "Aspirin irreversibly inhibits COX-1 and COX-2 enzymes."
@@ -161,14 +379,36 @@
         question: "What is the antidote for acetaminophen overdose?",
         answer: "N-acetylcysteine (NAC)."
       }
-      // ➕ Add more flashcards here
     ];
 
+    let flashcards;
     let currentCard = 0;
     let isFlipped = false;
     const card = document.getElementById("flashcard");
 
+    // Always load default cards if storage is missing/corrupt/empty
+    function getSavedCards() {
+      let savedCards;
+      try {
+        savedCards = JSON.parse(localStorage.getItem("flashcards"));
+      } catch (e) {
+        savedCards = null;
+      }
+      if (!savedCards || !Array.isArray(savedCards) || savedCards.length === 0) {
+        localStorage.setItem("flashcards", JSON.stringify(defaultCards));
+        return [...defaultCards];
+      }
+      return savedCards;
+    }
+
+    flashcards = getSavedCards();
+
     function updateCardContent() {
+      if (flashcards.length === 0) {
+        document.getElementById("question").textContent = "No flashcards available.";
+        document.getElementById("answer").textContent = "Please add new flashcards.";
+        return;
+      }
       card.classList.remove("flipped");
       isFlipped = false;
       document.getElementById("question").textContent = flashcards[currentCard].question;
@@ -181,8 +421,8 @@
     }
 
     function animateAndChange(direction) {
+      if (flashcards.length === 0) return;
       card.classList.add(direction === "next" ? "animate-next" : "animate-prev");
-
       setTimeout(() => {
         card.classList.remove("animate-next", "animate-prev");
         if (direction === "next") {
@@ -194,16 +434,91 @@
       }, 400);
     }
 
-    function nextCard() {
-      animateAndChange("next");
+    function nextCard() { animateAndChange("next"); }
+    function prevCard() { animateAndChange("prev"); }
+
+    function openModal(id) {
+      document.getElementById(id).style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      if (id === 'viewModal') renderSavedList();
+      if (id === 'addModal') setTimeout(() => document.getElementById("newQuestion").focus(), 100);
     }
 
-    function prevCard() {
-      animateAndChange("prev");
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    function saveNewCard() {
+      const question = document.getElementById("newQuestion").value.trim();
+      const answer = document.getElementById("newAnswer").value.trim();
+      if (!question || !answer) {
+        alert("Both question and answer are required.");
+        return;
+      }
+      flashcards.push({ question, answer });
+      localStorage.setItem("flashcards", JSON.stringify(flashcards));
+      document.getElementById("newQuestion").value = '';
+      document.getElementById("newAnswer").value = '';
+      currentCard = flashcards.length - 1;
+      closeModal("addModal");
+      updateCardContent();
+    }
+
+    function renderSavedList() {
+      const list = document.getElementById("savedList");
+      list.innerHTML = "";
+      flashcards.forEach((fc, index) => {
+        const item = document.createElement("div");
+        item.className = "flashcard-entry";
+        item.innerHTML = `
+          <strong>Q${index + 1}:</strong> ${fc.question}<br>
+          <strong>A:</strong> ${fc.answer}
+          <button class="delete-btn" onclick="deleteCard(${index})" aria-label="Delete card"><i class="fas fa-trash"></i> Delete</button>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function deleteCard(index) {
+      if (!confirm("Are you sure you want to delete this flashcard?")) return;
+      flashcards.splice(index, 1);
+      localStorage.setItem("flashcards", JSON.stringify(flashcards));
+      // If after deletion, flashcards is empty, restore defaults in UI and storage
+      if (flashcards.length === 0) {
+        flashcards = [...defaultCards];
+        localStorage.setItem("flashcards", JSON.stringify(flashcards));
+        currentCard = 0;
+      } else if (currentCard >= flashcards.length) {
+        currentCard = Math.max(0, flashcards.length - 1);
+      }
+      renderSavedList();
+      updateCardContent();
+    }
+
+    function toggleFabMenu() {
+      const menu = document.getElementById("fabMenu");
+      const fabBtn = document.getElementById("fabBtn");
+      menu.classList.toggle("show");
+      fabBtn.classList.toggle("active");
+      // Optional: close menu if clicked outside
+      if (menu.classList.contains("show")) {
+        window.addEventListener("mousedown", fabOutsideHandler);
+      } else {
+        window.removeEventListener("mousedown", fabOutsideHandler);
+      }
+    }
+    function fabOutsideHandler(e) {
+      const menu = document.getElementById("fabMenu");
+      const fabBtn = document.getElementById("fabBtn");
+      if (!menu.contains(e.target) && !fabBtn.contains(e.target)) {
+        menu.classList.remove("show");
+        fabBtn.classList.remove("active");
+        window.removeEventListener("mousedown", fabOutsideHandler);
+      }
     }
 
     updateCardContent();
   </script>
-
 </body>
 </html>

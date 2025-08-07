@@ -3,197 +3,58 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quiz Room</title>
-  <style>
-    body { background: linear-gradient(to right,#141e30,#243b55); color:white; font-family:sans-serif; text-align:center; padding:20px; }
-    button { display:block; margin:10px auto; padding:12px 20px; background:rgba(255,255,255,0.15); color:white; border:none; border-radius:8px; cursor:pointer; max-width:300px; width:100%; }
-    button:disabled { background:rgba(255,255,255,0.05); color:#aaa; cursor:not-allowed; }
-    .correct { background:#00c851; }
-    .incorrect { background:#ff3547; }
-    #startBtn { background:#00ffc3; color:#000; font-size:18px; }
-    #startBtn:disabled { background:#ccc; color:#666; }
-    #lobby, #categoryChooser { margin-top:20px; display:inline-block; text-align:left; }
-    #status { margin-top:20px; font-size:16px; }
-    @media(max-width:480px){ body{padding:10px;} button{font-size:16px;} }
-  </style>
+  <title>Multiplayer Quiz</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <h1>Multiplayer Quiz</h1>
   <div id="status">Loading room...</div>
 
-  <div id="categoryChooser" style="display:none;">
-    <h3>Select Category:</h3>
-    <button id="catPath">Pathology</button>
-    <button id="catPharm">Pharmacology</button>
+  <!-- ✍️ Nickname + Avatar Entry -->
+  <div id="nameEntry" class="scene">
+    <h3>Enter Your Nickname</h3>
+    <input id="nicknameInput" type="text" placeholder="e.g. BrainyDoc123" maxlength="20" />
+
+    <h4>Choose an Avatar:</h4>
+    <div id="avatarPicker">
+      <button class="avatar">🧠</button>
+      <button class="avatar">🧑‍⚕️</button>
+      <button class="avatar">👩‍🔬</button>
+      <button class="avatar">👨‍🏫</button>
+      <button class="avatar">🤓</button>
+    </div>
+
+    <button id="saveNameBtn">Continue</button>
   </div>
 
-  <div id="lobby" style="display:none;">
-    <h3>Players in Lobby:</h3>
-    <ul id="player-list"></ul>
+  <!-- 🏁 Lobby Scene -->
+  <div id="scene-lobby" class="scene">
+    <div id="categoryChooser">
+      <h3>Select Category:</h3>
+      <button id="catPath">Pathology</button>
+      <button id="catPharm">Pharmacology</button>
+    </div>
+    <button id="startBtn">Start Game</button>
   </div>
 
-  <div id="leaderboard"></div>
-
-  <div id="question-container" style="display:none;">
+  <!-- 📋 Game Scene -->
+  <div id="scene-game" class="scene">
     <h2 id="question-text"></h2>
     <div id="answers"></div>
     <p>⏳ Time left: <span id="time-left">-</span></p>
     <p class="score">Your Score: <span id="score">0</span></p>
   </div>
 
-  <button id="startBtn" style="display:none;">Start Game</button>
+  <!-- 🏆 Result Scene -->
+  <div id="scene-result" class="scene">
+    <h2 id="result-title">🎉 Quiz Finished!</h2>
+    <p class="score">Your Final Score: <span id="final-score">0</span></p>
+    <p id="winner-summary"></p>
+    <div id="final-leaderboard"></div>
+    <button id="play-again-btn">🔁 Play Again</button>
+  </div>
 
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-    import { getDatabase, ref, set, update, get, onValue, child } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
-
-    const firebaseConfig = { /* your config */ databaseURL:"https://pathpharmm-default-rtdb.firebaseio.com/" };
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const roomCode = new URLSearchParams(location.search).get('room') || localStorage.getItem('roomCode');
-    localStorage.setItem('roomCode', roomCode);
-    const roomRef = ref(db, `rooms/${roomCode}`);
-
-    let isHost = localStorage.getItem("isHost")==="true";
-    let playerId = localStorage.getItem('playerId') || ('guest_'+Math.random().toString(36).substr(2,6).toUpperCase());
-    localStorage.setItem('playerId', playerId);
-    let score=0, currentIndex=0, timerInterval=null;
-    let questions=[];
-
-    const catChooser = document.getElementById('categoryChooser');
-    const catPath = document.getElementById('catPath');
-    const catPharm = document.getElementById('catPharm');
-    const lobbyDiv = document.getElementById('lobby');
-    const playerList = document.getElementById('player-list');
-    const leaderboard = document.getElementById('leaderboard');
-    const statusMsg = document.getElementById('status');
-    const startBtn = document.getElementById('startBtn');
-    const questionContainer = document.getElementById('question-container');
-    const questionText = document.getElementById('question-text');
-    const answersDiv = document.getElementById('answers');
-    const timeLeft = document.getElementById('time-left');
-    const scoreEl = document.getElementById('score');
-
-    const pathology = [
-      {question:"What cell type proliferates in acute inflammation?", options:["Neutrophil","Lymphocyte","Macrophage","Basophil"], correct:0},
-      // more...
-    ];
-    const pharmacology = [
-      {question:"Which drug is a β‑blocker?", options:["Propranolol","Lisinopril","Losartan","Verapamil"], correct:0},
-      // more...
-    ];
-
-    function shuffle(a){ return a.sort(()=>Math.random()-0.5); }
-
-    async function initGame(){
-      const playersRef = child(roomRef,'players');
-      const psnap = await get(playersRef);
-      if(!psnap.exists()) await set(playersRef,{[playerId]:{id:playerId,score:0}});
-      else await update(child(playersRef,playerId),{id:playerId,score:0});
-      onValue(playersRef,s => {
-        const d=s.val()||{};
-        playerList.innerHTML = Object.keys(d).map(id=>`<li>${id}</li>`).join('');
-        leaderboard.innerHTML = "<h3>Leaderboard:</h3>" + Object.values(d).sort((a,b)=>b.score-a.score).map(p=>`<div>${p.id}: ${p.score}</div>`).join('');
-      });
-
-      if(isHost){
-        catChooser.style.display='block';
-        statusMsg.textContent="You're host. Choose a category.";
-        catPath.onclick=()=>chooseCategory('pathology');
-        catPharm.onclick=()=>chooseCategory('pharmacology');
-      } else {
-        statusMsg.textContent="Waiting for host...";
-      }
-
-      onValue(child(roomRef,'chosenCategory'),snap=>{
-        if(snap.exists()){
-          questions = shuffle((snap.val()==='pathology'?pathology:pharmacology).slice());
-          lobbyDiv.style.display='block';
-          if(isHost) startBtn.style.display='inline-block';
-          statusMsg.textContent=isHost?"Lobby: players joined. Click start when ready.":"Waiting in lobby..."
-        }
-      });
-
-      startBtn.onclick=async()=>{
-        startBtn.disabled=true;
-        await set(child(roomRef,'gameStarted'),true);
-        await set(child(roomRef,'currentQuestion'),0);
-        await set(child(roomRef,'questionStartTime'),Date.now());
-      };
-
-      onValue(child(roomRef,'gameStarted'),snap=>{
-        if(snap.val()){
-          catChooser.style.display='none';
-          lobbyDiv.style.display='none';
-          statusMsg.style.display='none';
-          startBtn.style.display='none';
-          questionContainer.style.display='block';
-        }
-      });
-
-      onValue(child(roomRef,'currentQuestion'),snap=>{ if(snap.exists()) currentIndex=snap.val(); });
-      onValue(child(roomRef,'questionStartTime'),snap=>{ if(snap.exists()) startQuestionLoop(snap.val()); });
-      onValue(child(roomRef,'quizEnded'),snap=>{ if(snap.val()) showEnd(); });
-    }
-
-    async function chooseCategory(cat){
-      await set(child(roomRef,'chosenCategory'),cat);
-    }
-
-    function startQuestionLoop(ts){
-      clearInterval(timerInterval);
-      displayQuestion();
-      timerInterval = setInterval(()=>{
-        const elapsed=Math.floor((Date.now()-ts)/1000);
-        const rem = 10-elapsed;
-        timeLeft.textContent=rem>0?rem:0;
-        if(rem<=0){ clearInterval(timerInterval); lockButtons(); if(isHost) goNextQuestion(); }
-      },200);
-    }
-
-    function displayQuestion(){
-      const q=questions[currentIndex];
-      if(!q) return showEnd();
-      questionText.textContent=q.question;
-      answersDiv.innerHTML='';
-      scoreEl.textContent=score;
-      q.options.forEach((opt,i)=>{
-        const btn=document.createElement('button');
-        btn.textContent=opt;
-        btn.onclick=()=>answerQuestion(i);
-        answersDiv.appendChild(btn);
-      });
-    }
-
-    async function answerQuestion(i){
-      if(answersDiv.querySelector('button:disabled')) return;
-      lockButtons();
-      const q=questions[currentIndex];
-      const btns=answersDiv.querySelectorAll('button');
-      btns[i].classList.add(i===q.correct?'correct':'incorrect');
-      if(i===q.correct){ score+=10; scoreEl.textContent=score; await update(child(roomRef,`players/${playerId}`),{score}); }
-    }
-
-    function lockButtons(){ answersDiv.querySelectorAll('button').forEach(b=>b.disabled=true); }
-
-    async function goNextQuestion(){
-      currentIndex++;
-      if(currentIndex<questions.length){
-        await set(child(roomRef,'currentQuestion'),currentIndex);
-        await set(child(roomRef,'questionStartTime'),Date.now());
-      } else await set(child(roomRef,'quizEnded'),true);
-    }
-
-    function showEnd(){
-      clearInterval(timerInterval);
-      questionText.textContent="🎉 Quiz Finished!";
-      answersDiv.innerHTML='';
-      timeLeft.textContent='-';
-      statusMsg.style.display='block';
-      statusMsg.textContent="Thanks for playing!";
-    }
-
-    initGame();
-  </script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
