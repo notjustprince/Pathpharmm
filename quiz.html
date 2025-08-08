@@ -4,54 +4,49 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Multiplayer Quiz</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <h1>Multiplayer Quiz</h1>
   <div id="status">Loading room...</div>
 
-  <!-- ✍️ Nickname + Avatar Entry -->
-  <div id="nameEntry" class="scene">
-    <h3>Enter Your Nickname</h3>
-    <input id="nicknameInput" type="text" placeholder="e.g. BrainyDoc123" maxlength="20" />
-
-    <h4>Choose an Avatar:</h4>
-    <div id="avatarPicker">
-      <button class="avatar">🧠</button>
-      <button class="avatar">🧑‍⚕️</button>
-      <button class="avatar">👩‍🔬</button>
-      <button class="avatar">👨‍🏫</button>
-      <button class="avatar">🤓</button>
-    </div>
-
-    <button id="saveNameBtn">Continue</button>
-  </div>
-
-  <!-- 🏁 Lobby Scene -->
-  <div id="scene-lobby" class="scene">
+  <!-- Lobby -->
+  <div id="scene‑lobby" class="scene">
     <div id="categoryChooser">
       <h3>Select Category:</h3>
       <button id="catPath">Pathology</button>
       <button id="catPharm">Pharmacology</button>
     </div>
-    <button id="startBtn">Start Game</button>
   </div>
 
-  <!-- 📋 Game Scene -->
-  <div id="scene-game" class="scene">
-    <h2 id="question-text"></h2>
-    <div id="answers"></div>
-    <p>⏳ Time left: <span id="time-left">-</span></p>
-    <p class="score">Your Score: <span id="score">0</span></p>
+  <!-- Game -->
+  <div id="scene‑game" class="scene">
+    <div class="card question-card">
+      <h2 id="question-text"></h2>
+    </div>
+    <div class="card answers-card">
+      <div id="answers"></div>
+    </div>
+    <div class="info-bar">
+      <span>
+        <i class="fa-solid fa-hourglass-half"></i> 
+        <span id="time-left">-</span>
+      </span>
+      <span>
+        <i class="fa-solid fa-star"></i>
+        <span id="score">0</span>
+      </span>
+    </div>
   </div>
 
-  <!-- 🏆 Result Scene -->
-  <div id="scene-result" class="scene">
-    <h2 id="result-title">🎉 Quiz Finished!</h2>
-    <p class="score">Your Final Score: <span id="final-score">0</span></p>
-    <p id="winner-summary"></p>
-    <div id="final-leaderboard"></div>
+  <!-- Result -->
+  <div id="scene‑result" class="scene">
+    <h2 id="result-title">Quiz Finished!</h2>
+    <p class="score"><i class="fa-solid fa-star"></i> 
+      Your Final Score: <span id="final-score">0</span></p>
+    <p id="result-outcome"></p>
     <button id="play-again-btn">🔁 Play Again</button>
   </div>
 

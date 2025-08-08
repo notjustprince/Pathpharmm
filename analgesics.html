@@ -3,24 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Intro to Pharmacology</title>
+  <title>Intro to Analgesics</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent; /* Remove mobile tap highlight */
+      -webkit-tap-highlight-color: transparent;
     }
-
-    /* Remove blue outline on focus */
     :focus {
       outline: none;
     }
-
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right top, #6a11cb, #2575fc);
+      background: linear-gradient(to right top, #ff512f, #dd2476);
       min-height: 100vh;
       padding: 20px 15px 100px;
       display: flex;
@@ -28,33 +25,27 @@
       align-items: center;
       animation: fadeIn 0.6s ease-out;
     }
-
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
-    /* Soft tap animation */
     @keyframes softTap {
       0% { transform: scale(1); }
       40% { transform: scale(0.95); }
       100% { transform: scale(1); }
     }
-
     h1 {
       color: #fff;
       text-align: center;
       font-size: 26px;
       margin-bottom: 10px;
     }
-
     p {
       color: #ddd;
       font-size: 15px;
       text-align: center;
       margin-bottom: 25px;
     }
-
     .grid-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -62,7 +53,6 @@
       width: 100%;
       max-width: 600px;
     }
-
     .card {
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -79,23 +69,19 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
       user-select: none;
     }
-
     .card:hover {
       background: rgba(255, 255, 255, 0.25);
       transform: scale(1.07);
       transition: transform 0.35s ease, background 0.35s ease;
     }
-
     .card:active {
       animation: softTap 0.25s ease;
     }
-
     .card i {
       display: block;
       font-size: 22px;
       margin-bottom: 8px;
     }
-
     .back-btn {
       margin-top: 30px;
       background: rgba(255,255,255,0.1);
@@ -109,12 +95,10 @@
       transition: background 0.35s ease;
       user-select: none;
     }
-
     .back-btn:hover {
       background: rgba(255,255,255,0.3);
       transform: scale(1.05);
     }
-
     .back-btn:active {
       animation: softTap 0.25s ease;
     }
@@ -122,20 +106,20 @@
 </head>
 <body>
 
-  <h1><i class="fas fa-book-medical"></i> Introduction to Pharmacology</h1>
-  <p>Explore key foundation topics below:</p>
+  <h1><i class="fas fa-hand-holding-medical"></i> Introduction to Analgesics</h1>
+  <p>Understand pain relief medicines and their applications:</p>
 
   <div class="grid-container">
-    <div class="card" onclick="location.href='drugbasics.html'"><i class="fas fa-dna"></i> Drug Basics</div>
-    <div class="card" onclick="location.href='administration.html'"><i class="fas fa-syringe"></i> Administration</div>
-    <div class="card" onclick="location.href='mechanism.html'"><i class="fas fa-balance-scale"></i> Mechanism</div>
-    <div class="card" onclick="location.href='dose_response.html'"><i class="fas fa-chart-line"></i> Dose Response</div>
-    <div class="card" onclick="location.href='kinetics.html'"><i class="fas fa-hourglass-half"></i> Kinetics</div>
-    <div class="card" onclick="location.href='contraindications.html'"><i class="fas fa-ban"></i> Contraindications</div>
-    <div class="card" onclick="location.href='resistance.html'"><i class="fas fa-viruses"></i> Resistance</div>
-    <div class="card" onclick="location.href='formulations.html'"><i class="fas fa-capsules"></i> Formulations</div>
-    <div class="card" onclick="location.href='bioavailability.html'"><i class="fas fa-chart-area"></i> Bioavailability</div>
-    <div class="card" onclick="location.href='trials.html'"><i class="fas fa-vial"></i> Trials</div>
+    <div class="card" onclick="location.href='types.html'"><i class="fas fa-th-list"></i> Types of Analgesics</div>
+    <div class="card" onclick="location.href='mechanism.html'"><i class="fas fa-cogs"></i> Mechanism of Action</div>
+    <div class="card" onclick="location.href='opioids.html'"><i class="fas fa-capsules"></i> Opioid Analgesics</div>
+    <div class="card" onclick="location.href='nsaids.html'"><i class="fas fa-tablets"></i> NSAIDs</div>
+    <div class="card" onclick="location.href='paracetamol.html'"><i class="fas fa-pills"></i> Paracetamol</div>
+    <div class="card" onclick="location.href='adverse.html'"><i class="fas fa-exclamation-triangle"></i> Adverse Effects</div>
+    <div class="card" onclick="location.href='dosage.html'"><i class="fas fa-prescription-bottle-alt"></i> Dosage & Administration</div>
+    <div class="card" onclick="location.href='interactions.html'"><i class="fas fa-random"></i> Drug Interactions</div>
+    <div class="card" onclick="location.href='guidelines.html'"><i class="fas fa-book-medical"></i> Prescribing Guidelines</div>
+    <div class="card" onclick="location.href='case_studies.html'"><i class="fas fa-file-medical"></i> Case Studies</div>
   </div>
 
   <button class="back-btn" onclick="history.back()"><i class="fas fa-arrow-left"></i> Back</button>

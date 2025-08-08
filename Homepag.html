@@ -1,129 +1,336 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Multiplayer Quiz – Game (Offline Test)</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Pathology & Pharmacology Local Tutor</title>
+  <style>
+    body { background: #21253a; color: #fff; font-family: Arial,sans-serif; margin: 0; }
+    .container { max-width: 600px; margin: 40px auto; padding: 24px; background: rgba(0,0,0,0.20); border-radius: 18px; box-shadow: 0 8px 24px #0007;}
+    h2 { text-align: center; margin-bottom: 18px;}
+    #chat-window { background: #2a2e50; border-radius: 8px; padding: 15px; min-height: 220px; max-height: 440px; overflow-y: auto; margin-bottom: 18px;}
+    .user { color: #6a9cf6; font-weight: bold; margin-bottom: 10px;}
+    .bot { color: #ffc857; margin-bottom: 10px;}
+    #chat-input { width: 100%; padding: 10px; border-radius: 7px; border: none; outline: none;}
+    #send-btn { background: #6a11cb; color: #fff; border: none; border-radius: 7px; padding: 10px 18px; cursor: pointer; margin-top: 8px;}
+    #send-btn:hover { background: #2575fc;}
+    .topic-list { color:#f9d923; }
+    .example { color:#89f7fe; font-style:italic; }
+    b { color: #ffe066; }
+    a { color: #81ecec; text-decoration: underline;}
+    .quiz { color: #ff6b6b; font-weight: bold; }
+    .details { color: #e0eaff; }
+    .summary { color: #ffe066; }
+  </style>
 </head>
 <body>
-  <h1>Multiplayer Quiz</h1>
-  <div id="question-container">
-    <h2 id="question-text">Loading...</h2>
-    <div id="answers"></div>
-    <p>⏳ Time left: <span id="time-left">-</span></p>
-    <p class="score">Your Score: <span id="score">0</span></p>
+  <div class="container">
+    <h2>Pathology & Pharmacology Tutor Bot (Local)</h2>
+    <div id="chat-window"></div>
+    <input type="text" id="chat-input" placeholder="Ask me about drugs, diseases, mechanisms..." autocomplete="off"/>
+    <button id="send-btn">Send</button>
   </div>
-
   <script>
-    // Sample questions
-    const pathology = [
-      { question: "What cell type proliferates in acute inflammation?", options: ["Neutrophil", "Lymphocyte", "Macrophage", "Basophil"], correct: 0 },
-      { question: "Which organ is most affected by amyloidosis?", options: ["Liver", "Heart", "Brain", "Lung"], correct: 1 },
-      { question: "Which type of necrosis is typical in myocardial infarction?", options: ["Coagulative", "Liquefactive", "Caseous", "Fat"], correct: 0 },
-    ];
+    // Massive expandable knowledge base
+    const knowledge = {
+      // --- PHARMACOLOGY ---
+      "antibiotics": {
+        summary: "Antibiotics are agents that kill or inhibit the growth of bacteria.",
+        details: "Major classes include beta-lactams (penicillins, cephalosporins), macrolides, tetracyclines, aminoglycosides, fluoroquinolones, and sulfonamides. Mechanisms include inhibition of cell wall synthesis, protein synthesis, nucleic acid synthesis, and metabolic pathways.",
+        examples: "Penicillin, Amoxicillin, Cephalexin, Azithromycin, Ciprofloxacin.",
+        quiz: "Name two antibiotics that inhibit protein synthesis."
+      },
+      "penicillins": {
+        summary: "Penicillins are beta-lactam antibiotics that inhibit bacterial cell wall synthesis.",
+        details: "They bind to penicillin-binding proteins, disrupting peptidoglycan cross-linking and causing bacterial lysis. Used for gram-positive infections, some gram-negatives. Resistance via beta-lactamases.",
+        examples: "Penicillin G, Penicillin V, Amoxicillin, Ampicillin.",
+        quiz: "What is the mechanism of resistance in staphylococcus aureus to penicillins?"
+      },
+      "cephalosporins": {
+        summary: "Cephalosporins are beta-lactam antibiotics, structurally related to penicillins.",
+        details: "They have broader spectrum and are classified into generations. Used for pneumonia, meningitis, UTIs, and more.",
+        examples: "Cefalexin (1st gen), Cefuroxime (2nd), Ceftriaxone (3rd), Cefepime (4th).",
+        quiz: "Which generation of cephalosporins is most effective against Pseudomonas?"
+      },
+      "macrolides": {
+        summary: "Macrolides inhibit bacterial protein synthesis by binding to the 50S ribosomal subunit.",
+        details: "Used for respiratory tract infections, atypical pathogens. Also have anti-inflammatory effects.",
+        examples: "Erythromycin, Azithromycin, Clarithromycin.",
+        quiz: "How do macrolides differ from aminoglycosides in mechanism of action?"
+      },
+      "tetracyclines": {
+        summary: "Tetracyclines inhibit protein synthesis by binding to the 30S ribosomal subunit.",
+        details: "Effective against broad spectrum, including rickettsiae, chlamydia. Contraindicated in children and pregnancy.",
+        examples: "Tetracycline, Doxycycline, Minocycline.",
+        quiz: "Why shouldn't tetracyclines be used in children?"
+      },
+      "aminoglycosides": {
+        summary: "Aminoglycosides inhibit protein synthesis by binding irreversibly to the 30S ribosomal subunit.",
+        details: "Bactericidal, used for severe gram-negative infections. Not absorbed orally.",
+        examples: "Gentamicin, Amikacin, Tobramycin, Streptomycin.",
+        quiz: "Name a major toxicity of aminoglycosides."
+      },
+      "fluoroquinolones": {
+        summary: "Fluoroquinolones inhibit bacterial DNA gyrase and topoisomerase IV.",
+        details: "Broad-spectrum, used for UTIs, pneumonia, GI infections. Can cause tendonitis.",
+        examples: "Ciprofloxacin, Levofloxacin, Moxifloxacin.",
+        quiz: "What is a contraindication for fluoroquinolones?"
+      },
+      "nsaids": {
+        summary: "NSAIDs (Non-steroidal anti-inflammatory drugs) inhibit cyclooxygenase (COX) enzymes, reducing prostaglandin synthesis.",
+        details: "Used for pain, inflammation, fever. Can cause GI irritation, renal toxicity, bleeding.",
+        examples: "Ibuprofen, Naproxen, Diclofenac, Aspirin.",
+        quiz: "Why are NSAIDs contraindicated in peptic ulcer disease?"
+      },
+      "opioids": {
+        summary: "Opioids are drugs that bind opioid receptors to provide analgesia.",
+        details: "Used for moderate to severe pain, cough suppression, diarrhea. Risk of dependence, respiratory depression.",
+        examples: "Morphine, Codeine, Fentanyl, Oxycodone.",
+        quiz: "What is the antidote for opioid overdose?"
+      },
+      "paracetamol": {
+        summary: "Paracetamol (acetaminophen) is an analgesic and antipyretic.",
+        details: "It acts centrally but has minimal anti-inflammatory effect. Overdose causes liver toxicity.",
+        examples: "Tylenol, Panadol.",
+        quiz: "What organ is most affected by paracetamol overdose?"
+      },
+      "pharmacokinetics": {
+        summary: "Pharmacokinetics is the study of how the body absorbs, distributes, metabolizes, and excretes drugs (ADME).",
+        details: "Key concepts: bioavailability, half-life, volume of distribution, clearance, first-pass metabolism.",
+        examples: "Oral drugs may have reduced bioavailability due to first-pass metabolism in the liver.",
+        quiz: "Explain the concept of first-pass metabolism."
+      },
+      "pharmacodynamics": {
+        summary: "Pharmacodynamics is the study of what a drug does to the body (mechanism, effects, dose-response).",
+        details: "Includes receptor binding, agonism/antagonism, potency, efficacy, therapeutic index.",
+        examples: "Beta-blockers antagonize beta-adrenergic receptors to lower blood pressure.",
+        quiz: "What is the difference between potency and efficacy?"
+      },
+      "side effects": {
+        summary: "Side effects are unwanted actions of drugs at therapeutic doses.",
+        details: "Can be minor (nausea, headache) or serious (organ toxicity, allergic reactions).",
+        examples: "NSAIDs: GI bleed, Opioids: constipation, Aminoglycosides: nephrotoxicity.",
+        quiz: "Name a common side effect of opioids."
+      },
+      "adverse effects": {
+        summary: "Adverse effects are harmful or unintended drug effects.",
+        details: "Includes side effects, toxicity, allergies, drug interactions.",
+        examples: "Anaphylaxis to penicillin, liver failure from paracetamol overdose.",
+        quiz: "What is the difference between side effect and adverse effect?"
+      },
+      "autonomic": {
+        summary: "The autonomic nervous system (ANS) controls involuntary functions (heart rate, digestion, etc.).",
+        details: "Divided into sympathetic (fight/flight) and parasympathetic (rest/digest) branches. Drugs can act as agonists or antagonists.",
+        examples: "Atropine (antimuscarinic), Epinephrine (adrenergic agonist).",
+        quiz: "What is the effect of sympathetic stimulation on pupils?"
+      },
+      "cns": {
+        summary: "CNS drugs affect the brain and spinal cord: antidepressants, antipsychotics, anxiolytics, anticonvulsants.",
+        details: "SSRIs increase serotonin; antipsychotics block dopamine; benzodiazepines enhance GABA.",
+        examples: "Fluoxetine, Diazepam, Haloperidol, Phenytoin.",
+        quiz: "Which neurotransmitter is increased by SSRIs?"
+      },
+      // --- PATHOLOGY ---
+      "inflammation": {
+        summary: "Inflammation is the body's response to injury, infection, or irritation.",
+        details: "Acute inflammation: rapid onset, neutrophils. Chronic: longer duration, macrophages/lymphocytes. Chemical mediators: histamine, prostaglandins, cytokines.",
+        examples: "Appendicitis (acute), Tuberculosis (chronic).",
+        quiz: "Which cell predominates in acute inflammation?"
+      },
+      "healing": {
+        summary: "Healing involves regeneration and repair of damaged tissues.",
+        details: "Regeneration: replacement by same cell type. Repair: scar formation (fibrosis). Factors: infection, diabetes, nutrition.",
+        examples: "Liver regeneration, skin scar.",
+        quiz: "Which process results in scar formation?"
+      },
+      "neoplasia": {
+        summary: "Neoplasia is abnormal, uncontrolled cell growth; can be benign or malignant (cancer).",
+        details: "Malignant neoplasms invade, metastasize. Hallmarks: evading apoptosis, self-sufficiency in growth signals, angiogenesis.",
+        examples: "Benign: lipoma. Malignant: carcinoma, sarcoma.",
+        quiz: "What is the difference between benign and malignant tumors?"
+      },
+      "cancer": {
+        summary: "Cancer is a malignant neoplasm characterized by invasion and metastasis.",
+        details: "Caused by genetic mutations, environmental factors, viruses. Treated via surgery, chemo, radiation, immunotherapy.",
+        examples: "Lung cancer, breast cancer, leukemia.",
+        quiz: "Name two hallmarks of cancer."
+      },
+      "immunopathology": {
+        summary: "Immunopathology studies diseases due to abnormal immune responses.",
+        details: "Hypersensitivity (allergy), autoimmunity (diabetes type 1, lupus), immunodeficiency (HIV/AIDS).",
+        examples: "Type I: allergy, Type IV: contact dermatitis.",
+        quiz: "Which hypersensitivity is cell-mediated?"
+      },
+      "cell injury": {
+        summary: "Cell injury occurs when cells cannot adapt to stress, leading to reversible or irreversible damage.",
+        details: "Reversible: cell swelling, fatty change. Irreversible: necrosis, apoptosis. Causes: hypoxia, toxins, infection.",
+        examples: "Myocardial infarction: ischemic injury.",
+        quiz: "Difference between necrosis and apoptosis?"
+      },
+      "necrosis": {
+        summary: "Necrosis is uncontrolled cell death due to injury; associated with inflammation.",
+        details: "Types: coagulative, liquefactive, caseous, fat necrosis.",
+        examples: "Coagulative: heart, Liquefactive: brain, Caseous: TB.",
+        quiz: "Which type of necrosis is typical in the brain?"
+      },
+      "apoptosis": {
+        summary: "Apoptosis is programmed cell death; not accompanied by inflammation.",
+        details: "Triggered by physiological (embryogenesis) or pathological (DNA damage) signals.",
+        examples: "Embryonic development, cell turnover.",
+        quiz: "Is apoptosis inflammatory?"
+      },
+      "pathology": {
+        summary: "Pathology is the study of disease: causes, mechanisms, morphological changes, and clinical effects.",
+        details: "Branches: general pathology, systemic pathology, clinical pathology.",
+        examples: "Inflammation, neoplasia, cell injury.",
+        quiz: "List four aspects of disease studied in pathology."
+      },
+      // --- GENERAL ---
+      "pharmacology": {
+        summary: "Pharmacology is the study of drugs: sources, mechanisms, uses, side effects.",
+        details: "Divided into pharmacokinetics, pharmacodynamics, clinical pharmacology, toxicology.",
+        examples: "Antibiotics, NSAIDs, Opioids.",
+        quiz: "What is the difference between pharmacokinetics and pharmacodynamics?"
+      }
+      // You can keep adding more topics endlessly!
+    };
 
-    const pharmacology = [
-      { question: "Which drug is a β‑blocker?", options: ["Propranolol", "Lisinopril", "Losartan", "Verapamil"], correct: 0 },
-      { question: "Which drug inhibits ACE?", options: ["Lisinopril", "Losartan", "Hydralazine", "Propranolol"], correct: 0 },
-      { question: "Which is a loop diuretic?", options: ["Furosemide", "HCTZ", "Spironolactone", "Acetazolamide"], correct: 0 },
-    ];
+    // Keywords mapping for flexible Q&A
+    const keywordMap = {
+      "antibiotic": "antibiotics",
+      "antibiotics": "antibiotics",
+      "penicillin": "penicillins",
+      "penicillins": "penicillins",
+      "cephalosporin": "cephalosporins",
+      "cephalosporins": "cephalosporins",
+      "macrolide": "macrolides",
+      "macrolides": "macrolides",
+      "tetracycline": "tetracyclines",
+      "tetracyclines": "tetracyclines",
+      "aminoglycoside": "aminoglycosides",
+      "aminoglycosides": "aminoglycosides",
+      "fluoroquinolone": "fluoroquinolones",
+      "fluoroquinolones": "fluoroquinolones",
+      "nsaid": "nsaids",
+      "nsaids": "nsaids",
+      "opioid": "opioids",
+      "opioids": "opioids",
+      "paracetamol": "paracetamol",
+      "acetaminophen": "paracetamol",
+      "side effect": "side effects",
+      "side effects": "side effects",
+      "adverse effect": "adverse effects",
+      "adverse effects": "adverse effects",
+      "pharmacokinetics": "pharmacokinetics",
+      "pharmacodynamics": "pharmacodynamics",
+      "autonomic": "autonomic",
+      "cns": "cns",
+      "central nervous system": "cns",
+      "inflammation": "inflammation",
+      "healing": "healing",
+      "neoplasia": "neoplasia",
+      "cancer": "cancer",
+      "immunopathology": "immunopathology",
+      "immunity": "immunopathology",
+      "cell injury": "cell injury",
+      "cell death": "cell injury",
+      "necrosis": "necrosis",
+      "apoptosis": "apoptosis",
+      "pathology": "pathology",
+      "pharmacology": "pharmacology"
+      // Add more mappings as needed!
+    };
 
-    // Choose one category manually here for testing
-    const category = 'pathology'; // or 'pharmacology'
-    const questions = shuffle(category === 'pathology' ? pathology : pharmacology);
-
-    // Quiz variables
-    let score = 0;
-    let currentIndex = 0;
-    let timerInterval = null;
-
-    // DOM elements
-    const questionText = document.getElementById('question-text');
-    const answersDiv = document.getElementById('answers');
-    const timeLeft = document.getElementById('time-left');
-    const scoreEl = document.getElementById('score');
-
-    function shuffle(arr) {
-      return [...arr].sort(() => Math.random() - 0.5);
+    function getTopic(msg) {
+      msg = msg.toLowerCase();
+      for (const key in keywordMap) {
+        if (msg.includes(key)) return keywordMap[key];
+      }
+      return null;
     }
 
-    function startGame() {
-      setTimeout(() => startQuestionLoop(), 500);
-    }
+    function getBotReply(message) {
+      const msg = message.toLowerCase().trim();
 
-    function startQuestionLoop() {
-      clearInterval(timerInterval);
-      displayQuestion();
-      let startTime = Date.now();
+      // Help / listing
+      if (msg === "help" || msg === "topics" || msg.includes("list topics")) {
+        return `<span class="topic-list">Topics: ${Object.keys(knowledge).join(", ")}</span>`;
+      }
+      if (msg === "quiz" || msg.includes("give me a quiz") || msg.includes("ask me a question")) {
+        // Pick a random topic
+        const keys = Object.keys(knowledge);
+        const topic = keys[Math.floor(Math.random() * keys.length)];
+        return `<span class="quiz">${knowledge[topic].quiz}</span>`;
+      }
 
-      timerInterval = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startTime) / 1000);
-        const rem = 10 - elapsed;
-        timeLeft.textContent = rem > 0 ? rem : 0;
-        if (rem <= 0) {
-          clearInterval(timerInterval);
-          lockButtons();
-          goNextQuestion();
+      // Greeting
+      if (["hello", "hi", "hey"].some(w => msg.includes(w))) {
+        return "Hello! I'm your med tutor bot. Ask me about any pathology or pharmacology topic.";
+      }
+
+      // Who are you
+      if (msg.includes("who are you") || msg.includes("what are you")) {
+        return "I'm a local medical chatbot. I can teach pathology and pharmacology topics without internet or APIs!";
+      }
+
+      // Knowledge answers
+      const topic = getTopic(msg);
+      if (topic && knowledge[topic]) {
+        let reply = `<b>${topic.charAt(0).toUpperCase() + topic.slice(1)}</b><br>`;
+        // If user asks for summary or explanation
+        if (msg.includes("explain") || msg.includes("summary") || msg.includes("overview")) {
+          reply += `<span class="summary">${knowledge[topic].summary}</span>`;
+        } else if (msg.includes("detail") || msg.includes("mechanism") || msg.includes("how")) {
+          reply += `<span class="details">${knowledge[topic].details}</span>`;
+        } else if (msg.includes("example") || msg.includes("examples") || msg.includes("list")) {
+          reply += `<span class="example">Examples: ${knowledge[topic].examples}</span>`;
+        } else if (msg.includes("quiz") || msg.includes("question")) {
+          reply += `<span class="quiz">Quiz: ${knowledge[topic].quiz}</span>`;
+        } else {
+          reply += `<span class="summary">${knowledge[topic].summary}</span><br><span class="details">${knowledge[topic].details}</span><br><span class="example">Examples: ${knowledge[topic].examples}</span><br><span class="quiz"><b>Quiz:</b> ${knowledge[topic].quiz}</span>`;
         }
-      }, 200);
-    }
-
-    function displayQuestion() {
-      const q = questions[currentIndex];
-      if (!q) {
-        showEndScreen();
-        return;
-      }
-      questionText.textContent = q.question;
-      answersDiv.innerHTML = '';
-      scoreEl.textContent = score;
-
-      q.options.forEach((opt, i) => {
-        const btn = document.createElement('button');
-        btn.textContent = opt;
-        btn.onclick = () => answerQuestion(i);
-        answersDiv.appendChild(btn);
-      });
-    }
-
-    function lockButtons() {
-      document.querySelectorAll('#answers button').forEach(btn => btn.disabled = true);
-    }
-
-    function answerQuestion(index) {
-      const q = questions[currentIndex];
-      const btns = answersDiv.querySelectorAll('button');
-      lockButtons();
-
-      if (index === q.correct) {
-        btns[index].classList.add('correct');
-        score += 10;
-      } else {
-        btns[index].classList.add('incorrect');
-        btns[q.correct].classList.add('correct');
+        return reply;
       }
 
-      scoreEl.textContent = score;
-    }
-
-    function goNextQuestion() {
-      currentIndex++;
-      if (currentIndex < questions.length) {
-        startQuestionLoop();
-      } else {
-        showEndScreen();
+      // Direct Q&A for mechanism, effects, etc.
+      if (msg.includes("mechanism of action of penicillin")) {
+        return "Penicillins work by inhibiting bacterial cell wall synthesis, leading to cell lysis and death.";
       }
+      if (msg.includes("difference between necrosis and apoptosis")) {
+        return "Necrosis is uncontrolled cell death with inflammation; apoptosis is programmed cell death without inflammation.";
+      }
+
+      // Fallback
+      return "Sorry, I don't know about that yet. Type 'help' to see topics, or ask me about a drug, disease, or mechanism!";
     }
 
-    function showEndScreen() {
-      clearInterval(timerInterval);
-      questionText.textContent = "🎉 Quiz Complete!";
-      answersDiv.innerHTML = '';
-      timeLeft.textContent = '-';
+    function appendMessage(sender, text) {
+      chatWindow.innerHTML += `<div class="${sender}">${sender === 'user' ? 'You' : 'Bot'}: ${text}</div>`;
+      chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
-    startGame();
+    // UI handling
+    const chatWindow = document.getElementById('chat-window');
+    const chatInput = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('send-btn');
+
+    sendBtn.onclick = () => {
+      const userMsg = chatInput.value.trim();
+      if (!userMsg) return;
+      appendMessage('user', userMsg);
+      setTimeout(() => {
+        appendMessage('bot', getBotReply(userMsg));
+      }, 400);
+      chatInput.value = '';
+      chatInput.focus();
+    };
+
+    chatInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") sendBtn.click();
+    });
+
+    // Initial greeting
+    appendMessage('bot', "Hi! I'm your local med tutor bot. Type 'help' to see topics, or ask about pathology/pharmacology.");
   </script>
 </body>
 </html>

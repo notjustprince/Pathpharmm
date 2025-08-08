@@ -6,7 +6,6 @@
   <title>Med Topics</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
-    /* Add your CSS exactly as in your original file */
     * {
       margin: 0;
       padding: 0;
@@ -198,9 +197,9 @@
     <div class="topic-grid">
       <div class="topic-card" onclick="location.href='intropharm.html'"><i class="fas fa-book-medical"></i> Intro</div>
       <div class="topic-card" onclick="location.href='autonomic.html'"><i class="fas fa-brain"></i> Autonomics</div>
-      <div class="topic-card" onclick="location.href='quiz_antibiotics.html'"><i class="fas fa-capsules"></i> Antibiotics</div>
-      <div class="topic-card" onclick="location.href='quiz_analgesics.html'"><i class="fas fa-pills"></i> Analgesics</div>
-      <div class="topic-card" onclick="location.href='quiz_cns.html'"><i class="fas fa-head-side-virus"></i> CNS Drugs</div>
+      <div class="topic-card" onclick="location.href='antibiotics.html'"><i class="fas fa-capsules"></i> Antibiotics</div>
+      <div class="topic-card" onclick="location.href='analgesics.html'"><i class="fas fa-pills"></i> Analgesics</div>
+      <div class="topic-card" onclick="location.href='cns.html'"><i class="fas fa-head-side-virus"></i> CNS Drugs</div>
     </div>
   </div>
 
@@ -229,7 +228,7 @@
 
   <!-- Bottom Navigation -->
   <div class="bottom-nav">
-    <div class="nav-item active" onclick="switchTab('pharma-section', this)"><span><i class="fas fa-pills"></i></span>Pharma</div>
+    <div class="nav-item" onclick="switchTab('pharma-section', this)"><span><i class="fas fa-pills"></i></span>Pharma</div>
     <div class="nav-item" onclick="switchTab('patho-section', this)"><span><i class="fas fa-flask"></i></span>Patho</div>
     <div class="nav-item" onclick="switchTab('flashcard-section', this)"><span><i class="fas fa-layer-group"></i></span>Cards</div>
     <div class="nav-item" onclick="switchTab('challenge-section', this)"><span><i class="fas fa-users"></i></span>Challenge</div>
@@ -307,20 +306,33 @@
     const sections = ["pharma-section", "patho-section", "flashcard-section", "challenge-section"];
     const navItems = document.querySelectorAll('.nav-item');
 
+    // --- Tab Persistence Implementation ---
     function switchTab(id, el) {
       sections.forEach(sec => {
         document.getElementById(sec).style.display = (sec === id ? 'block' : 'none');
       });
       navItems.forEach(item => item.classList.remove('active'));
       el.classList.add('active');
+      // Save tab to localStorage
+      localStorage.setItem("activeTab", id);
     }
 
-    switchTab("pharma-section", navItems[0]);
+    // On load, restore last tab or default
+    document.addEventListener("DOMContentLoaded", () => {
+      let activeTab = localStorage.getItem("activeTab");
+      // If not set or invalid, default to pharma-section
+      if (!activeTab || !sections.includes(activeTab)) activeTab = "pharma-section";
+      // Find navItem corresponding to activeTab
+      const activeIndex = sections.indexOf(activeTab);
+      switchTab(activeTab, navItems[activeIndex]);
+    });
 
+    // Touch swipe support for tab switching
     let startX = 0;
     document.addEventListener('touchstart', e => startX = e.touches[0].clientX);
     document.addEventListener('touchend', e => {
       const delta = e.changedTouches[0].clientX - startX;
+      // Find current tab index
       const i = sections.findIndex(id => document.getElementById(id).style.display === 'block');
       if (Math.abs(delta) > 60) {
         const next = delta < 0 ? (i + 1) % 4 : (i + 3) % 4;
