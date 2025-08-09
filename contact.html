@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script>
+(function(){
+    emailjs.init("O8654Zw197xdTZl19"); // Your Public Key
+})();
+</script>
+<style>
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  text-align: center;
+}
+
+.page-header {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 500px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  color: white;
+  z-index: 1000;
+}
+
+.contact-content {
+  max-width: 600px;
+  width: 100%;
+}
+
+.contact-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.contact-content input,
+.contact-content textarea {
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  font-size: 14px;
+  backdrop-filter: blur(8px);
+}
+
+.contact-content input::placeholder,
+.contact-content textarea::placeholder {
+  color: rgba(255,255,255,0.7);
+}
+
+.contact-content button {
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  background: rgba(255,255,255,0.3);
+  color: black;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.contact-content button:hover {
+  background: rgba(255,255,255,0.5);
+}
+
+#form-status {
+  font-size: 14px;
+  margin-top: 10px;
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="page-header">
+  <h2>Contact Us</h2>
+</div>
+
+<!-- Main Content -->
+<div class="glass-card contact-content">
+  <h2>We’d Love to Hear From You</h2>
+  <p>Have questions, feedback, or suggestions? Fill out the form below or reach out via email.</p>
+
+  <form id="contact-form">
+    <input type="text" name="name" placeholder="Your Name" required>
+    <input type="email" name="email" placeholder="Your Email" required>
+    <textarea name="title" rows="5" placeholder="Your Message" required></textarea>
+    <button type="submit">Send Message</button>
+  </form>
+
+  <p id="form-status"></p>
+
+  <p style="margin-top: 15px; font-size: 14px;">
+    Or email us directly at <strong>pathpharmguide@gmail.com</strong>
+  </p>
+</div>
+
+<script>
+document.getElementById("contact-form").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  emailjs.sendForm("service_h08hssr", "template_6gyts9m", this)
+    .then(() => {
+      document.getElementById("form-status").textContent = "✅ Message sent successfully!";
+      document.getElementById("form-status").style.color = "lightgreen";
+      this.reset();
+    }, (err) => {
+      document.getElementById("form-status").textContent = "❌ Failed to send. Please try again.";
+      document.getElementById("form-status").style.color = "red";
+      console.error("EmailJS error:", err);
+    });
+});
+</script>
+
+</body>
+</html>

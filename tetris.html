@@ -1,0 +1,80 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tetris — Mobile Friendly</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#0f1724;--accent:#00d1ff;--muted:#9aa7b2}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial}
+    body{display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,var(--bg),#05101a);color:#e6eef3}
+    .wrap{display:flex;gap:24px;padding:12px;flex-wrap:wrap;justify-content:center}
+    canvas{background:linear-gradient(180deg,#071220,#0b1522);display:block;image-rendering:pixelated;border-radius:8px}
+    .panel{background:var(--panel);padding:16px;border-radius:8px;min-width:220px}
+    h1{font-size:18px;margin:0 0 12px}
+    .stat{display:flex;justify-content:space-between;margin:6px 0;color:var(--muted)}
+    .controls{font-size:13px;color:var(--muted);margin-top:12px}
+    button{background:var(--accent);border:none;color:#000;padding:10px;border-radius:6px;cursor:pointer;font-size:16px;min-width:60px}
+    .mobile-controls{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+    footer{font-size:12px;color:var(--muted);margin-top:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <canvas id="game" width="240" height="480"></canvas>
+    <div class="panel">
+      <h1>TETRIS</h1>
+      <div class="stat"><span>Score</span><strong id="score">0</strong></div>
+      <div class="stat"><span>Lines</span><strong id="lines">0</strong></div>
+      <div class="stat"><span>Level</span><strong id="level">1</strong></div>
+      <div style="margin-top:12px"><canvas id="next" width="120" height="120"></canvas></div>
+      <div class="mobile-controls">
+        <button onclick="playerMove(-1)">←</button>
+        <button onclick="playerMove(1)">→</button>
+        <button onclick="playerDrop()">↓</button>
+        <button onclick="playerRotate(-1)">⟲</button>
+        <button onclick="playerRotate(1)">⟳</button>
+        <button onclick="hardDrop()">⬇</button>
+        <button onclick="togglePause()">⏯</button>
+        <button onclick="restart()">🔄</button>
+      </div>
+      <footer>Touch controls added for mobile.</footer>
+    </div>
+  </div>
+<script>
+// Original game logic wrapped to expose functions globally
+(() => {
+  const COLS = 10, ROWS = 20, BLOCK = 24;
+  const cvs = document.getElementById('game');
+  const ctx = cvs.getContext('2d');
+  ctx.scale(1,1);
+  const nextCanvas = document.getElementById('next');
+  const nctx = nextCanvas.getContext('2d');
+  let grid, score, lines, level, dropInterval, dropCounter, lastTime, current, next, running;
+  const SHAPES = {I:[[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],J:[[1,0,0],[1,1,1],[0,0,0]],L:[[0,0,1],[1,1,1],[0,0,0]],O:[[1,1],[1,1]],S:[[0,1,1],[1,1,0],[0,0,0]],T:[[0,1,0],[1,1,1],[0,0,0]],Z:[[1,1,0],[0,1,1],[0,0,0]]};
+  const COLORS = {I:'#00f0f0',J:'#0000f0',L:'#f0a000',O:'#f0f000',S:'#00f000',T:'#a000f0',Z:'#f00000'};
+  const PIECES = Object.keys(SHAPES);
+  function createMatrix(r,c){const m=[];for(let i=0;i<r;i++)m.push(new Array(c).fill(0));return m;}
+  function randomPiece(){const type=PIECES[Math.floor(Math.random()*PIECES.length)];return {shape:SHAPES[type].map(row=>row.slice()),type,row:0,col:Math.floor((COLS - SHAPES[type][0].length)/2)};}
+  function rotate(matrix,dir){for(let y=0;y<matrix.length;y++){for(let x=y+1;x<matrix[y].length;x++){[matrix[y][x],matrix[x][y]]=[matrix[x][y],matrix[y][x]];}}if(dir>0)matrix.forEach(row=>row.reverse());else matrix.reverse();}
+  function collide(grid,piece){for(let y=0;y<piece.shape.length;y++){for(let x=0;x<piece.shape[y].length;x++){if(piece.shape[y][x]&&(grid[piece.row+y]&&grid[piece.row+y][piece.col+x])!==0)return true;}}return false;}
+  function merge(grid,piece){for(let y=0;y<piece.shape.length;y++){for(let x=0;x<piece.shape[y].length;x++){if(piece.shape[y][x])grid[piece.row+y][piece.col+x]=piece.type;}}}
+  function sweep(){let rowCount=0;outer:for(let y=ROWS-1;y>=0;y--){for(let x=0;x<COLS;x++){if(!grid[y][x])continue outer;}const row=grid.splice(y,1)[0].fill(0);grid.unshift(row);y++;rowCount++;}if(rowCount>0){const points=[0,40,100,300,1200];score+=(points[rowCount]||0)*level;lines+=rowCount;level=Math.floor(lines/10)+1;dropInterval=Math.max(100,1000-(level-1)*100);}}
+  window.playerDrop=function(){current.row++;if(collide(grid,current)){current.row--;merge(grid,current);sweep();spawn();}dropCounter=0;};
+  window.playerMove=function(dir){current.col+=dir;if(collide(grid,current))current.col-=dir;};
+  window.playerRotate=function(dir){const pos=current.col;rotate(current.shape,dir);let offset=1;while(collide(grid,current)){current.col+=offset;offset=-(offset+(offset>0?1:-1));if(Math.abs(offset)>current.shape[0].length){rotate(current.shape,-dir);current.col=pos;return;}}};
+  function spawn(){current=next||randomPiece();next=randomPiece();current.row=0;current.col=Math.floor((COLS - current.shape[0].length)/2);if(collide(grid,current)){running=false;}}
+  window.hardDrop=function(){while(!collide(grid,{...current,row:current.row+1}))current.row++;merge(grid,current);sweep();spawn();dropCounter=0;};
+  function drawCell(x,y,type){const px=x*BLOCK,py=y*BLOCK;ctx.fillStyle=type?COLORS[type]:'rgba(255,255,255,0.02)';ctx.fillRect(px,py,BLOCK-1,BLOCK-1);if(type){ctx.strokeStyle='rgba(0,0,0,0.25)';ctx.strokeRect(px,py,BLOCK-1,BLOCK-1);}}
+  function draw(){ctx.clearRect(0,0,cvs.width,cvs.height);for(let y=0;y<ROWS;y++){for(let x=0;x<COLS;x++)drawCell(x,y,grid[y][x]);}if(current){for(let y=0;y<current.shape.length;y++){for(let x=0;x<current.shape[y].length;x++){if(current.shape[y][x])drawCell(current.col+x,current.row+y,current.type);}}}}
+  function drawNext(){nctx.clearRect(0,0,nextCanvas.width,nextCanvas.height);const scale=20,offX=10,offY=10;if(!next)return;for(let y=0;y<next.shape.length;y++){for(let x=0;x<next.shape[y].length;x++){if(next.shape[y][x]){nctx.fillStyle=COLORS[next.type];nctx.fillRect(offX+x*scale,offY+y*scale,scale-2,scale-2);}}}}
+  function updateScore(){document.getElementById('score').textContent=score;document.getElementById('lines').textContent=lines;document.getElementById('level').textContent=level;}
+  function update(time=0){if(!running){ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(0,0,cvs.width,cvs.height);ctx.fillStyle='white';ctx.font='20px sans-serif';ctx.fillText('GAME OVER',20,220);return;}const delta=time-lastTime;lastTime=time;dropCounter+=delta;if(dropCounter>dropInterval)playerDrop();draw();drawNext();updateScore();requestAnimationFrame(update);}
+  window.restart=function(){grid=createMatrix(ROWS,COLS);score=0;lines=0;level=1;dropInterval=1000;running=true;current=null;next=null;spawn();spawn();lastTime=0;requestAnimationFrame(update);};
+  window.togglePause=function(){running=!running;if(running){lastTime=performance.now();requestAnimationFrame(update);}};
+  grid=createMatrix(ROWS,COLS);score=0;lines=0;level=1;dropInterval=1000;dropCounter=0;lastTime=0;running=true;spawn();spawn();cvs.width=COLS*BLOCK;cvs.height=ROWS*BLOCK;update();
+})();
+</script>
+</body>
+</html>

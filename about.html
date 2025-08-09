@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Us</title>
+<link rel="stylesheet" href="style.css"> <!-- reuse your existing styles -->
+<style>
+/* Page-specific tweaks */
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Vertical centering */
+  min-height: 100vh;
+  padding: 20px;
+  text-align: center;
+}
+
+.page-header {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 500px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center title */
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  color: white;
+  z-index: 1000;
+}
+
+.about-content {
+  max-width: 600px;
+  width: 100%;
+}
+
+.about-content ul {
+  text-align: left; /* Keep bullet points left-aligned */
+  margin-top: 10px;
+  padding-left: 20px;
+  display: inline-block; /* Keep them centered as a block */
+}
+.about-content li {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="page-header">
+  <h2>About Us</h2>
+</div>
+
+<!-- Main Content -->
+<div class="glass-card about-content">
+  <h2>Welcome to Med Topics!</h2>
+  <p>
+    We’re dedicated to making medical learning <strong>simpler, faster, and more engaging</strong> for students and professionals alike.
+  </p>
+  
+  <h3>What We Offer</h3>
+  <ul>
+    <li>Pharmacology & Pathology topics broken into bite-sized lessons</li>
+    <li>Interactive flashcards for quick revision</li>
+    <li>Fun quizzes and challenges to test your knowledge</li>
+  </ul>
+  
+  <h3>Our Mission</h3>
+  <p>
+    To empower learners with clear, reliable, and easy-to-use tools that make complex medical topics accessible to everyone.
+  </p>
+  
+  <h3>Why Choose Us?</h3>
+  <ul>
+    <li>Content curated by passionate medical enthusiasts</li>
+    <li>Designed for mobile-friendly studying</li>
+    <li>Constantly updated with new topics and quizzes</li>
+  </ul>
+</div>
+
+</body>
+</html>
