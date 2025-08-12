@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Intro to Pathology</title>
+  <title>Inflammation - Pathology</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
     * {
@@ -19,7 +19,7 @@
 
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right top, #8B0000, #2b0000);
+      background: linear-gradient(to right top, #b71c1c, #f57c00);
       min-height: 100vh;
       padding: 20px 15px 100px;
       display: flex;
@@ -52,7 +52,7 @@
     }
 
     p {
-      color: #eee;
+      color: #ffe0b2;
       font-size: 15px;
       text-align: center;
       margin-bottom: 25px;
@@ -85,9 +85,9 @@
     }
 
     .card:hover {
-      background: rgba(255, 0, 0, 0.25);
+      background: rgba(255, 100, 0, 0.25);
       transform: scale(1.07);
-      box-shadow: 0 8px 24px rgba(255, 0, 0, 0.3);
+      box-shadow: 0 8px 24px rgba(255, 100, 0, 0.3);
     }
 
     .card:active {
@@ -126,20 +126,19 @@
 </head>
 <body>
 
-  <h1><i class="fas fa-microscope"></i> Introduction to Pathology</h1>
-  <p>Discover the core concepts and branches of pathology:</p>
+  <h1><i class="fas fa-burn"></i> Inflammation</h1>
+  <p>Explore the mechanisms, types, and signs of inflammation:</p>
 
   <div class="grid-container">
-    <div class="card" onclick="location.href='cell_injury.html'"><i class="fas fa-dna"></i> Cell Injury</div>
-    <div class="card" onclick="location.href='inflammation.html'"><i class="fas fa-burn"></i> Inflammation</div>
-    <div class="card" onclick="location.href='neoplasia.html'"><i class="fas fa-ribbon"></i> Neoplasia</div>
-    <div class="card" onclick="location.href='genetic_disorders.html'"><i class="fas fa-code-branch"></i> Genetic Disorders</div>
-    <div class="card" onclick="location.href='immunopathology.html'"><i class="fas fa-shield-virus"></i> Immunopathology</div>
-    <div class="card" onclick="location.href='systemic_pathology.html'"><i class="fas fa-lungs"></i> Systemic Pathology</div>
-    <div class="card" onclick="location.href='hematopathology.html'"><i class="fas fa-vial"></i> Hematopathology</div>
-    <div class="card" onclick="location.href='microbial_pathology.html'"><i class="fas fa-virus"></i> Microbial Pathology</div>
-    <div class="card" onclick="location.href='degenerative_diseases.html'"><i class="fas fa-brain"></i> Degenerative Diseases</div>
-    <div class="card" onclick="location.href='forensic_pathology.html'"><i class="fas fa-balance-scale"></i> Forensic Pathology</div>
+    <div class="card" onclick="location.href='definition_inflammation.html'"><i class="fas fa-info-circle"></i> Definition</div>
+    <div class="card" onclick="location.href='causes_inflammation.html'"><i class="fas fa-virus"></i> Causes</div>
+    <div class="card" onclick="location.href='types_inflammation.html'"><i class="fas fa-list"></i> Types</div>
+    <div class="card" onclick="location.href='signs_inflammation.html'"><i class="fas fa-eye"></i> Cardinal Signs</div>
+    <div class="card" onclick="location.href='acute_inflammation.html'"><i class="fas fa-bolt"></i> Acute Inflammation</div>
+    <div class="card" onclick="location.href='chronic_inflammation.html'"><i class="fas fa-hourglass-half"></i> Chronic Inflammation</div>
+    <div class="card" onclick="location.href='pathogenesis_inflammation.html'"><i class="fas fa-dna"></i> Pathogenesis</div>
+    <div class="card" onclick="location.href='mediators_inflammation.html'"><i class="fas fa-vials"></i> Chemical Mediators</div>
+    <div class="card" onclick="location.href='treatment_inflammation.html'"><i class="fas fa-capsules"></i> Treatment</div>
   </div>
 
   <button class="back-btn" onclick="history.back()"><i class="fas fa-arrow-left"></i> Back</button>

@@ -232,20 +232,42 @@ h2, h1 {
 }
 .nav-item span { font-size:20px; }
 .nav-item.active {
-  background: linear-gradient(90deg, rgba(255,204,51,0.12), rgba(0,255,200,0.06));
+  background: linear-gradient(90deg, rgba(255, 204, 51, 0.12), rgba(0, 255, 200, 0.06));
   color: white;
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.17);
-  font-weight:800;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.17);
+  font-weight: 800;
+  
+  /* Glass effect */
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
 }
 
 /* active indicator (sliding) */
 .nav-indicator {
-  position:absolute; bottom:-10px; left:0; height:6px; width:80px;
-  background: linear-gradient(90deg,#2575fc);
-border-radius:20px; transition: transform 300ms cubic-bezier(.2,.9,.2,1), width 300ms;
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  height: 6px;
+  width: 80px;
+  
+  /* Fully transparent but still glassy */
+  background: transparent;
+  backdrop-filter: blur(6px) saturate(140%);
+  -webkit-backdrop-filter: blur(6px) saturate(140%);
+  
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.35);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15),
+              inset 0 0 6px rgba(255,255,255,0.25);
+  
+  transition: transform 300ms cubic-bezier(.2,.9,.2,1), 
+              width 300ms, 
+              background 300ms;
   z-index: 10;
-  pointer-events:none;
+  pointer-events: none;
 }
 
 @media (max-width: 500px) {
@@ -402,6 +424,28 @@ onAuthStateChanged(auth, user => {
     logoutBtn.style.display = "block";    
   }    
 });
+</script>
+<script>
+// Preload from localStorage for instant header display
+(function preloadHeader() {
+  const savedName = localStorage.getItem("userName");
+  const skipped = localStorage.getItem("skip") === "true";
+  const userIcon = document.getElementById("user-icon");
+  const greeting = document.getElementById("greeting");
+  const logoutBtn = document.getElementById("logout-btn");
+
+  if (savedName) {
+    userIcon.textContent = savedName[0].toUpperCase();
+    greeting.textContent = skipped ? `Welcome, ${savedName}` : `Hello, ${savedName.split(" ")[0]}`;
+    logoutBtn.textContent = skipped ? "Login" : "Logout";
+    logoutBtn.style.display = "block";
+  } else {
+    userIcon.textContent = "G";
+    greeting.textContent = "Welcome, Guest";
+    logoutBtn.textContent = "Login";
+    logoutBtn.style.display = "block";
+  }
+})();
 </script>
 
 <script>
