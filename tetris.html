@@ -1,80 +1,636 @@
 <!doctype html>
-
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tetris — Mobile Friendly</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Med Topics — Improved UI (Glassy)</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
   <style>
-    :root{--bg:#0b1220;--panel:#0f1724;--accent:#00d1ff;--muted:#9aa7b2}
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial}
-    body{display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,var(--bg),#05101a);color:#e6eef3}
-    .wrap{display:flex;gap:24px;padding:12px;flex-wrap:wrap;justify-content:center}
-    canvas{background:linear-gradient(180deg,#071220,#0b1522);display:block;image-rendering:pixelated;border-radius:8px}
-    .panel{background:var(--panel);padding:16px;border-radius:8px;min-width:220px}
-    h1{font-size:18px;margin:0 0 12px}
-    .stat{display:flex;justify-content:space-between;margin:6px 0;color:var(--muted)}
-    .controls{font-size:13px;color:var(--muted);margin-top:12px}
-    button{background:var(--accent);border:none;color:#000;padding:10px;border-radius:6px;cursor:pointer;font-size:16px;min-width:60px}
-    .mobile-controls{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
-    footer{font-size:12px;color:var(--muted);margin-top:12px}
+    /* ---------- Base / Reset ---------- */
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html,body { height: 100%; }
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      color: #fff;
+      padding: 96px 16px 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height: 1.35;
+    }
+
+    /* Soft animated background (subtle, low-cost) */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(600px 600px at 10% 10%, rgba(255,255,255,0.03), transparent 10%),
+                  radial-gradient(500px 500px at 90% 90%, rgba(0,0,0,0.04), transparent 10%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Reduced motion preference */
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation: none !important; }
+    }
+
+    /* ---------- Header (glass) ---------- */
+    .user-header {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 760px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      backdrop-filter: blur(12px) saturate(120%);
+      -webkit-backdrop-filter: blur(12px) saturate(120%);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+      border-radius: 14px;
+      z-index: 1200;
+    }
+
+    .left-group { display:flex; align-items:center; gap:10px; }
+
+    /* hamburger / menu button */
+    .hamburger {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      background: transparent;
+      border-radius: 10px;
+      color: #fff;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.06);
+      transition: transform 220ms cubic-bezier(.2,.9,.2,1), background 220ms, color 220ms;
+      font-size: 16px;
+    }
+    .hamburger:focus { outline: none; box-shadow: 0 6px 20px white(0,0,0,0.35), 0 0 0 3px (255,204,0,0.12); }
+    .hamburger:hover { transform: translateY(-2px) scale(1.03); background: rgba(255,255,255,0.03); color: #ffecb3; }
+    .hamburger.open { transform: rotate(90deg) scale(1.03); color: #00ffd0; }
+
+    /* user icon + greeting */
+    .user-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display:flex; align-items:center; justify-content:center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06));
+      font-weight:700; color:#fff; font-size:18px;
+      border:1px solid rgba(255,255,255,0.06);
+    }
+    .greeting {
+      color: #fff; font-size:16px; font-weight:600;
+      margin-left: 6px;
+      display:flex; align-items:center; gap:8px;
+    }
+
+    /* login/logout */
+    .logout-btn {
+      background: linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-weight:700;
+      cursor:pointer;
+      transition: transform 200ms, background 200ms, color 200ms;
+      display: none;
+    }
+    .logout-btn:focus { outline: none; box-shadow: 0 6px 20px rgba(0,0,0,0.35); }
+    .logout-btn:hover { transform: translateY(-2px); background: rgba(255,255,255,0.12); color: #000; }
+
+    /* dropdown menu (keyboard accessible) */
+    .dropdown-menu {
+      position: absolute;
+      top: 84px;
+      left: 18px;
+      background: rgba(20,20,20,0.95);
+      color: #fff;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+      display: none;
+      flex-direction: column;
+      min-width: 220px;
+      z-index: 1300;
+      padding: 8px;
+      transform-origin: top left;
+      animation: dropdownIn 260ms cubic-bezier(.2,.9,.2,1);
+    }
+    .dropdown-menu.show { display:flex; }
+    .dropdown-menu a {
+      display:flex; gap:12px; align-items:center; text-decoration:none; color:#fff;
+      padding:10px 12px; border-radius:8px; font-size:14px;
+    }
+    .dropdown-menu a:focus, .dropdown-menu a:hover { background: rgba(255,255,255,0.04); color: #fffbf0; outline: none; }
+
+    @keyframes dropdownIn {
+      from { opacity: 0; transform: translateY(-8px) scale(.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ---------- Content Cards (glass) ---------- */
+    .container {
+      width: 100%;
+      max-width: 900px;
+      z-index: 10;
+      display: grid;
+      gap: 18px;
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+
+    .glass-card {
+      position: relative;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      backdrop-filter: blur(16px) saturate(120%);
+      -webkit-backdrop-filter: blur(16px) saturate(120%);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.32);
+      padding: 26px;
+      color: #fff;
+      transition: transform 340ms cubic-bezier(.2,.9,.2,1), opacity 300ms;
+      opacity: 0; transform: translateY(8px);
+    }
+    .glass-card.active { opacity: 1; transform: translateY(0); }
+
+    /* Headings */
+    h1, h2 {
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display:flex; align-items:center; gap:10px;
+    }
+    h1 .fa, h2 .fa { color: #ffecb3; font-size:18px; }
+
+    /* topic grid */
+    .topic-grid {
+      display:flex;
+      flex-wrap:wrap;
+      gap: 14px;
+      justify-content: space-between;
+    }
+
+    .topic-card, .btn {
+      flex: 0 1 calc(50% - 10px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border-radius: 14px;
+      padding: 16px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      border: 1px solid rgba(255,255,255,0.06);
+      display:flex; gap:12px; align-items:center; justify-content:center;
+      cursor:pointer;
+      transition: transform 260ms cubic-bezier(.2,.9,.2,1), box-shadow 260ms, background 260ms;
+      position: relative;
+      overflow: hidden;
+    }
+    .topic-card i, .btn i { font-size:18px; color: #fff; transition: transform 260ms; }
+
+    /* shimmering microinteraction (on hover) */
+    .topic-card::after {
+      content:"";
+      position:absolute; inset:0;
+      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0) 100%);
+      transform: translateX(-120%);
+      transition: transform 420ms;
+      pointer-events:none;
+    }
+    .topic-card:hover::after, .btn:hover::after { transform: translateX(120%); }
+    .topic-card:hover, .btn:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(0,0,0,0.32); background: rgba(255,255,255,0.07); }
+    .topic-card:active, .btn:active { transform: translateY(-2px) scale(.998); }
+
+    /* full-width CTA buttons */
+    .btn {
+      width: 100%;
+      margin-top: 10px;
+      justify-content: center;
+    }
+
+    /* emphasized button style */
+    .primary {
+      background: linear-gradient(90deg, rgba(255,204,51,0.18), rgba(0,255,200,0.06));
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .primary:hover { box-shadow: 0 20px 50px rgba(0,0,0,0.36); }
+
+    /* icon float effect for better personality */
+    .topic-card .fa, .btn .fa {
+      transform-origin: center;
+    }
+    .topic-card:hover .fa, .btn:hover .fa { transform: translateY(-6px) rotate(-6deg) scale(1.08); color: #ffeea8; }
+
+    /* text readability */
+    h1.site-title { font-size: 22px; }
+    p.subtle { color: rgba(255,255,255,0.78); font-size:13px; margin-top:6px; }
+
+    /* ---------- Bottom Navigation ---------- */
+    .bottom-nav {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 36px);
+      max-width: 760px;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(10px) saturate(120%);
+      -webkit-backdrop-filter: blur(10px) saturate(120%);
+      border-radius: 14px;
+      padding: 8px;
+      display:flex;
+      gap:8px;
+      justify-content: space-between;
+      align-items:center;
+      border: 1px solid rgba(255,255,255,0.06);
+      z-index: 1200;
+      position: fixed;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.28);
+    }
+
+    .nav-item {
+      flex: 1 1 0;
+      text-align:center;
+      padding:8px 10px;
+      color: rgba(255,255,255,0.95);
+      font-size:13px;
+      border-radius:10px;
+      cursor:pointer;
+      transition: transform 220ms, background 220ms, color 220ms;
+      display:flex; flex-direction:column; align-items:center; gap:6px;
+      position: relative;
+    }
+    .nav-item span { font-size:18px; }
+    .nav-item.active {
+      background: linear-gradient(90deg, rgba(255,204,51,0.12), rgba(0,255,200,0.06));
+      color: white;
+      transform: translateY(-6px);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+      font-weight:800;
+    }
+
+    /* active indicator (sliding) */
+    .nav-indicator {
+      position:absolute; bottom:-10px; left:0; height:6px; width:80px;
+      background: linear-gradient(90deg,#ffcc4d,#00ffd0);
+      border-radius:20px; transition: transform 300ms cubic-bezier(.2,.9,.2,1), width 300ms;
+      z-index: 10;
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 720px) {
+      body { padding: 88px 10px 120px; }
+      .topic-card, .btn { flex: 1 1 100%; }
+      .user-header { max-width: 520px; }
+      .dropdown-menu { left: 8px; right: 8px; top: 82px; min-width:auto; }
+      .bottom-nav { width: calc(100% - 24px); }
+    }
+
+    /* keyboard focus for cards */
+    .topic-card:focus, .btn:focus { outline:none; box-shadow: 0 12px 30px (0,0,0,0.32), 0 0 0 4px rgba(255,204,51,0.08); }
+
+    /* small helper */
+    .muted { color: rgba(255,255,255,0.72); font-weight:600; font-size:12px; }
+
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <canvas id="game" width="240" height="480"></canvas>
-    <div class="panel">
-      <h1>TETRIS</h1>
-      <div class="stat"><span>Score</span><strong id="score">0</strong></div>
-      <div class="stat"><span>Lines</span><strong id="lines">0</strong></div>
-      <div class="stat"><span>Level</span><strong id="level">1</strong></div>
-      <div style="margin-top:12px"><canvas id="next" width="120" height="120"></canvas></div>
-      <div class="mobile-controls">
-        <button onclick="playerMove(-1)">←</button>
-        <button onclick="playerMove(1)">→</button>
-        <button onclick="playerDrop()">↓</button>
-        <button onclick="playerRotate(-1)">⟲</button>
-        <button onclick="playerRotate(1)">⟳</button>
-        <button onclick="hardDrop()">⬇</button>
-        <button onclick="togglePause()">⏯</button>
-        <button onclick="restart()">🔄</button>
-      </div>
-      <footer>Touch controls added for mobile.</footer>
+  <!-- Header -->
+  <header class="user-header" role="banner" aria-label="Top navigation">
+    <div class="left-group">
+      <button id="hamburger" class="hamburger" aria-haspopup="true" aria-expanded="false" aria-controls="dropdown-menu" title="Open menu">
+        <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
+      </button>
+
+      <div class="user-icon" id="user-icon" aria-hidden="false">?</div>
+      <div class="greeting" id="greeting" aria-live="polite">Welcome</div>
     </div>
-  </div>
-<script>
-// Original game logic wrapped to expose functions globally
-(() => {
-  const COLS = 10, ROWS = 20, BLOCK = 24;
-  const cvs = document.getElementById('game');
-  const ctx = cvs.getContext('2d');
-  ctx.scale(1,1);
-  const nextCanvas = document.getElementById('next');
-  const nctx = nextCanvas.getContext('2d');
-  let grid, score, lines, level, dropInterval, dropCounter, lastTime, current, next, running;
-  const SHAPES = {I:[[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],J:[[1,0,0],[1,1,1],[0,0,0]],L:[[0,0,1],[1,1,1],[0,0,0]],O:[[1,1],[1,1]],S:[[0,1,1],[1,1,0],[0,0,0]],T:[[0,1,0],[1,1,1],[0,0,0]],Z:[[1,1,0],[0,1,1],[0,0,0]]};
-  const COLORS = {I:'#00f0f0',J:'#0000f0',L:'#f0a000',O:'#f0f000',S:'#00f000',T:'#a000f0',Z:'#f00000'};
-  const PIECES = Object.keys(SHAPES);
-  function createMatrix(r,c){const m=[];for(let i=0;i<r;i++)m.push(new Array(c).fill(0));return m;}
-  function randomPiece(){const type=PIECES[Math.floor(Math.random()*PIECES.length)];return {shape:SHAPES[type].map(row=>row.slice()),type,row:0,col:Math.floor((COLS - SHAPES[type][0].length)/2)};}
-  function rotate(matrix,dir){for(let y=0;y<matrix.length;y++){for(let x=y+1;x<matrix[y].length;x++){[matrix[y][x],matrix[x][y]]=[matrix[x][y],matrix[y][x]];}}if(dir>0)matrix.forEach(row=>row.reverse());else matrix.reverse();}
-  function collide(grid,piece){for(let y=0;y<piece.shape.length;y++){for(let x=0;x<piece.shape[y].length;x++){if(piece.shape[y][x]&&(grid[piece.row+y]&&grid[piece.row+y][piece.col+x])!==0)return true;}}return false;}
-  function merge(grid,piece){for(let y=0;y<piece.shape.length;y++){for(let x=0;x<piece.shape[y].length;x++){if(piece.shape[y][x])grid[piece.row+y][piece.col+x]=piece.type;}}}
-  function sweep(){let rowCount=0;outer:for(let y=ROWS-1;y>=0;y--){for(let x=0;x<COLS;x++){if(!grid[y][x])continue outer;}const row=grid.splice(y,1)[0].fill(0);grid.unshift(row);y++;rowCount++;}if(rowCount>0){const points=[0,40,100,300,1200];score+=(points[rowCount]||0)*level;lines+=rowCount;level=Math.floor(lines/10)+1;dropInterval=Math.max(100,1000-(level-1)*100);}}
-  window.playerDrop=function(){current.row++;if(collide(grid,current)){current.row--;merge(grid,current);sweep();spawn();}dropCounter=0;};
-  window.playerMove=function(dir){current.col+=dir;if(collide(grid,current))current.col-=dir;};
-  window.playerRotate=function(dir){const pos=current.col;rotate(current.shape,dir);let offset=1;while(collide(grid,current)){current.col+=offset;offset=-(offset+(offset>0?1:-1));if(Math.abs(offset)>current.shape[0].length){rotate(current.shape,-dir);current.col=pos;return;}}};
-  function spawn(){current=next||randomPiece();next=randomPiece();current.row=0;current.col=Math.floor((COLS - current.shape[0].length)/2);if(collide(grid,current)){running=false;}}
-  window.hardDrop=function(){while(!collide(grid,{...current,row:current.row+1}))current.row++;merge(grid,current);sweep();spawn();dropCounter=0;};
-  function drawCell(x,y,type){const px=x*BLOCK,py=y*BLOCK;ctx.fillStyle=type?COLORS[type]:'rgba(255,255,255,0.02)';ctx.fillRect(px,py,BLOCK-1,BLOCK-1);if(type){ctx.strokeStyle='rgba(0,0,0,0.25)';ctx.strokeRect(px,py,BLOCK-1,BLOCK-1);}}
-  function draw(){ctx.clearRect(0,0,cvs.width,cvs.height);for(let y=0;y<ROWS;y++){for(let x=0;x<COLS;x++)drawCell(x,y,grid[y][x]);}if(current){for(let y=0;y<current.shape.length;y++){for(let x=0;x<current.shape[y].length;x++){if(current.shape[y][x])drawCell(current.col+x,current.row+y,current.type);}}}}
-  function drawNext(){nctx.clearRect(0,0,nextCanvas.width,nextCanvas.height);const scale=20,offX=10,offY=10;if(!next)return;for(let y=0;y<next.shape.length;y++){for(let x=0;x<next.shape[y].length;x++){if(next.shape[y][x]){nctx.fillStyle=COLORS[next.type];nctx.fillRect(offX+x*scale,offY+y*scale,scale-2,scale-2);}}}}
-  function updateScore(){document.getElementById('score').textContent=score;document.getElementById('lines').textContent=lines;document.getElementById('level').textContent=level;}
-  function update(time=0){if(!running){ctx.fillStyle='rgba(0,0,0,0.6)';ctx.fillRect(0,0,cvs.width,cvs.height);ctx.fillStyle='white';ctx.font='20px sans-serif';ctx.fillText('GAME OVER',20,220);return;}const delta=time-lastTime;lastTime=time;dropCounter+=delta;if(dropCounter>dropInterval)playerDrop();draw();drawNext();updateScore();requestAnimationFrame(update);}
-  window.restart=function(){grid=createMatrix(ROWS,COLS);score=0;lines=0;level=1;dropInterval=1000;running=true;current=null;next=null;spawn();spawn();lastTime=0;requestAnimationFrame(update);};
-  window.togglePause=function(){running=!running;if(running){lastTime=performance.now();requestAnimationFrame(update);}};
-  grid=createMatrix(ROWS,COLS);score=0;lines=0;level=1;dropInterval=1000;dropCounter=0;lastTime=0;running=true;spawn();spawn();cvs.width=COLS*BLOCK;cvs.height=ROWS*BLOCK;update();
-})();
-</script>
+
+    <div>
+      <button id="logout-btn" class="logout-btn" aria-label="Login or Logout">Login</button>
+    </div>
+  </header>
+
+  <!-- Dropdown -->
+  <nav id="dropdown-menu" class="dropdown-menu" role="menu" aria-label="User menu">
+    <a role="menuitem" href="https://median.co/share/noyblp#apk"><i class="fas fa-download"></i>Download App</a>
+    <a role="menuitem" href="about.html"><i class="fas fa-info-circle"></i>About Us</a>
+    <a role="menuitem" href="contact.html"><i class="fas fa-phone-alt"></i>Contact</a>
+  </nav>
+
+  <!-- Main content container -->
+  <main class="container" role="main" aria-live="polite">
+    <!-- Pharmacology -->
+    <section id="pharma-section" class="glass-card" aria-label="Pharmacology topics">
+      <h2><i class="fas fa-stethoscope"></i> Pharmacology Topics</h2>
+      <p class="subtle">Browse core pharmacology topics and quizzes.</p>
+      <div class="topic-grid" role="list">
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='intropharm.html'">
+          <i class="fas fa-book-medical" aria-hidden="true"></i> Intro
+        </div>
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='autonomic.html'">
+          <i class="fas fa-brain" aria-hidden="true"></i> Autonomics
+        </div>
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='antibiotics.html'">
+          <i class="fas fa-capsules" aria-hidden="true"></i> Antibiotics
+        </div>
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='analgesics.html'">
+          <i class="fas fa-pills" aria-hidden="true"></i> Analgesics
+        </div>
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='cns.html'">
+          <i class="fas fa-head-side-virus" aria-hidden="true"></i> CNS Drugs
+        </div>
+      </div>
+    </section>
+
+    <!-- Pathology -->
+    <section id="patho-section" class="glass-card" aria-label="Pathology topics">
+      <h2><i class="fas fa-flask"></i> Pathology Topics</h2>
+      <p class="subtle">Key pathology subjects and practice quizzes.</p>
+      <div class="topic-grid" role="list">
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='intropath.html'">
+          <i class="fas fa-book" aria-hidden="true"></i> Intro
+        </div>
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='quiz_inflammation.html'">
+          <i class="fas fa-fire" aria-hidden="true"></i> Inflammation
+        </div>
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='quiz_healing.html'">
+          <i class="fas fa-band-aid" aria-hidden="true"></i> Healing
+        </div>
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='quiz_neoplasia.html'">
+          <i class="fas fa-dna" aria-hidden="true"></i> Neoplasia
+        </div>
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='quiz_immunopathology.html'">
+          <i class="fas fa-shield-virus" aria-hidden="true"></i> Immuno
+        </div>
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='quiz_cell_injury.html'">
+          <i class="fas fa-bolt" aria-hidden="true"></i> Cell Injury
+        </div>
+      </div>
+    </section>
+
+    <!-- Flashcards CTA -->
+    <section id="flashcard-section" class="glass-card" aria-label="Flashcards">
+      <h1 class="site-title"><i class="fas fa-layer-group"></i> What would you like to study?</h1>
+      <div class="topic-grid" style="margin-top:8px;">
+        <button class="btn primary" onclick="location.href='pharmcard.html'" tabindex="0">
+          <i class="fas fa-pills" aria-hidden="true"></i> Pharmacology Flashcards
+        </button>
+        <button class="btn primary" onclick="location.href='pathcard.html'" tabindex="0">
+          <i class="fas fa-heartbeat" aria-hidden="true"></i> Pathology Flashcards
+        </button>
+      </div>
+    </section>
+
+    <!-- Multiplayer / Challenge -->
+    <section id="challenge-section" class="glass-card" aria-label="Play with friends">
+      <h2><i class="fas fa-users"></i> Play with Friends</h2>
+      <p class="subtle">Invite friends, compete in quizzes, and learn together.</p>
+      <div style="margin-top:12px;">
+        <button class="btn" onclick="location.href='multiplayer.html'"><i class="fas fa-gamepad"></i> Play Multiplayer</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
+    <div class="nav-item" data-target="pharma-section" tabindex="0" aria-label="Pharmacology tab">
+      <span><i class="fas fa-pills"></i></span>
+      <div>Pharma</div>
+    </div>
+    <div class="nav-item" data-target="patho-section" tabindex="0" aria-label="Pathology tab">
+      <span><i class="fas fa-flask"></i></span>
+      <div>Patho</div>
+    </div>
+    <div class="nav-item" data-target="flashcard-section" tabindex="0" aria-label="Flashcards tab">
+      <span><i class="fas fa-layer-group"></i></span>
+      <div>Cards</div>
+    </div>
+    <div class="nav-item" data-target="challenge-section" tabindex="0" aria-label="Challenge tab">
+      <span><i class="fas fa-users"></i></span>
+      <div>Challenge</div>
+    </div>
+    <!-- nav indicator (visual, managed by JS) -->
+    <div id="navIndicator" class="nav-indicator" aria-hidden="true"></div>
+  </nav>
+
+  <!-- ---------- Scripts (complete) ---------- -->
+  <script type="module">
+    /***********************
+     * Firebase Auth Setup *
+     ***********************/
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgRJlAMQVnY5Zu7nkMPmdvS7lc5xMcJz4",
+      authDomain: "pathpharmm.firebaseapp.com",
+      projectId: "pathpharmm",
+      storageBucket: "pathpharmm.appspot.com",
+      messagingSenderId: "836525944124",
+      appId: "1:836525944124:web:9ab28aa79e9f12aeea8239"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Elements
+    const logoutBtn = document.getElementById('logout-btn');
+    const userIcon = document.getElementById('user-icon');
+    const greeting = document.getElementById('greeting');
+
+    // Keep original logic but enhance greetings and fallback
+    onAuthStateChanged(auth, user => {
+      const skipped = localStorage.getItem("skip") === "true";
+      if (!user && !skipped) {
+        // If user isn't signed in and hasn't explicitly skipped, redirect to login
+        // (Preserve original behavior)
+        window.location.href = "index.html";
+        return;
+      }
+
+      if (user) {
+        const name = user.displayName || (user.email ? user.email.split('@')[0] : "User");
+        localStorage.setItem("userName", name);
+        const first = name.split(" ")[0];
+        userIcon.textContent = first[0]?.toUpperCase() || "U";
+        greeting.textContent = `Hello, ${first}`;
+        logoutBtn.textContent = "Logout";
+        logoutBtn.onclick = async () => {
+          if (!confirm("Are you sure you want to log out?")) return;
+          await signOut(auth);
+          localStorage.removeItem("skip");
+          localStorage.removeItem("userName");
+          window.location.href = "index.html";
+        };
+        logoutBtn.style.display = "inline-flex";
+      } else if (skipped) {
+        const name = localStorage.getItem("userName") || "Guest";
+        userIcon.textContent = name[0]?.toUpperCase() || "G";
+        greeting.textContent = `Welcome, ${name}`;
+        logoutBtn.textContent = "Login";
+        logoutBtn.onclick = () => {
+          localStorage.removeItem("skip");
+          window.location.href = "index.html";
+        };
+        logoutBtn.style.display = "inline-flex";
+      }
+    });
+  </script>
+
+  <script>
+    /*******************************
+     * UI Logic: Tabs, Dropdowns, *
+     * Keyboard accessibility, etc *
+     *******************************/
+
+    // Basic references
+    const sections = ["pharma-section","patho-section","flashcard-section","challenge-section"];
+    const navItems = Array.from(document.querySelectorAll('.nav-item'));
+    const cardSections = sections.map(id => document.getElementById(id));
+    const navIndicator = document.getElementById('navIndicator');
+
+    // Utility: show section by id (uses classes for transitions)
+    function showSection(id) {
+      cardSections.forEach(sec => {
+        if (sec.id === id) {
+          sec.classList.add('active');
+          sec.style.display = 'block';
+        } else {
+          sec.classList.remove('active');
+          // Keep layout-friendly hide after animation frame
+          sec.style.display = 'none';
+        }
+      });
+
+      // nav active
+      navItems.forEach(item => item.classList.toggle('active', item.dataset.target === id));
+      // move indicator to active item
+      const active = navItems.find(i => i.dataset.target === id);
+      if (active) {
+        // compute transform relative to nav container
+        const navRect = active.parentElement.getBoundingClientRect();
+        const itemRect = active.getBoundingClientRect();
+        const left = itemRect.left - navRect.left + (itemRect.width - Math.max(60, itemRect.width * 0.6)) / 2;
+        navIndicator.style.width = Math.max(60, itemRect.width * 0.6) + 'px';
+        navIndicator.style.transform = 'translateX(' + left + 'px)';
+        // for smaller screens, ensure indicator stays visible
+      }
+      localStorage.setItem("activeTab", id);
+    }
+
+    // Initialize on DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', () => {
+      // Get last active tab
+      let activeTab = localStorage.getItem("activeTab");
+      if (!activeTab || !sections.includes(activeTab)) activeTab = "pharma-section";
+      // Ensure all sections hidden, then show desired
+      cardSections.forEach(sec => sec.style.display = 'none');
+      showSection(activeTab);
+
+      // Add click handlers to nav items
+      navItems.forEach(item => {
+        item.addEventListener('click', () => showSection(item.dataset.target));
+        // support keyboard activation
+        item.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showSection(item.dataset.target); }
+        });
+      });
+
+      // make topic cards activate on Enter
+      document.querySelectorAll('.topic-card, .btn').forEach(el => {
+        el.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            el.click();
+          }
+        });
+      });
+
+      // initial indicator placement (after paint)
+      setTimeout(() => showSection(activeTab), 160);
+    });
+
+    // Touch swipe to change tabs (lightweight)
+    let touchStartX = 0;
+    document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive:true});
+    document.addEventListener('touchend', e => {
+      const delta = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(delta) < 60) return;
+      const currentIndex = sections.findIndex(id => document.getElementById(id).classList.contains('active'));
+      if (currentIndex === -1) return;
+      const nextIndex = delta < 0 ? (currentIndex + 1) % sections.length : (currentIndex - 1 + sections.length) % sections.length;
+      showSection(sections[nextIndex]);
+    }, {passive:true});
+
+    /*****************
+     * Dropdown menu  *
+     *****************/
+    const hamburger = document.getElementById('hamburger');
+    const dropdown = document.getElementById('dropdown-menu');
+
+    function toggleDropdown(open) {
+      const isOpen = typeof open === 'boolean' ? open : !dropdown.classList.contains('show');
+      if (isOpen) {
+        dropdown.classList.add('show');
+        hamburger.classList.add('open');
+        hamburger.setAttribute('aria-expanded','true');
+        // focus first link for keyboard users
+        const first = dropdown.querySelector('a');
+        if (first) first.focus();
+      } else {
+        dropdown.classList.remove('show');
+        hamburger.classList.remove('open');
+        hamburger.setAttribute('aria-expanded','false');
+        hamburger.focus();
+      }
+    }
+
+    // click & keyboard
+    hamburger.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(); });
+    hamburger.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleDropdown(); } });
+
+    // close when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target) && !hamburger.contains(e.target)) {
+        toggleDropdown(false);
+      }
+    });
+
+    // close with Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') toggleDropdown(false);
+    });
+
+    // Auto-hide dropdown on navigation (so when user clicks link it closes)
+    dropdown.querySelectorAll('a').forEach(a => a.addEventListener('click', () => toggleDropdown(false)));
+
+    // Ensure accessible focus ring for interactive elements
+    document.addEventListener('focusin', (e) => {
+      if (e.target.matches('.topic-card, .btn, .nav-item, .hamburger, #logout-btn, .dropdown-menu a')) {
+        // noop here, CSS handles focus state; placeholder to extend if needed
+      }
+    });
+
+    // Prevent accidental drags / highlight on long press
+    document.addEventListener('dragstart', e => e.preventDefault());
+  </script>
 </body>
 </html>

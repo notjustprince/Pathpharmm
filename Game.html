@@ -1,156 +1,633 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF‑8"/>
-  <meta name="viewport" content="width=device‑width, initial‑scale=1.0"/>
-  <title>Quiz Game</title>
-  <link rel="stylesheet" href="styles.css"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Med Topics — Improved UI</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <style>
+    /* ---------- Base / Reset ---------- */
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html,body { height: 100%; }
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      color: #fff;
+      padding: 96px 16px 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height: 1.35;
+    }
+
+    /* Soft animated background (subtle, low-cost) */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(600px 600px at 10% 10%, rgba(255,255,255,0.03), transparent 10%),
+                  radial-gradient(500px 500px at 90% 90%, rgba(0,0,0,0.04), transparent 10%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Reduced motion preference */
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation: none !important; }
+    }
+
+    /* ---------- Header (glass) ---------- */
+    .user-header {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 760px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(10px) saturate(120%);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      border-radius: 14px;
+      z-index: 1200;
+    }
+
+    .left-group { display:flex; align-items:center; gap:10px; }
+
+    /* hamburger / menu button */
+    .hamburger {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      background: transparent;
+      border-radius: 10px;
+      color: #fff;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.06);
+      transition: transform 220ms cubic-bezier(.2,.9,.2,1), background 220ms;
+      font-size: 16px;
+    }
+    .hamburger:focus { outline: none; box-shadow: 0 6px 20px rgba(0,0,0,0.35), 0 0 0 3px rgba(255,204,0,0.12); }
+    .hamburger:hover { transform: translateY(-2px) scale(1.03); background: rgba(255,255,255,0.03); color: #ffecb3; }
+    .hamburger.open { transform: rotate(90deg) scale(1.03); color: #00ffd0; }
+
+    /* user icon + greeting */
+    .user-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display:flex; align-items:center; justify-content:center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06));
+      font-weight:700; color:#fff; font-size:18px;
+      border:1px solid rgba(255,255,255,0.06);
+    }
+    .greeting {
+      color: #fff; font-size:16px; font-weight:600;
+      margin-left: 6px;
+      display:flex; align-items:center; gap:8px;
+    }
+
+    /* login/logout */
+    .logout-btn {
+      background: linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-weight:700;
+      cursor:pointer;
+      transition: transform 200ms, background 200ms, color 200ms;
+    }
+    .logout-btn:focus { outline: none; box-shadow: 0 6px 20px rgba(0,0,0,0.35); }
+    .logout-btn:hover { transform: translateY(-2px); background: rgba(255,255,255,0.12); color: #000; }
+
+    /* dropdown menu (keyboard accessible) */
+    .dropdown-menu {
+      position: absolute;
+      top: 84px;
+      left: 18px;
+      background: rgba(20,20,20,0.95);
+      color: #fff;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+      display: none;
+      flex-direction: column;
+      min-width: 220px;
+      z-index: 1300;
+      padding: 8px;
+      transform-origin: top left;
+      animation: dropdownIn 260ms cubic-bezier(.2,.9,.2,1);
+    }
+    .dropdown-menu.show { display:flex; }
+    .dropdown-menu a {
+      display:flex; gap:12px; align-items:center; text-decoration:none; color:#fff;
+      padding:10px 12px; border-radius:8px; font-size:14px;
+    }
+    .dropdown-menu a:focus, .dropdown-menu a:hover { background: rgba(255,255,255,0.04); color: #fffbf0; outline: none; }
+
+    @keyframes dropdownIn {
+      from { opacity: 0; transform: translateY(-8px) scale(.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ---------- Content Cards (glass) ---------- */
+    .container {
+      width: 100%;
+      max-width: 900px;
+      z-index: 10;
+      display: grid;
+      gap: 18px;
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+
+    .glass-card {
+      position: relative;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(12px) saturate(120%);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 14px 40px rgba(0,0,0,0.28);
+      padding: 26px;
+      color: #fff;
+      transition: transform 340ms cubic-bezier(.2,.9,.2,1), opacity 300ms;
+      opacity: 0; transform: translateY(8px);
+    }
+    .glass-card.active { opacity: 1; transform: translateY(0); }
+
+    /* Headings */
+    h1, h2 {
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display:flex; align-items:center; gap:10px;
+    }
+    h1 .fa, h2 .fa { color: #ffecb3; font-size:18px; }
+
+    /* topic grid */
+    .topic-grid {
+      display:flex;
+      flex-wrap:wrap;
+      gap: 14px;
+      justify-content: space-between;
+    }
+
+    .topic-card, .btn {
+      flex: 0 1 calc(50% - 10px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border-radius: 14px;
+      padding: 16px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      border: 1px solid rgba(255,255,255,0.06);
+      display:flex; gap:12px; align-items:center; justify-content:center;
+      cursor:pointer;
+      transition: transform 260ms cubic-bezier(.2,.9,.2,1), box-shadow 260ms, background 260ms;
+      position: relative;
+      overflow: hidden;
+    }
+    .topic-card i, .btn i { font-size:18px; color: #fff; transition: transform 260ms; }
+
+    /* shimmering microinteraction (on hover) */
+    .topic-card::after {
+      content:"";
+      position:absolute; inset:0;
+      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0) 100%);
+      transform: translateX(-120%);
+      transition: transform 420ms;
+      pointer-events:none;
+    }
+    .topic-card:hover::after, .btn:hover::after { transform: translateX(120%); }
+    .topic-card:hover, .btn:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(0,0,0,0.32); background: rgba(255,255,255,0.07); }
+    .topic-card:active, .btn:active { transform: translateY(-2px) scale(.998); }
+
+    /* full-width CTA buttons */
+    .btn {
+      width: 100%;
+      margin-top: 10px;
+      justify-content: center;
+    }
+
+    /* emphasized button style */
+    .primary {
+      background: linear-gradient(90deg, rgba(255,204,51,0.18), rgba(0,255,200,0.06));
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .primary:hover { box-shadow: 0 20px 50px rgba(0,0,0,0.36); }
+
+    /* icon float effect for better personality */
+    .topic-card .fa, .btn .fa {
+      transform-origin: center;
+    }
+    .topic-card:hover .fa, .btn:hover .fa { transform: translateY(-6px) rotate(-6deg) scale(1.08); color: #ffeea8; }
+
+    /* text readability */
+    h1.site-title { font-size: 22px; }
+    p.subtle { color: rgba(255,255,255,0.78); font-size:13px; margin-top:6px; }
+
+    /* ---------- Bottom Navigation ---------- */
+    .bottom-nav {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 36px);
+      max-width: 760px;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(8px) saturate(120%);
+      border-radius: 14px;
+      padding: 8px;
+      display:flex;
+      gap:8px;
+      justify-content: space-between;
+      align-items:center;
+      border: 1px solid rgba(255,255,255,0.06);
+      z-index: 1200;
+    }
+
+    .nav-item {
+      flex: 1 1 0;
+      text-align:center;
+      padding:8px 10px;
+      color: rgba(255,255,255,0.95);
+      font-size:13px;
+      border-radius:10px;
+      cursor:pointer;
+      transition: transform 220ms, background 220ms, color 220ms;
+      display:flex; flex-direction:column; align-items:center; gap:6px;
+    }
+    .nav-item span { font-size:18px; }
+    .nav-item.active {
+      background: linear-gradient(90deg, rgba(255,204,51,0.12), rgba(0,255,200,0.06));
+      color: #111;
+      transform: translateY(-6px);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+      font-weight:800;
+    }
+
+    /* active indicator (sliding) */
+    .nav-indicator {
+      position:absolute; bottom:-10px; left:0; height:6px; width:80px;
+      background: linear-gradient(90deg,#ffcc4d,#00ffd0);
+      border-radius:6px; transition: transform 300ms cubic-bezier(.2,.9,.2,1), width 300ms;
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 720px) {
+      body { padding: 88px 10px 120px; }
+      .topic-card, .btn { flex: 1 1 100%; }
+      .user-header { max-width: 520px; }
+      .dropdown-menu { left: 8px; right: 8px; top: 82px; min-width:auto; }
+      .bottom-nav { width: calc(100% - 24px); }
+    }
+
+    /* keyboard focus for cards */
+    .topic-card:focus, .btn:focus { outline:none; box-shadow: 0 12px 30px rgba(0,0,0,0.32), 0 0 0 4px rgba(255,204,51,0.08); }
+
+    /* small helper */
+    .muted { color: rgba(255,255,255,0.72); font-weight:600; font-size:12px; }
+  </style>
 </head>
 <body>
-  <h1>Quiz Time</h1>
-  <div id="game">
-    <h2 id="question">Loading...</h2>
-    <div id="answers"></div>
-    <p>Time left: <span id="timer">-</span></p>
-    <p>Your Score: <span id="score">0</span></p>
-    <p id="error" style="color:red;display:none;">Error: failed to load question.</p>
-  </div>
+  <!-- Header -->
+  <header class="user-header" role="banner" aria-label="Top navigation">
+    <div class="left-group">
+      <button id="hamburger" class="hamburger" aria-haspopup="true" aria-expanded="false" aria-controls="dropdown-menu" title="Open menu">
+        <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
+      </button>
 
+      <div class="user-icon" id="user-icon" aria-hidden="false">?</div>
+      <div class="greeting" id="greeting" aria-live="polite">Welcome</div>
+    </div>
+
+    <div>
+      <button id="logout-btn" class="logout-btn" aria-label="Login or Logout">Login</button>
+    </div>
+  </header>
+
+  <!-- Dropdown -->
+  <nav id="dropdown-menu" class="dropdown-menu" role="menu" aria-label="User menu">
+    <a role="menuitem" href="https://median.co/share/noyblp#apk"><i class="fas fa-download"></i>Download App</a>
+    <a role="menuitem" href="about.html"><i class="fas fa-info-circle"></i>About Us</a>
+    <a role="menuitem" href="contact.html"><i class="fas fa-phone-alt"></i>Contact</a>
+  </nav>
+
+  <!-- Main content container -->
+  <main class="container" role="main" aria-live="polite">
+    <!-- Pharmacology -->
+    <section id="pharma-section" class="glass-card" aria-label="Pharmacology topics">
+      <h2><i class="fas fa-stethoscope"></i> Pharmacology Topics</h2>
+      <p class="subtle">Browse core pharmacology topics and quizzes.</p>
+      <div class="topic-grid" role="list">
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='intropharm.html'">
+          <i class="fas fa-book-medical" aria-hidden="true"></i> Intro
+        </div>
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='autonomic.html'">
+          <i class="fas fa-brain" aria-hidden="true"></i> Autonomics
+        </div>
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='antibiotics.html'">
+          <i class="fas fa-capsules" aria-hidden="true"></i> Antibiotics
+        </div>
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='analgesics.html'">
+          <i class="fas fa-pills" aria-hidden="true"></i> Analgesics
+        </div>
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='cns.html'">
+          <i class="fas fa-head-side-virus" aria-hidden="true"></i> CNS Drugs
+        </div>
+      </div>
+    </section>
+
+    <!-- Pathology -->
+    <section id="patho-section" class="glass-card" aria-label="Pathology topics">
+      <h2><i class="fas fa-flask"></i> Pathology Topics</h2>
+      <p class="subtle">Key pathology subjects and practice quizzes.</p>
+      <div class="topic-grid" role="list">
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='intropath.html'">
+          <i class="fas fa-book" aria-hidden="true"></i> Intro
+        </div>
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='quiz_inflammation.html'">
+          <i class="fas fa-fire" aria-hidden="true"></i> Inflammation
+        </div>
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='quiz_healing.html'">
+          <i class="fas fa-band-aid" aria-hidden="true"></i> Healing
+        </div>
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='quiz_neoplasia.html'">
+          <i class="fas fa-dna" aria-hidden="true"></i> Neoplasia
+        </div>
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='quiz_immunopathology.html'">
+          <i class="fas fa-shield-virus" aria-hidden="true"></i> Immuno
+        </div>
+        <div class="topic-card" role="listitem" tabindex="0" onclick="location.href='quiz_cell_injury.html'">
+          <i class="fas fa-bolt" aria-hidden="true"></i> Cell Injury
+        </div>
+      </div>
+    </section>
+
+    <!-- Flashcards CTA -->
+    <section id="flashcard-section" class="glass-card" aria-label="Flashcards">
+      <h1 class="site-title"><i class="fas fa-layer-group"></i> What would you like to study?</h1>
+      <div class="topic-grid" style="margin-top:8px;">
+        <button class="btn primary" onclick="location.href='pharmcard.html'" tabindex="0">
+          <i class="fas fa-pills" aria-hidden="true"></i> Pharmacology Flashcards
+        </button>
+        <button class="btn primary" onclick="location.href='pathcard.html'" tabindex="0">
+          <i class="fas fa-heartbeat" aria-hidden="true"></i> Pathology Flashcards
+        </button>
+      </div>
+    </section>
+
+    <!-- Multiplayer / Challenge -->
+    <section id="challenge-section" class="glass-card" aria-label="Play with friends">
+      <h2><i class="fas fa-users"></i> Play with Friends</h2>
+      <p class="subtle">Invite friends, compete in quizzes, and learn together.</p>
+      <div style="margin-top:12px;">
+        <button class="btn" onclick="location.href='multiplayer.html'"><i class="fas fa-gamepad"></i> Play Multiplayer</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
+    <div class="nav-item" data-target="pharma-section" tabindex="0" aria-label="Pharmacology tab">
+      <span><i class="fas fa-pills"></i></span>
+      <div>Pharma</div>
+    </div>
+    <div class="nav-item" data-target="patho-section" tabindex="0" aria-label="Pathology tab">
+      <span><i class="fas fa-flask"></i></span>
+      <div>Patho</div>
+    </div>
+    <div class="nav-item" data-target="flashcard-section" tabindex="0" aria-label="Flashcards tab">
+      <span><i class="fas fa-layer-group"></i></span>
+      <div>Cards</div>
+    </div>
+    <div class="nav-item" data-target="challenge-section" tabindex="0" aria-label="Challenge tab">
+      <span><i class="fas fa-users"></i></span>
+      <div>Challenge</div>
+    </div>
+    <!-- nav indicator (visual, managed by JS) -->
+    <div id="navIndicator" class="nav-indicator" aria-hidden="true"></div>
+  </nav>
+
+  <!-- ---------- Scripts (complete) ---------- -->
   <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-    import { getDatabase, ref, onValue, update, set } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+    /***********************
+     * Firebase Auth Setup *
+     ***********************/
+    // NOTE: original config from provided file is preserved here.
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
-    const app = initializeApp({ databaseURL: "https://pathpharmm-default‑rtdb.firebaseio.com/" });
-    const db = getDatabase(app);
-
-    const roomCode = new URLSearchParams(location.search).get('room');
-    const playerId = localStorage.getItem('playerId');
-    const isHost = localStorage.getItem('isHost') === 'true';
-    const paths = {
-      category: `rooms/${roomCode}/chosenCategory`,
-      currentQuestion: `rooms/${roomCode}/currentQuestion`,
-      questionStartTime: `rooms/${roomCode}/questionStartTime`,
-      quizEnded: `rooms/${roomCode}/quizEnded`,
-      playerScore: `rooms/${roomCode}/players/${playerId}`
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgRJlAMQVnY5Zu7nkMPmdvS7lc5xMcJz4",
+      authDomain: "pathpharmm.firebaseapp.com",
+      projectId: "pathpharmm",
+      storageBucket: "pathpharmm.appspot.com",
+      messagingSenderId: "836525944124",
+      appId: "1:836525944124:web:9ab28aa79e9f12aeea8239"
     };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-    let questions = [], index = 0, score = 0, timer = null;
+    // Elements
+    const logoutBtn = document.getElementById('logout-btn');
+    const userIcon = document.getElementById('user-icon');
+    const greeting = document.getElementById('greeting');
 
-    const qElem = document.getElementById('question');
-    const answersDiv = document.getElementById('answers');
-    const timerElem = document.getElementById('timer');
-    const scoreElem = document.getElementById('score');
-    const errorElem = document.getElementById('error');
-
-    const categoryQs = {
-      pathology: [
-        { q: "What cell type proliferates in acute inflammation?", opts: ["Neutrophil","Lymphocyte","Macrophage","Basophil"], ans: 0},
-        { q: "Which organ is most affected by amyloidosis?", opts: ["Liver","Heart","Brain","Lung"], ans: 1 },
-        { q: "Which necrosis in MI?", opts: ["Coagulative","Liquefactive","Caseous","Fat"], ans: 0 }
-      ],
-      pharmacology: [
-        { q: "Which is a β-blocker?", opts: ["Propranolol","Lisinopril","Losartan","Verapamil"], ans: 0 },
-        { q: "Which inhibits ACE?", opts: ["Lisinopril","Losartan","Hydralazine","Propranolol"], ans: 0 },
-        { q: "Which is a loop diuretic?", opts: ["Furosemide","HCTZ","Spironolactone","Acetazolamide"], ans: 0 }
-      ]
-    };
-
-    function shuffle(a){return [...a].sort(()=>Math.random()-0.5);}
-
-    onValue(ref(db, paths.category), snap => {
-      const cat = snap.val();
-      if (!cat || !categoryQs[cat]) {
-        errorElem.textContent = "⛔ Invalid category.";
-        errorElem.style.display = 'block';
+    // Keep original logic but enhance greetings and fallback
+    onAuthStateChanged(auth, user => {
+      const skipped = localStorage.getItem("skip") === "true";
+      if (!user && !skipped) {
+        // If user isn't signed in and hasn't explicitly skipped, redirect to login
+        // (Preserve original behavior)
+        window.location.href = "index.html";
         return;
       }
-      questions = shuffle(categoryQs[cat]);
-      console.log("Questions loaded:", questions);
-    });
 
-    onValue(ref(db, paths.currentQuestion), snap => {
-      index = snap.exists() ? snap.val() : 0;
+      if (user) {
+        const name = user.displayName || (user.email ? user.email.split('@')[0] : "User");
+        localStorage.setItem("userName", name);
+        const first = name.split(" ")[0];
+        userIcon.textContent = first[0]?.toUpperCase() || "U";
+        greeting.textContent = `Hello, ${first}`;
+        logoutBtn.textContent = "Logout";
+        logoutBtn.onclick = async () => {
+          if (!confirm("Are you sure you want to log out?")) return;
+          await signOut(auth);
+          localStorage.removeItem("skip");
+          localStorage.removeItem("userName");
+          window.location.href = "index.html";
+        };
+        logoutBtn.style.display = "inline-flex";
+      } else if (skipped) {
+        const name = localStorage.getItem("userName") || "Guest";
+        userIcon.textContent = name[0]?.toUpperCase() || "G";
+        greeting.textContent = `Welcome, ${name}`;
+        logoutBtn.textContent = "Login";
+        logoutBtn.onclick = () => {
+          localStorage.removeItem("skip");
+          window.location.href = "index.html";
+        };
+        logoutBtn.style.display = "inline-flex";
+      }
     });
+  </script>
 
-    onValue(ref(db, paths.questionStartTime), snap => {
-      if (snap.exists()) startLoop(snap.val());
-    });
+  <script>
+    /*******************************
+     * UI Logic: Tabs, Dropdowns, *
+     * Keyboard accessibility, etc *
+     *******************************/
 
-    onValue(ref(db, paths.quizEnded), snap => {
-      if (snap.val()) endQuiz();
-    });
+    // Basic references
+    const sections = ["pharma-section","patho-section","flashcard-section","challenge-section"];
+    const navItems = Array.from(document.querySelectorAll('.nav-item'));
+    const cardSections = sections.map(id => document.getElementById(id));
+    const navIndicator = document.getElementById('navIndicator');
 
-    function startLoop(startTs) {
-      clearInterval(timer);
-      renderQuestion();
-      timer = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startTs)/1000);
-        const rem = 10 - elapsed;
-        timerElem.textContent = rem > 0 ? rem : 0;
-        if (rem <= 0) {
-          clearInterval(timer);
-          disableAnswers();
-          if (isHost) nextQuestion();
+    // Utility: show section by id (uses classes for transitions)
+    function showSection(id) {
+      cardSections.forEach(sec => {
+        if (sec.id === id) {
+          sec.classList.add('active');
+          sec.style.display = 'block';
+        } else {
+          sec.classList.remove('active');
+          // Keep layout-friendly hide after animation frame
+          sec.style.display = 'none';
         }
-      }, 200);
-    }
-
-    function renderQuestion() {
-      const obj = questions[index];
-      console.log("Rendering Q#", index, obj);
-      if (!obj) {
-        errorElem.textContent = "❗ Question not found.";
-        errorElem.style.display = 'block';
-        qElem.textContent = '';
-        return;
-      }
-      errorElem.style.display = 'none';
-      qElem.textContent = obj.q;
-      answersDiv.innerHTML = '';
-      scoreElem.textContent = score;
-      obj.opts.forEach((opt,i) => {
-        const btn = document.createElement('button');
-        btn.textContent = opt;
-        btn.onclick = () => answer(i, obj.ans, btn);
-        answersDiv.appendChild(btn);
       });
+
+      // nav active
+      navItems.forEach(item => item.classList.toggle('active', item.dataset.target === id));
+      // move indicator to active item
+      const active = navItems.find(i => i.dataset.target === id);
+      if (active) {
+        // compute transform relative to nav container
+        const navRect = active.parentElement.getBoundingClientRect();
+        const itemRect = active.getBoundingClientRect();
+        const left = itemRect.left - navRect.left + (itemRect.width - Math.max(60, itemRect.width * 0.6)) / 2;
+        navIndicator.style.width = Math.max(60, itemRect.width * 0.6) + 'px';
+        navIndicator.style.transform = 'translateX(' + left + 'px)';
+        // for smaller screens, ensure indicator stays visible
+      }
+      localStorage.setItem("activeTab", id);
     }
 
-    function disableAnswers(){
-      answersDiv.querySelectorAll('button').forEach(b=>b.disabled=true);
-    }
+    // Initialize on DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', () => {
+      // Get last active tab
+      let activeTab = localStorage.getItem("activeTab");
+      if (!activeTab || !sections.includes(activeTab)) activeTab = "pharma-section";
+      // Ensure all sections hidden, then show desired
+      cardSections.forEach(sec => sec.style.display = 'none');
+      showSection(activeTab);
 
-    async function answer(chosen, correct, btn) {
-      if (answersDiv.querySelector('button:disabled')) return;
-      disableAnswers();
-      if (chosen === correct) {
-        btn.classList.add('correct');
-        score += 10;
-        scoreElem.textContent = score;
-        await update(ref(db, paths.playerScore), { score });
+      // Add click handlers to nav items
+      navItems.forEach(item => {
+        item.addEventListener('click', () => showSection(item.dataset.target));
+        // support keyboard activation
+        item.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showSection(item.dataset.target); }
+        });
+      });
+
+      // make topic cards activate on Enter
+      document.querySelectorAll('.topic-card, .btn').forEach(el => {
+        el.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            el.click();
+          }
+        });
+      });
+
+      // initial indicator placement (after paint)
+      setTimeout(() => showSection(activeTab), 160);
+    });
+
+    // Touch swipe to change tabs (lightweight)
+    let touchStartX = 0;
+    document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive:true});
+    document.addEventListener('touchend', e => {
+      const delta = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(delta) < 60) return;
+      const currentIndex = sections.findIndex(id => document.getElementById(id).classList.contains('active'));
+      if (currentIndex === -1) return;
+      const nextIndex = delta < 0 ? (currentIndex + 1) % sections.length : (currentIndex - 1 + sections.length) % sections.length;
+      showSection(sections[nextIndex]);
+    }, {passive:true});
+
+    /*****************
+     * Dropdown menu  *
+     *****************/
+    const hamburger = document.getElementById('hamburger');
+    const dropdown = document.getElementById('dropdown-menu');
+
+    function toggleDropdown(open) {
+      const isOpen = typeof open === 'boolean' ? open : !dropdown.classList.contains('show');
+      if (isOpen) {
+        dropdown.classList.add('show');
+        hamburger.classList.add('open');
+        hamburger.setAttribute('aria-expanded','true');
+        // focus first link for keyboard users
+        const first = dropdown.querySelector('a');
+        if (first) first.focus();
       } else {
-        btn.classList.add('incorrect');
-        const cs = answersDiv.children[correct];
-        if (cs) cs.classList.add('correct');
+        dropdown.classList.remove('show');
+        hamburger.classList.remove('open');
+        hamburger.setAttribute('aria-expanded','false');
+        hamburger.focus();
       }
     }
 
-    async function nextQuestion(){
-      const newIndex = index + 1;
-      if (newIndex < questions.length) {
-        await set(ref(db, paths.currentQuestion), newIndex);
-        await set(ref(db, paths.questionStartTime), Date.now());
-      } else {
-        await set(ref(db, paths.quizEnded), true);
-      }
-    }
+    // click & keyboard
+    hamburger.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(); });
+    hamburger.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleDropdown(); } });
 
-    function endQuiz(){
-      clearInterval(timer);
-      qElem.textContent = "🎉 Quiz Complete!";
-      answersDiv.innerHTML = '';
-      timerElem.textContent = '-';
-    }
+    // close when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target) && !hamburger.contains(e.target)) {
+        toggleDropdown(false);
+      }
+    });
+
+    // close with Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') toggleDropdown(false);
+    });
+
+    // ensure links are keyboard focusable in dropdown (they are <a> so fine)
+
+    /***********************
+     * Small niceties / UX *
+     ***********************/
+    // Auto-hide dropdown on navigation (so when user clicks link it closes)
+    dropdown.querySelectorAll('a').forEach(a => a.addEventListener('click', () => toggleDropdown(false)));
+
+    // Ensure accessible focus ring for interactive elements
+    document.addEventListener('focusin', (e) => {
+      if (e.target.matches('.topic-card, .btn, .nav-item, .hamburger, #logout-btn, .dropdown-menu a')) {
+        // noop here, CSS handles focus state; this placeholder keeps ability to extend
+      }
+    });
+
+    // Prevent accidental drags / highlight on long press
+    document.addEventListener('dragstart', e => e.preventDefault());
   </script>
 </body>
 </html>

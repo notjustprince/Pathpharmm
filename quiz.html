@@ -1,55 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Multiplayer Quiz</title>
+
+  <!-- Font Awesome for icons -->
   <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- App CSS -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <h1>Multiplayer Quiz</h1>
-  <div id="status">Loading room...</div>
+  <div id="status">Loading...</div>
 
-  <!-- Lobby -->
-  <div id="scene‑lobby" class="scene">
-    <div id="categoryChooser">
-      <h3>Select Category:</h3>
-      <button id="catPath">Pathology</button>
-      <button id="catPharm">Pharmacology</button>
+  <!-- ========== NAME / AVATAR ENTRY ========== -->
+  <div id="nameEntry" class="scene">
+    <h3>Enter your nickname</h3>
+    <input id="nicknameInput" type="text" placeholder="e.g. BrainyDoc123" maxlength="20" />
+    <h4>Choose an avatar</h4>
+    <div id="avatarPicker" class="card">
+      <button class="avatar">🧠</button>
+      <button class="avatar">🧑‍⚕️</button>
+      <button class="avatar">👩‍🔬</button>
+      <button class="avatar">👨‍🏫</button>
+      <button class="avatar">🤓</button>
+    </div>
+    <button id="saveNameBtn">Continue</button>
+  </div>
+
+  <!-- ========== LOBBY ========== -->
+  <div id="scene-lobby" class="scene">
+    <div id="categoryChooser" class="card">
+      <h3>Select category & number of questions</h3>
+
+      <!-- Host-only: choose number -->
+      <div id="questionCountContainer" style="margin-bottom:12px;">
+        <label for="questionCount" style="display:block; margin-bottom:8px; font-weight:600; color: #fff;">
+          Number of questions
+        </label>
+        <select id="questionCount">
+          <option value="5">5</option>
+          <option value="10" selected>10</option>
+          <option value="15">15</option>
+          <option value="20">20</option>
+        </select>
+      </div>
+
+      <div class="category-buttons">
+        <button id="catPath">Pathology</button>
+        <button id="catPharm">Pharmacology</button>
+      </div>
+
+      <!-- Visible to everyone: show what host chose (live) -->
+      <div id="chosenInfo" class="card" style="margin-top:14px; display:none;">
+        <div><strong>Host will use:</strong></div>
+        <div>Category: <span id="chosenCategory">-</span></div>
+        <div>Questions: <span id="chosenCount">-</span></div>
+      </div>
+    </div>
+
+    <!-- Players list -->
+    <div class="card" style="margin-top:12px;">
+      <h4>Players in room</h4>
+      <ul id="playersList" class="players-list"></ul>
     </div>
   </div>
 
-  <!-- Game -->
-  <div id="scene‑game" class="scene">
+  <!-- ========== GAME SCENE ========== -->
+  <div id="scene-game" class="scene">
     <div class="card question-card">
-      <h2 id="question-text"></h2>
+      <h2 id="question-text">Question will appear here</h2>
     </div>
+
     <div class="card answers-card">
       <div id="answers"></div>
     </div>
+
     <div class="info-bar">
-      <span>
-        <i class="fa-solid fa-hourglass-half"></i> 
-        <span id="time-left">-</span>
-      </span>
-      <span>
-        <i class="fa-solid fa-star"></i>
-        <span id="score">0</span>
-      </span>
+      <span><i class="fa-solid fa-hourglass-half"></i> <span id="time-left">-</span>s</span>
+      <span><i class="fa-solid fa-star"></i> Score: <span id="score">0</span></span>
     </div>
   </div>
 
-  <!-- Result -->
-  <div id="scene‑result" class="scene">
+  <!-- ========== RESULT SCENE ========== -->
+  <div id="scene-result" class="scene">
     <h2 id="result-title">Quiz Finished!</h2>
-    <p class="score"><i class="fa-solid fa-star"></i> 
-      Your Final Score: <span id="final-score">0</span></p>
-    <p id="result-outcome"></p>
-    <button id="play-again-btn">🔁 Play Again</button>
+    <p class="score"><i class="fa-solid fa-star"></i> Your Final Score: <span id="final-score">0</span></p>
+    <div id="result-details" class="card"></div>
+    <button id="play-again-btn">Play Again</button>
   </div>
 
+  <!-- Main app -->
   <script type="module" src="app.js"></script>
 </body>
 </html>

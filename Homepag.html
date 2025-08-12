@@ -1,336 +1,520 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pathology & Pharmacology Local Tutor</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Med Topics — Fixed & Mobile Friendly</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
   <style>
-    body { background: #21253a; color: #fff; font-family: Arial,sans-serif; margin: 0; }
-    .container { max-width: 600px; margin: 40px auto; padding: 24px; background: rgba(0,0,0,0.20); border-radius: 18px; box-shadow: 0 8px 24px #0007;}
-    h2 { text-align: center; margin-bottom: 18px;}
-    #chat-window { background: #2a2e50; border-radius: 8px; padding: 15px; min-height: 220px; max-height: 440px; overflow-y: auto; margin-bottom: 18px;}
-    .user { color: #6a9cf6; font-weight: bold; margin-bottom: 10px;}
-    .bot { color: #ffc857; margin-bottom: 10px;}
-    #chat-input { width: 100%; padding: 10px; border-radius: 7px; border: none; outline: none;}
-    #send-btn { background: #6a11cb; color: #fff; border: none; border-radius: 7px; padding: 10px 18px; cursor: pointer; margin-top: 8px;}
-    #send-btn:hover { background: #2575fc;}
-    .topic-list { color:#f9d923; }
-    .example { color:#89f7fe; font-style:italic; }
-    b { color: #ffe066; }
-    a { color: #81ecec; text-decoration: underline;}
-    .quiz { color: #ff6b6b; font-weight: bold; }
-    .details { color: #e0eaff; }
-    .summary { color: #ffe066; }
+    :root{
+      --bg-grad: linear-gradient(135deg,#6a11cb,#2575fc);
+      --glass-border: rgba(255,255,255,0.14);
+      --card-hover: rgba(255,255,255,0.28);
+      --nav-active: rgba(255,255,255,0.22);
+      --max-width: 520px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial;
+      background: var(--bg-grad);
+      color: #ffffff;
+      -webkit-font-smoothing:antialiased;
+      display:flex;
+      justify-content:center;
+      padding:96px 16px 160px; /* ample bottom padding for fixed nav on mobile */
+      min-height:100vh;
+    }
+
+    .app {
+      width:100%;
+      max-width:var(--max-width);
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      align-items:stretch;
+      position:relative;
+      touch-action: pan-y; /* allow vertical scroll but keep horizontal swipe usable */
+    }
+
+    /* Header */
+    .user-header {
+      position:fixed;
+      top:12px;
+      left:50%;
+      transform:translateX(-50%);
+      width:calc(100% - 32px);
+      max-width:var(--max-width);
+      height:56px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:6px 12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border-radius:12px;
+      border:1px solid var(--glass-border);
+      box-shadow: 0 6px 22px rgba(0,0,0,0.25);
+      z-index:1000;
+      backdrop-filter: blur(10px);
+    }
+
+    .left { display:flex; align-items:center; gap:10px; }
+
+    .hamburger { display:inline-grid; place-items:center; width:40px;height:40px; border-radius:8px; cursor:pointer; color:#fff; background:transparent; border:1px solid transparent; transition:transform .22s ease, background .22s ease, color .22s ease; }
+    .hamburger:hover{transform:scale(1.08); color:#00ffcc}
+    .hamburger.open{transform:rotate(90deg) scale(1.03); color:#00ffcc; background:rgba(0,0,0,0.12)}
+    .hamburger:focus{outline:3px solid rgba(0,255,204,0.12)}
+
+    .user-area { display:flex; align-items:center; gap:12px; }
+    .user-icon { width:44px; height:44px; border-radius:50%; background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06)); display:grid; place-items:center; font-weight:700; color:#fff; font-size:16px; border:1px solid var(--glass-border); }
+    .greeting { font-size:15px; font-weight:600; color:#fff; display:flex; flex-direction:column; line-height:1; }
+    .greeting small { font-weight:500; font-size:12px; opacity:0.9; color:rgba(255,255,255,0.9) }
+
+    .action-btn { padding:8px 12px; border-radius:10px; border:1px solid var(--glass-border); background:transparent; color:#fff; cursor:pointer; font-weight:600; display:inline-flex; gap:8px; align-items:center; }
+    .action-btn:hover{background:var(--nav-active); color:#08101a}
+    .action-btn:focus{outline:3px solid rgba(0,255,204,0.08)}
+
+    /* Dropdown (positioned via JS) */
+    .dropdown-menu {
+      position:fixed;
+      width:220px;
+      max-width:70%;
+      background:linear-gradient(180deg, rgba(13,13,13,0.96), rgba(28,28,28,0.96));
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+      z-index:1200;
+      display:none;
+      flex-direction:column;
+      overflow:hidden;
+      transform-origin:top left;
+      padding:6px 6px;
+    }
+    .dropdown-menu a { display:flex; gap:10px; align-items:center; padding:10px 12px; color:#fff; text-decoration:none; font-weight:600; border-radius:8px; }
+    .dropdown-menu a i{width:20px;text-align:center}
+    .dropdown-menu a:hover{background:rgba(255,255,255,0.04)}
+
+    /* Cards */
+    .glass-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.04));
+      border-radius:18px; padding:18px; border:1px solid var(--glass-border);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.25); backdrop-filter: blur(14px);
+    }
+    .glass-card.hidden { display:none }
+
+    .hero { display:flex; gap:12px; align-items:center; justify-content:space-between; }
+    .hero h1 { font-size:20px; margin:0; letter-spacing:-0.2px }
+    .hero p { margin:0; opacity:0.95; font-size:13px }
+
+    .topic-grid { display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; }
+    .topic-card {
+      flex:0 1 calc(50% - 6px);
+      min-height:78px; border-radius:12px; padding:12px;
+      display:flex; align-items:center; gap:12px; font-weight:700; font-size:14px;
+      cursor:pointer; transition: transform .22s cubic-bezier(.2,.9,.2,1), background .22s;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border:1px solid rgba(255,255,255,0.06); box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .topic-card i { font-size:20px; width:30px; text-align:center; color:#fff }
+    .topic-card:hover { transform:translateY(-6px); background:var(--card-hover) }
+    .topic-card:active { transform:translateY(-2px) }
+    .topic-card:focus{outline:3px solid rgba(0,255,204,0.10)}
+
+    .cta { display:flex; flex-direction:column; gap:10px; margin-top:8px; }
+    .btn { border-radius:12px; padding:12px 14px; background: linear-gradient(90deg,#ff7a7a,#ff416c); color:white; border:none; font-weight:700; cursor:pointer; box-shadow: 0 10px 30px rgba(255,65,108,0.12); display:flex; align-items:center; gap:10px; justify-content:center; }
+    .btn.secondary { background:linear-gradient(90deg,#00c6ff,#0072ff); }
+
+    .topic-card[data-accent="pharm"]{ border-left:4px solid rgba(0,200,120,0.9) }
+    .topic-card[data-accent="path"] { border-left:4px solid rgba(255,90,90,0.95) }
+
+    .stagger-enter { opacity:0; transform:translateY(18px); }
+    .stagger-enter.show { animation:fadeUp .48s cubic-bezier(.2,.9,.2,1) forwards; }
+    @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+
+    /* bottom nav */
+    .bottom-nav {
+      position:fixed; bottom:12px; left:50%; transform:translateX(-50%); width:calc(100% - 32px); max-width:var(--max-width);
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border-radius:14px; border:1px solid var(--glass-border);
+      display:flex; justify-content:space-between; padding:10px; gap:8px; z-index:1000; backdrop-filter: blur(10px); box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+    }
+    .nav-item { flex:1; text-align:center; color:#fff; font-weight:600; font-size:12px; cursor:pointer; padding:6px 8px; border-radius:10px; transition: transform .18s, background .18s; display:flex; flex-direction:column; align-items:center; gap:6px; }
+    .nav-item .icon { font-size:18px }
+    .nav-item.active { background:var(--nav-active); transform:translateY(-6px); box-shadow:0 12px 30px rgba(0,0,0,0.25); }
+    .nav-item:focus{outline:3px solid rgba(0,255,204,0.08)}
+
+    .swipe-indicator { display:flex; justify-content:center; gap:6px; margin-top:8px; }
+    .swipe-dot{ width:8px; height:8px; background:rgba(255,255,255,0.12); border-radius:50%; transition: all .18s; }
+    .swipe-dot.active{ width:22px; background:rgba(255,255,255,0.22); border-radius:10px }
+
+    .onboard-tooltip { position:fixed; bottom:86px; left:50%; transform:translateX(-50%); max-width:420px; width:calc(100% - 48px); background:linear-gradient(180deg, rgba(8,12,20,0.98), rgba(14,18,30,0.98)); border-radius:14px; padding:12px 14px; color:#fff; border:1px solid rgba(255,255,255,0.06); box-shadow:0 18px 40px rgba(0,0,0,0.45); z-index:1100; display:none; gap:8px; }
+
+    @media (max-width:520px){
+      .topic-card{ flex-basis:100% }
+      body{ padding-bottom:200px }
+      .dropdown-menu{ max-width: calc(100% - 40px) }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Pathology & Pharmacology Tutor Bot (Local)</h2>
-    <div id="chat-window"></div>
-    <input type="text" id="chat-input" placeholder="Ask me about drugs, diseases, mechanisms..." autocomplete="off"/>
-    <button id="send-btn">Send</button>
+  <div class="app" id="app" aria-live="polite">
+    <header class="user-header" role="banner" aria-label="Top Navigation">
+      <div class="left">
+        <button id="hamburger" class="hamburger" aria-haspopup="true" aria-expanded="false" aria-controls="dropdownMenu" title="Open menu">
+          <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="user-area" role="region" aria-label="User area">
+        <div class="user-icon" id="user-icon" aria-hidden="true">G</div>
+        <div class="greeting" id="greeting" aria-live="polite">
+          <span id="greetPrimary">Welcome</span>
+          <small id="greetSub"></small>
+        </div>
+        <button id="authBtn" class="action-btn" aria-label="Login or Logout">Login</button>
+      </div>
+    </header>
+
+    <nav id="dropdownMenu" class="dropdown-menu" role="menu" aria-hidden="true">
+      <a href="#" role="menuitem" id="downloadApp"><i class="fas fa-download"></i> Download App</a>
+      <a href="#" role="menuitem" id="aboutUs"><i class="fas fa-info-circle"></i> About</a>
+      <a href="#" role="menuitem" id="contactUs"><i class="fas fa-phone-alt"></i> Contact</a>
+      <a href="#" role="menuitem" id="settings" style="display:none"><i class="fas fa-cog"></i> Settings</a>
+    </nav>
+
+    <section class="glass-card stagger-enter" id="pharma-section" role="region" aria-labelledby="pharmaTitle">
+      <div class="hero" style="align-items:flex-start">
+        <div>
+          <h1 id="pharmaTitle"><i class="fas fa-pills" aria-hidden="true"></i> Pharmacology Topics</h1>
+          <p>Short, sharp topics to reinforce learning.</p>
+        </div>
+        <div style="min-width:92px; text-align:right">
+          <button class="action-btn" id="previewBtn" title="Try a sample question">Preview</button>
+        </div>
+      </div>
+
+      <div class="topic-grid" id="pharmGrid" aria-label="Pharmacology topics">
+        <div class="topic-card" data-accent="pharm" tabindex="0" role="button" aria-pressed="false" onclick="navigate('intropharm.html')">
+          <i class="fas fa-book-medical" aria-hidden="true"></i><div>Intro</div>
+        </div>
+        <div class="topic-card" data-accent="pharm" tabindex="0" role="button" onclick="navigate('autonomic.html')">
+          <i class="fas fa-brain" aria-hidden="true"></i><div>Autonomics</div>
+        </div>
+        <div class="topic-card" data-accent="pharm" tabindex="0" role="button" onclick="navigate('antibiotics.html')">
+          <i class="fas fa-capsules" aria-hidden="true"></i><div>Antibiotics</div>
+        </div>
+        <div class="topic-card" data-accent="pharm" tabindex="0" role="button" onclick="navigate('analgesics.html')">
+          <i class="fas fa-pills" aria-hidden="true"></i><div>Analgesics</div>
+        </div>
+        <div class="topic-card" data-accent="pharm" tabindex="0" role="button" onclick="navigate('cns.html')">
+          <i class="fas fa-head-side-virus" aria-hidden="true"></i><div>CNS Drugs</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="glass-card stagger-enter" id="patho-section" role="region" aria-labelledby="pathoTitle">
+      <h1 id="pathoTitle"><i class="fas fa-flask" aria-hidden="true"></i> Pathology Topics</h1>
+      <div class="topic-grid" id="pathGrid" aria-label="Pathology topics">
+        <div class="topic-card" data-accent="path" tabindex="0" role="button" onclick="navigate('intropath.html')"><i class="fas fa-book" aria-hidden="true"></i> Intro</div>
+        <div class="topic-card" data-accent="path" tabindex="0" role="button" onclick="navigate('quiz_inflammation.html')"><i class="fas fa-fire" aria-hidden="true"></i> Inflammation</div>
+        <div class="topic-card" data-accent="path" tabindex="0" role="button" onclick="navigate('quiz_healing.html')"><i class="fas fa-band-aid" aria-hidden="true"></i> Healing</div>
+        <div class="topic-card" data-accent="path" tabindex="0" role="button" onclick="navigate('quiz_neoplasia.html')"><i class="fas fa-dna" aria-hidden="true"></i> Neoplasia</div>
+        <div class="topic-card" data-accent="path" tabindex="0" role="button" onclick="navigate('quiz_immunopathology.html')"><i class="fas fa-shield-virus" aria-hidden="true"></i> Immuno</div>
+        <div class="topic-card" data-accent="path" tabindex="0" role="button" onclick="navigate('quiz_cell_injury.html')"><i class="fas fa-bolt" aria-hidden="true"></i> Cell Injury</div>
+      </div>
+    </section>
+
+    <section class="glass-card stagger-enter" id="flashcard-section" role="region" aria-labelledby="flashTitle">
+      <h1 id="flashTitle">What would you like to study?</h1>
+      <div class="cta">
+        <button class="btn" onclick="navigate('pharmcard.html')" aria-label="Pharmacology Flashcards"><i class="fas fa-pills" aria-hidden="true"></i> Pharmacology Flashcards</button>
+        <button class="btn secondary" onclick="navigate('pathcard.html')" aria-label="Pathology Flashcards"><i class="fas fa-layer-group" aria-hidden="true"></i> Pathology Flashcards</button>
+      </div>
+    </section>
+
+    <section class="glass-card stagger-enter" id="challenge-section" role="region" aria-labelledby="challengeTitle">
+      <h1 id="challengeTitle"><i class="fas fa-users" aria-hidden="true"></i> Play with Friends</h1>
+      <div style="display:flex; gap:10px; margin-top:8px">
+        <button class="btn" onclick="navigate('multiplayer.html')"><i class="fas fa-gamepad"></i> Play Multiplayer</button>
+        <button class="btn secondary" onclick="navigate('leaderboard.html')"><i class="fas fa-trophy"></i> Leaderboard</button>
+      </div>
+    </section>
+
+    <div id="onboard" class="onboard-tooltip" role="dialog" aria-labelledby="onboardTitle" aria-modal="false">
+      <p id="onboardTitle">Welcome! Quick tour</p>
+      <p style="font-size:13px; opacity:0.92; margin-top:6px">Tap a tab below to switch topic groups. Use Preview to try one sample question without signing in.</p>
+      <div class="onboard-actions" style="display:flex; gap:8px; margin-top:8px">
+        <button id="dismissOnboard">Got it</button>
+        <button id="showDemo">Show Preview</button>
+      </div>
+    </div>
   </div>
+
+  <nav class="bottom-nav" aria-label="Bottom Navigation">
+    <div class="nav-item" data-target="pharma-section" tabindex="0" role="tab" aria-selected="false"><i class="icon fas fa-pills" aria-hidden="true"></i><span>Pharma</span></div>
+    <div class="nav-item" data-target="patho-section" tabindex="0" role="tab" aria-selected="false"><i class="icon fas fa-flask" aria-hidden="true"></i><span>Patho</span></div>
+    <div class="nav-item" data-target="flashcard-section" tabindex="0" role="tab" aria-selected="false"><i class="icon fas fa-layer-group" aria-hidden="true"></i><span>Cards</span></div>
+    <div class="nav-item" data-target="challenge-section" tabindex="0" role="tab" aria-selected="false"><i class="icon fas fa-users" aria-hidden="true"></i><span>Challenge</span></div>
+  </nav>
+
+  <div style="position:fixed; bottom:78px; left:50%; transform:translateX(-50%); z-index:1100;">
+    <div class="swipe-indicator" id="swipeIndicator" aria-hidden="true">
+      <div class="swipe-dot"></div><div class="swipe-dot"></div><div class="swipe-dot"></div><div class="swipe-dot"></div>
+    </div>
+  </div>
+
   <script>
-    // Massive expandable knowledge base
-    const knowledge = {
-      // --- PHARMACOLOGY ---
-      "antibiotics": {
-        summary: "Antibiotics are agents that kill or inhibit the growth of bacteria.",
-        details: "Major classes include beta-lactams (penicillins, cephalosporins), macrolides, tetracyclines, aminoglycosides, fluoroquinolones, and sulfonamides. Mechanisms include inhibition of cell wall synthesis, protein synthesis, nucleic acid synthesis, and metabolic pathways.",
-        examples: "Penicillin, Amoxicillin, Cephalexin, Azithromycin, Ciprofloxacin.",
-        quiz: "Name two antibiotics that inhibit protein synthesis."
-      },
-      "penicillins": {
-        summary: "Penicillins are beta-lactam antibiotics that inhibit bacterial cell wall synthesis.",
-        details: "They bind to penicillin-binding proteins, disrupting peptidoglycan cross-linking and causing bacterial lysis. Used for gram-positive infections, some gram-negatives. Resistance via beta-lactamases.",
-        examples: "Penicillin G, Penicillin V, Amoxicillin, Ampicillin.",
-        quiz: "What is the mechanism of resistance in staphylococcus aureus to penicillins?"
-      },
-      "cephalosporins": {
-        summary: "Cephalosporins are beta-lactam antibiotics, structurally related to penicillins.",
-        details: "They have broader spectrum and are classified into generations. Used for pneumonia, meningitis, UTIs, and more.",
-        examples: "Cefalexin (1st gen), Cefuroxime (2nd), Ceftriaxone (3rd), Cefepime (4th).",
-        quiz: "Which generation of cephalosporins is most effective against Pseudomonas?"
-      },
-      "macrolides": {
-        summary: "Macrolides inhibit bacterial protein synthesis by binding to the 50S ribosomal subunit.",
-        details: "Used for respiratory tract infections, atypical pathogens. Also have anti-inflammatory effects.",
-        examples: "Erythromycin, Azithromycin, Clarithromycin.",
-        quiz: "How do macrolides differ from aminoglycosides in mechanism of action?"
-      },
-      "tetracyclines": {
-        summary: "Tetracyclines inhibit protein synthesis by binding to the 30S ribosomal subunit.",
-        details: "Effective against broad spectrum, including rickettsiae, chlamydia. Contraindicated in children and pregnancy.",
-        examples: "Tetracycline, Doxycycline, Minocycline.",
-        quiz: "Why shouldn't tetracyclines be used in children?"
-      },
-      "aminoglycosides": {
-        summary: "Aminoglycosides inhibit protein synthesis by binding irreversibly to the 30S ribosomal subunit.",
-        details: "Bactericidal, used for severe gram-negative infections. Not absorbed orally.",
-        examples: "Gentamicin, Amikacin, Tobramycin, Streptomycin.",
-        quiz: "Name a major toxicity of aminoglycosides."
-      },
-      "fluoroquinolones": {
-        summary: "Fluoroquinolones inhibit bacterial DNA gyrase and topoisomerase IV.",
-        details: "Broad-spectrum, used for UTIs, pneumonia, GI infections. Can cause tendonitis.",
-        examples: "Ciprofloxacin, Levofloxacin, Moxifloxacin.",
-        quiz: "What is a contraindication for fluoroquinolones?"
-      },
-      "nsaids": {
-        summary: "NSAIDs (Non-steroidal anti-inflammatory drugs) inhibit cyclooxygenase (COX) enzymes, reducing prostaglandin synthesis.",
-        details: "Used for pain, inflammation, fever. Can cause GI irritation, renal toxicity, bleeding.",
-        examples: "Ibuprofen, Naproxen, Diclofenac, Aspirin.",
-        quiz: "Why are NSAIDs contraindicated in peptic ulcer disease?"
-      },
-      "opioids": {
-        summary: "Opioids are drugs that bind opioid receptors to provide analgesia.",
-        details: "Used for moderate to severe pain, cough suppression, diarrhea. Risk of dependence, respiratory depression.",
-        examples: "Morphine, Codeine, Fentanyl, Oxycodone.",
-        quiz: "What is the antidote for opioid overdose?"
-      },
-      "paracetamol": {
-        summary: "Paracetamol (acetaminophen) is an analgesic and antipyretic.",
-        details: "It acts centrally but has minimal anti-inflammatory effect. Overdose causes liver toxicity.",
-        examples: "Tylenol, Panadol.",
-        quiz: "What organ is most affected by paracetamol overdose?"
-      },
-      "pharmacokinetics": {
-        summary: "Pharmacokinetics is the study of how the body absorbs, distributes, metabolizes, and excretes drugs (ADME).",
-        details: "Key concepts: bioavailability, half-life, volume of distribution, clearance, first-pass metabolism.",
-        examples: "Oral drugs may have reduced bioavailability due to first-pass metabolism in the liver.",
-        quiz: "Explain the concept of first-pass metabolism."
-      },
-      "pharmacodynamics": {
-        summary: "Pharmacodynamics is the study of what a drug does to the body (mechanism, effects, dose-response).",
-        details: "Includes receptor binding, agonism/antagonism, potency, efficacy, therapeutic index.",
-        examples: "Beta-blockers antagonize beta-adrenergic receptors to lower blood pressure.",
-        quiz: "What is the difference between potency and efficacy?"
-      },
-      "side effects": {
-        summary: "Side effects are unwanted actions of drugs at therapeutic doses.",
-        details: "Can be minor (nausea, headache) or serious (organ toxicity, allergic reactions).",
-        examples: "NSAIDs: GI bleed, Opioids: constipation, Aminoglycosides: nephrotoxicity.",
-        quiz: "Name a common side effect of opioids."
-      },
-      "adverse effects": {
-        summary: "Adverse effects are harmful or unintended drug effects.",
-        details: "Includes side effects, toxicity, allergies, drug interactions.",
-        examples: "Anaphylaxis to penicillin, liver failure from paracetamol overdose.",
-        quiz: "What is the difference between side effect and adverse effect?"
-      },
-      "autonomic": {
-        summary: "The autonomic nervous system (ANS) controls involuntary functions (heart rate, digestion, etc.).",
-        details: "Divided into sympathetic (fight/flight) and parasympathetic (rest/digest) branches. Drugs can act as agonists or antagonists.",
-        examples: "Atropine (antimuscarinic), Epinephrine (adrenergic agonist).",
-        quiz: "What is the effect of sympathetic stimulation on pupils?"
-      },
-      "cns": {
-        summary: "CNS drugs affect the brain and spinal cord: antidepressants, antipsychotics, anxiolytics, anticonvulsants.",
-        details: "SSRIs increase serotonin; antipsychotics block dopamine; benzodiazepines enhance GABA.",
-        examples: "Fluoxetine, Diazepam, Haloperidol, Phenytoin.",
-        quiz: "Which neurotransmitter is increased by SSRIs?"
-      },
-      // --- PATHOLOGY ---
-      "inflammation": {
-        summary: "Inflammation is the body's response to injury, infection, or irritation.",
-        details: "Acute inflammation: rapid onset, neutrophils. Chronic: longer duration, macrophages/lymphocytes. Chemical mediators: histamine, prostaglandins, cytokines.",
-        examples: "Appendicitis (acute), Tuberculosis (chronic).",
-        quiz: "Which cell predominates in acute inflammation?"
-      },
-      "healing": {
-        summary: "Healing involves regeneration and repair of damaged tissues.",
-        details: "Regeneration: replacement by same cell type. Repair: scar formation (fibrosis). Factors: infection, diabetes, nutrition.",
-        examples: "Liver regeneration, skin scar.",
-        quiz: "Which process results in scar formation?"
-      },
-      "neoplasia": {
-        summary: "Neoplasia is abnormal, uncontrolled cell growth; can be benign or malignant (cancer).",
-        details: "Malignant neoplasms invade, metastasize. Hallmarks: evading apoptosis, self-sufficiency in growth signals, angiogenesis.",
-        examples: "Benign: lipoma. Malignant: carcinoma, sarcoma.",
-        quiz: "What is the difference between benign and malignant tumors?"
-      },
-      "cancer": {
-        summary: "Cancer is a malignant neoplasm characterized by invasion and metastasis.",
-        details: "Caused by genetic mutations, environmental factors, viruses. Treated via surgery, chemo, radiation, immunotherapy.",
-        examples: "Lung cancer, breast cancer, leukemia.",
-        quiz: "Name two hallmarks of cancer."
-      },
-      "immunopathology": {
-        summary: "Immunopathology studies diseases due to abnormal immune responses.",
-        details: "Hypersensitivity (allergy), autoimmunity (diabetes type 1, lupus), immunodeficiency (HIV/AIDS).",
-        examples: "Type I: allergy, Type IV: contact dermatitis.",
-        quiz: "Which hypersensitivity is cell-mediated?"
-      },
-      "cell injury": {
-        summary: "Cell injury occurs when cells cannot adapt to stress, leading to reversible or irreversible damage.",
-        details: "Reversible: cell swelling, fatty change. Irreversible: necrosis, apoptosis. Causes: hypoxia, toxins, infection.",
-        examples: "Myocardial infarction: ischemic injury.",
-        quiz: "Difference between necrosis and apoptosis?"
-      },
-      "necrosis": {
-        summary: "Necrosis is uncontrolled cell death due to injury; associated with inflammation.",
-        details: "Types: coagulative, liquefactive, caseous, fat necrosis.",
-        examples: "Coagulative: heart, Liquefactive: brain, Caseous: TB.",
-        quiz: "Which type of necrosis is typical in the brain?"
-      },
-      "apoptosis": {
-        summary: "Apoptosis is programmed cell death; not accompanied by inflammation.",
-        details: "Triggered by physiological (embryogenesis) or pathological (DNA damage) signals.",
-        examples: "Embryonic development, cell turnover.",
-        quiz: "Is apoptosis inflammatory?"
-      },
-      "pathology": {
-        summary: "Pathology is the study of disease: causes, mechanisms, morphological changes, and clinical effects.",
-        details: "Branches: general pathology, systemic pathology, clinical pathology.",
-        examples: "Inflammation, neoplasia, cell injury.",
-        quiz: "List four aspects of disease studied in pathology."
-      },
-      // --- GENERAL ---
-      "pharmacology": {
-        summary: "Pharmacology is the study of drugs: sources, mechanisms, uses, side effects.",
-        details: "Divided into pharmacokinetics, pharmacodynamics, clinical pharmacology, toxicology.",
-        examples: "Antibiotics, NSAIDs, Opioids.",
-        quiz: "What is the difference between pharmacokinetics and pharmacodynamics?"
-      }
-      // You can keep adding more topics endlessly!
-    };
+    /* ========= Globals ========= */
+    const sections = ["pharma-section","patho-section","flashcard-section","challenge-section"];
+    const navItems = Array.from(document.querySelectorAll('.nav-item'));
+    const app = document.getElementById('app');
+    const dropdown = document.getElementById('dropdownMenu');
+    const hamburger = document.getElementById('hamburger');
+    const authBtn = document.getElementById('authBtn');
+    const greetingPrimary = document.getElementById('greetPrimary');
+    const greetingSub = document.getElementById('greetSub');
+    const userIcon = document.getElementById('user-icon');
+    const previewBtn = document.getElementById('previewBtn');
 
-    // Keywords mapping for flexible Q&A
-    const keywordMap = {
-      "antibiotic": "antibiotics",
-      "antibiotics": "antibiotics",
-      "penicillin": "penicillins",
-      "penicillins": "penicillins",
-      "cephalosporin": "cephalosporins",
-      "cephalosporins": "cephalosporins",
-      "macrolide": "macrolides",
-      "macrolides": "macrolides",
-      "tetracycline": "tetracyclines",
-      "tetracyclines": "tetracyclines",
-      "aminoglycoside": "aminoglycosides",
-      "aminoglycosides": "aminoglycosides",
-      "fluoroquinolone": "fluoroquinolones",
-      "fluoroquinolones": "fluoroquinolones",
-      "nsaid": "nsaids",
-      "nsaids": "nsaids",
-      "opioid": "opioids",
-      "opioids": "opioids",
-      "paracetamol": "paracetamol",
-      "acetaminophen": "paracetamol",
-      "side effect": "side effects",
-      "side effects": "side effects",
-      "adverse effect": "adverse effects",
-      "adverse effects": "adverse effects",
-      "pharmacokinetics": "pharmacokinetics",
-      "pharmacodynamics": "pharmacodynamics",
-      "autonomic": "autonomic",
-      "cns": "cns",
-      "central nervous system": "cns",
-      "inflammation": "inflammation",
-      "healing": "healing",
-      "neoplasia": "neoplasia",
-      "cancer": "cancer",
-      "immunopathology": "immunopathology",
-      "immunity": "immunopathology",
-      "cell injury": "cell injury",
-      "cell death": "cell injury",
-      "necrosis": "necrosis",
-      "apoptosis": "apoptosis",
-      "pathology": "pathology",
-      "pharmacology": "pharmacology"
-      // Add more mappings as needed!
-    };
-
-    function getTopic(msg) {
-      msg = msg.toLowerCase();
-      for (const key in keywordMap) {
-        if (msg.includes(key)) return keywordMap[key];
-      }
-      return null;
+    /* Audio: create AudioContext but resume only after user gesture */
+    let audioCtx;
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      document.addEventListener('pointerdown', () => { if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }, { once: true });
+    } catch (e) {
+      audioCtx = null;
     }
 
-    function getBotReply(message) {
-      const msg = message.toLowerCase().trim();
-
-      // Help / listing
-      if (msg === "help" || msg === "topics" || msg.includes("list topics")) {
-        return `<span class="topic-list">Topics: ${Object.keys(knowledge).join(", ")}</span>`;
-      }
-      if (msg === "quiz" || msg.includes("give me a quiz") || msg.includes("ask me a question")) {
-        // Pick a random topic
-        const keys = Object.keys(knowledge);
-        const topic = keys[Math.floor(Math.random() * keys.length)];
-        return `<span class="quiz">${knowledge[topic].quiz}</span>`;
-      }
-
-      // Greeting
-      if (["hello", "hi", "hey"].some(w => msg.includes(w))) {
-        return "Hello! I'm your med tutor bot. Ask me about any pathology or pharmacology topic.";
-      }
-
-      // Who are you
-      if (msg.includes("who are you") || msg.includes("what are you")) {
-        return "I'm a local medical chatbot. I can teach pathology and pharmacology topics without internet or APIs!";
-      }
-
-      // Knowledge answers
-      const topic = getTopic(msg);
-      if (topic && knowledge[topic]) {
-        let reply = `<b>${topic.charAt(0).toUpperCase() + topic.slice(1)}</b><br>`;
-        // If user asks for summary or explanation
-        if (msg.includes("explain") || msg.includes("summary") || msg.includes("overview")) {
-          reply += `<span class="summary">${knowledge[topic].summary}</span>`;
-        } else if (msg.includes("detail") || msg.includes("mechanism") || msg.includes("how")) {
-          reply += `<span class="details">${knowledge[topic].details}</span>`;
-        } else if (msg.includes("example") || msg.includes("examples") || msg.includes("list")) {
-          reply += `<span class="example">Examples: ${knowledge[topic].examples}</span>`;
-        } else if (msg.includes("quiz") || msg.includes("question")) {
-          reply += `<span class="quiz">Quiz: ${knowledge[topic].quiz}</span>`;
-        } else {
-          reply += `<span class="summary">${knowledge[topic].summary}</span><br><span class="details">${knowledge[topic].details}</span><br><span class="example">Examples: ${knowledge[topic].examples}</span><br><span class="quiz"><b>Quiz:</b> ${knowledge[topic].quiz}</span>`;
-        }
-        return reply;
-      }
-
-      // Direct Q&A for mechanism, effects, etc.
-      if (msg.includes("mechanism of action of penicillin")) {
-        return "Penicillins work by inhibiting bacterial cell wall synthesis, leading to cell lysis and death.";
-      }
-      if (msg.includes("difference between necrosis and apoptosis")) {
-        return "Necrosis is uncontrolled cell death with inflammation; apoptosis is programmed cell death without inflammation.";
-      }
-
-      // Fallback
-      return "Sorry, I don't know about that yet. Type 'help' to see topics, or ask me about a drug, disease, or mechanism!";
+    function clickSound(){
+      try {
+        if(!audioCtx) return;
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = 'sine';
+        o.frequency.value = 820;
+        g.gain.value = 0.0001;
+        o.connect(g); g.connect(audioCtx.destination);
+        g.gain.setTargetAtTime(0.12, audioCtx.currentTime, 0.01);
+        o.start();
+        setTimeout(()=> {
+          g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.12);
+          try { o.stop(audioCtx.currentTime + 0.14); } catch(e) {}
+        }, 80);
+      } catch(e) { /* ignore */ }
     }
 
-    function appendMessage(sender, text) {
-      chatWindow.innerHTML += `<div class="${sender}">${sender === 'user' ? 'You' : 'Bot'}: ${text}</div>`;
-      chatWindow.scrollTop = chatWindow.scrollHeight;
+    /* Safe update of swipe indicator (queries DOM at call time) */
+    function updateSwipeIndicator(idx){
+      const dots = document.querySelectorAll('.swipe-dot');
+      dots.forEach((d,i) => d.classList.toggle('active', i === idx));
     }
 
-    // UI handling
-    const chatWindow = document.getElementById('chat-window');
-    const chatInput = document.getElementById('chat-input');
-    const sendBtn = document.getElementById('send-btn');
+    /* Show/hide section by id */
+    function showSection(id){
+      sections.forEach(sec => {
+        const el = document.getElementById(sec);
+        if(!el) return;
+        el.classList.toggle('hidden', sec !== id);
+      });
+      // animate visible section
+      const el = document.getElementById(id);
+      if(el) { el.classList.add('show'); setTimeout(()=> el.classList.remove('show'), 700); }
 
-    sendBtn.onclick = () => {
-      const userMsg = chatInput.value.trim();
-      if (!userMsg) return;
-      appendMessage('user', userMsg);
-      setTimeout(() => {
-        appendMessage('bot', getBotReply(userMsg));
-      }, 400);
-      chatInput.value = '';
-      chatInput.focus();
-    };
+      // nav state
+      navItems.forEach(item => {
+        const target = item.getAttribute('data-target');
+        const isActive = target === id;
+        item.classList.toggle('active', isActive);
+        item.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
 
-    chatInput.addEventListener("keydown", e => {
-      if (e.key === "Enter") sendBtn.click();
+      // update dots
+      updateSwipeIndicator(sections.indexOf(id));
+      localStorage.setItem('activeTab', id);
+      app.setAttribute('aria-label', `Active section ${id.replace('-', ' ')}`);
+    }
+
+    /* Attach nav handlers */
+    navItems.forEach((item) => {
+      item.addEventListener('click', () => { clickSound(); showSection(item.dataset.target); });
+      item.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); item.click(); }});
     });
 
-    // Initial greeting
-    appendMessage('bot', "Hi! I'm your local med tutor bot. Type 'help' to see topics, or ask about pathology/pharmacology.");
+    /* Initialize active tab safe */
+    (function initActive(){
+      const stored = localStorage.getItem('activeTab');
+      const initial = stored && sections.includes(stored) ? stored : 'pharma-section';
+      sections.forEach(s => { const el = document.getElementById(s); if(el) el.classList.add('hidden'); });
+      showSection(initial);
+    })();
+
+    /* Stagger entrance */
+    document.querySelectorAll('.stagger-enter').forEach((el, i) => {
+      el.style.animationDelay = (i * 80) + 'ms';
+      setTimeout(()=> el.classList.add('show'), 120 + i*60);
+    });
+
+    /* Topic ke keyboard activation */
+    document.querySelectorAll('.topic-card').forEach(card => {
+      card.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); }});
+    });
+
+    /* Dropdown: position next to hamburger for mobile correctness */
+    function openDropdown(){
+      dropdown.style.display = 'flex';
+      dropdown.setAttribute('aria-hidden','false');
+      hamburger.classList.add('open');
+      hamburger.setAttribute('aria-expanded','true');
+
+      // position near hamburger with overflow guard
+      requestAnimationFrame(()=> {
+        const rect = hamburger.getBoundingClientRect();
+        // temporarily set to get width if needed
+        dropdown.style.left = '8px';
+        dropdown.style.top = (rect.bottom + 8) + 'px';
+        // ensure it doesn't overflow to the right
+        const ddw = dropdown.offsetWidth;
+        let left = rect.left;
+        if (left + ddw > window.innerWidth - 8) left = Math.max(8, window.innerWidth - ddw - 8);
+        dropdown.style.left = `${left}px`;
+      });
+    }
+    function closeDropdown(){
+      dropdown.style.display = 'none';
+      dropdown.setAttribute('aria-hidden','true');
+      hamburger.classList.remove('open');
+      hamburger.setAttribute('aria-expanded','false');
+    }
+
+    hamburger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = dropdown.style.display === 'flex';
+      if(isOpen) closeDropdown(); else openDropdown();
+      clickSound();
+    });
+    hamburger.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); hamburger.click(); }});
+    document.addEventListener('click', (e) => {
+      if(!dropdown.contains(e.target) && !hamburger.contains(e.target)) closeDropdown();
+    });
+    window.addEventListener('resize', () => { if(dropdown.style.display === 'flex') openDropdown(); });
+
+    /* Demo Auth/greeting handling */
+    let demoUser = null;
+    const skip = localStorage.getItem('skip') === 'true';
+    const savedName = localStorage.getItem('userName');
+
+    function setUserState(user){
+      demoUser = user;
+      if(user){
+        userIcon.textContent = user.name[0].toUpperCase();
+        authBtn.textContent = 'Logout';
+        authBtn.onclick = () => {
+          if(!confirm('Sign out?')) return;
+          clickSound();
+          localStorage.removeItem('userName');
+          localStorage.removeItem('skip');
+          setUserState(null);
+        };
+      } else {
+        const display = savedName || (skip ? 'Guest' : 'G');
+        userIcon.textContent = display[0].toUpperCase();
+        authBtn.textContent = 'Login';
+        authBtn.onclick = () => {
+          clickSound();
+          alert('Demo: replace with real auth flow.');
+        };
+      }
+    }
+    setUserState(savedName ? {name: savedName} : (skip ? {name: 'Guest'} : null) );
+
+    /* Greeting -- simplified, no Lagos time or MedTopics */
+    function updateGreeting(){
+      let primary = 'Welcome';
+      const name = demoUser ? demoUser.name.split(' ')[0] : (savedName || (skip ? 'Guest' : ''));
+      if(name) primary = `Welcome, ${name}`;
+      greetingPrimary.textContent = primary;
+      greetingSub.textContent = "";
+    }
+    updateGreeting();
+
+    /* Navigate stub (safe demo) */
+    function navigate(url){
+      clickSound();
+      // In production, remove the toast/demo and use: window.location.href = url;
+      const toast = document.createElement('div');
+      toast.textContent = `Would navigate to: ${url}`;
+      toast.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:140px;background:rgba(0,0,0,0.8);color:#fff;padding:10px 14px;border-radius:10px;font-weight:700;z-index:2000';
+      document.body.appendChild(toast);
+      setTimeout(()=> toast.remove(), 1600);
+    }
+
+    /* Preview button (sample question lightweight modal) */
+    if(previewBtn) previewBtn.addEventListener('click', () => {
+      clickSound();
+      const q = document.createElement('div');
+      q.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#071027;color:#fff;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);box-shadow:0 40px 80px rgba(0,0,0,0.6);z-index:2400';
+      q.innerHTML = `<div style="font-weight:800;margin-bottom:8px">Sample Question</div>
+                     <div style="opacity:0.95;margin-bottom:12px">Which receptor is primarily responsible for sympathetic cardiac stimulation?</div>
+                     <div style="display:flex;gap:8px"><button style="padding:8px 10px;border-radius:10px;border:none;background:#00b894;color:#071027;font-weight:700">Beta-1</button>
+                     <button style="padding:8px 10px;border-radius:10px;border:none;background:#ff7675;color:#071027;font-weight:700">Alpha-1</button>
+                     <button style="padding:8px 10px;border-radius:10px;border:none;background:#74b9ff;color:#071027;font-weight:700">Muscarinic</button></div>`;
+      document.body.appendChild(q);
+      setTimeout(()=> q.remove(), 3000);
+    });
+
+    /* Touch swipe for tabs */
+    let startX = null, startTime = null;
+    document.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; startTime = Date.now(); }, {passive:true});
+    document.addEventListener('touchend', (e) => {
+      if(startX === null) return;
+      const dx = e.changedTouches[0].clientX - startX;
+      const dt = Date.now() - startTime;
+      if(Math.abs(dx) > 60 && dt < 600){
+        const current = sections.findIndex(id => !document.getElementById(id).classList.contains('hidden'));
+        if(current === -1) return;
+        const dir = dx < 0 ? 1 : -1;
+        const next = (current + dir + sections.length) % sections.length;
+        showSection(sections[next]);
+        clickSound();
+      }
+      startX = null;
+      startTime = null;
+    }, {passive:true});
+
+    /* Swipe dots initial */
+    updateSwipeIndicator( sections.indexOf(localStorage.getItem('activeTab') || 'pharma-section') );
+
+    /* Onboarding */
+    const onboard = document.getElementById('onboard');
+    const dismissOnboard = document.getElementById('dismissOnboard');
+    const showDemo = document.getElementById('showDemo');
+
+    function maybeShowOnboard(){
+      const shown = localStorage.getItem('onboardShown_v1');
+      if(!shown && (localStorage.getItem('skip') === 'true' || !localStorage.getItem('userName'))){
+        onboard.style.display = 'flex';
+        setTimeout(()=> onboard.style.opacity = '1', 60);
+      }
+    }
+    if(dismissOnboard) dismissOnboard.addEventListener('click', () => { clickSound(); onboard.style.display = 'none'; localStorage.setItem('onboardShown_v1','true');});
+    if(showDemo) showDemo.addEventListener('click', () => { clickSound(); if(previewBtn) previewBtn.click(); onboard.style.display = 'none'; localStorage.setItem('onboardShown_v1','true');});
+    setTimeout(maybeShowOnboard, 900);
+
+    /* Accessibility */
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Tab') document.documentElement.classList.add('user-is-tabbing');
+      if(e.key === 'Escape') { closeDropdown(); if(onboard && onboard.style.display === 'flex') onboard.style.display = 'none'; }
+    });
+
+    Array.from(dropdown.querySelectorAll('a')).forEach(a => {
+      a.addEventListener('keydown', (e) => { if(e.key === 'Enter') { clickSound(); a.click(); }});
+    });
+
   </script>
 </body>
 </html>
